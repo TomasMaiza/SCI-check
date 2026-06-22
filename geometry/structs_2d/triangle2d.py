@@ -1,4 +1,4 @@
-from abstract_structs import AbstractSimplex
+from geometry.abstract_structs.simplex import AbstractSimplex
 from .point2d import Point2D
 import numpy as np
 from dataclasses import dataclass

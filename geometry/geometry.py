@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 import numpy as np
-from abstract_structs.point import AbstractPoint
-from abstract_structs.halfspace import AbstractHalfspace
-from abstract_structs.lpipoint import AbstractLPIPoint
-from abstract_structs.simplex import AbstractSimplex
+from .abstract_structs.point import AbstractPoint
+from .abstract_structs.halfspace import AbstractHalfspace
+from .abstract_structs.lpipoint import AbstractLPIPoint
+from .abstract_structs.simplex import AbstractSimplex
 from orientresult import OrientResult
 
 class AbstractGeometry(ABC):

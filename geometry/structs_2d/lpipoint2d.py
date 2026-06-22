@@ -1,4 +1,4 @@
-from abstract_structs import AbstractLPIPoint
+from geometry.abstract_structs.lpipoint import AbstractLPIPoint
 from .point2d import Point2D
 from .halfspace2d import Halfspace2D
 import numpy as np

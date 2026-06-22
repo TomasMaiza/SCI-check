@@ -1,4 +1,4 @@
-from abstract_structs import AbstractPoint
+from geometry.abstract_structs.point import AbstractPoint
 import numpy as np
 from dataclasses import dataclass
 

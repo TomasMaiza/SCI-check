@@ -1,11 +1,11 @@
 import numpy as np
-from .geometry import AbstractGeometryFactory
-from structs_2d.point2d import Point2D
-from structs_2d.halfspace2d import Halfspace2D
-from structs_2d.lpipoint2d import LPIPoint2D
-from structs_2d.triangle2d import Triangle2D
+from .geometry import AbstractGeometry
+from .structs_2d.point2d import Point2D
+from .structs_2d.halfspace2d import Halfspace2D
+from .structs_2d.lpipoint2d import LPIPoint2D
+from .structs_2d.triangle2d import Triangle2D
 
-class Geometry2d(AbstractGeometryFactory):
+class Geometry2d(AbstractGeometry):
   # geometría 2d
   def create_point(self, coord: tuple[float, float]) -> Point2D: # crea un punto
     return Point2D(x = coord[0], y = coord[1])
