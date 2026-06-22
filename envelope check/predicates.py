@@ -4,8 +4,9 @@ import numpy as np
 class AbstractPredicates(ABC):
   # clase para implementar los predicados en dimensión n
     
-  @property
-  @abstractmethod
+  @abstractmethod # AL PRINCIPIO ORIENT PUEDE SER SIMPLEMENTE CHEQUEAR SI SE VERIFICA
+  # LA INECUACIÓN (A LO MEJOR HACER OTRA FUNCIÓN MÁS ADEMÁS DE ORIENT)
+  # BUSCAR ORIENT2D (Y 3D?) EN LIBRERÍA exactpred
   def orient(self) -> bool: # retorna ???
     pass
 
