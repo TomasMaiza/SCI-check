@@ -1,5 +1,5 @@
 import numpy as np
-from .geometryfactory import AbstractGeometryFactory
+from .geometry import AbstractGeometryFactory
 from structs_2d.point2d import Point2D
 from structs_2d.halfspace2d import Halfspace2D
 from structs_2d.lpipoint2d import LPIPoint2D

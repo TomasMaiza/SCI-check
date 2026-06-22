@@ -4,8 +4,9 @@ from abstract_structs.point import AbstractPoint
 from abstract_structs.halfspace import AbstractHalfspace
 from abstract_structs.lpipoint import AbstractLPIPoint
 from abstract_structs.simplex import AbstractSimplex
+from orientresult import OrientResult
 
-class AbstractGeometryFactory(ABC):
+class AbstractGeometry(ABC):
   # clase abstracta para generar estructuras geométricas de dimensión n
   @abstractmethod
   def create_point(self, coord: tuple[float, ...]) -> AbstractPoint: # crea un punto
@@ -21,9 +22,4 @@ class AbstractGeometryFactory(ABC):
 
   @abstractmethod
   def create_halfspace(self, normal: tuple[float, ...], offset: float) -> AbstractHalfspace: # crea un semiespacio
-    pass
-
-  # SIGUE AGREGAR LAS LLAMADAS A CADA MÉTODO.
-  @abstractmethod
-  def orient(self) -> bool: # crea un semiespacio
     pass
