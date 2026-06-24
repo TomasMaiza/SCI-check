@@ -20,15 +20,15 @@ class CoverageChecker():
   def point_out(self, v: AbstractPoint, polytopeMap: PolytopeMap):
     ret = OUT
     
-    for halfspacesSet in polytopeMap:
-      counter = 0
-
-      for f in halfspacesSet: # en qué orden los tomo?
+    for halfspacesList in polytopeMap:
+      isInFlag = True
+      for f in halfspacesList: # con la lista llegan en orden
         ori = self._predicates.orient(v, f)
-        if (ori == IN):
-          counter += 1
+        if (ori == OUT):
+          isInFlag = False
+          break
 
-      if counter == len(halfspacesSet):
+      if isInFlag:
         ret = IN
         break
     

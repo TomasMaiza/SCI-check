@@ -11,6 +11,7 @@ import polytope as pc
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
+from scipy.spatial import ConvexHull
 
 # --- IMPORTA TUS CLASES ACÁ ---
 from geometry.geometry_2d import Geometry2d
@@ -35,13 +36,34 @@ def crear_caja(xmin: float, xmax: float, ymin: float, ymax: float) -> pc.Polytop
     return pc.Polytope(A, b)
 
 def extraer_semiespacios(poly: pc.Polytope, fabrica: Geometry2d) -> set:
-    """Extrae las inecuaciones Ax <= b del politopo y crea tus Halfspace2D"""
+    """Extrae los vértices del politopo, los ordena y crea Halfspace2D exactos."""
     caras = set()
-    for i in range(len(poly.A)):
-        # poly.A contiene las normales, poly.b contiene los offsets
-        normal = (poly.A[i, 0], poly.A[i, 1])
-        offset = float(poly.b[i])
-        caras.add(fabrica.create_halfspace(normal, offset))
+    
+    # poly.V devuelve las coordenadas crudas de los vértices
+    vertices = pc.extreme(poly)
+    
+    # ConvexHull encuentra el perímetro y ordena los vértices en sentido antihorario (CCW)
+    hull = ConvexHull(vertices)
+    indices_ordenados = hull.vertices 
+    cantidad_vertices = len(indices_ordenados)
+    
+    for i in range(cantidad_vertices):
+        # Tomamos el vértice actual y el siguiente (con módulo para cerrar el ciclo)
+        idx_actual = indices_ordenados[i]
+        idx_siguiente = indices_ordenados[(i + 1) % cantidad_vertices]
+        
+        v_actual = vertices[idx_actual]
+        v_siguiente = vertices[idx_siguiente]
+        
+        # Creamos los objetos Point2D usando tu fábrica
+        # Usamos los mismos índices del hull como ID para mantener un rastro
+        p1 = fabrica.create_point((float(v_actual[0]), float(v_actual[1])))
+        p2 = fabrica.create_point((float(v_siguiente[0]), float(v_siguiente[1])))
+        
+        # Creamos el semiespacio a partir de los dos puntos
+        cara = fabrica.create_halfspace((p1, p2))
+        caras.add(cara)
+        
     return caras
 
 def graficar_escenario(main_poly, subregions, titulo, ax):

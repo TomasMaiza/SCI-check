@@ -6,6 +6,7 @@ from coverage_checker.coverage_checker import CoverageChecker
 from triangulation import PolytopeTriangulator, DelaunayTriangulation
 import polytope as pc
 import numpy as np
+from scipy.spatial import ConvexHull
 
 IN = OrientResult.IN
 OUT = OrientResult.OUT
@@ -26,6 +27,7 @@ class SCIChecker():
     self._predicates = predicates
     self._polytope = polytope
     self._subregions = subregions # esto después vuela
+    # en qué orden están las subregiones?
 
   def triangulate_polytope(self): # asignar índices a vértices y guardar todo en variables?
     triangulator = PolytopeTriangulator(DelaunayTriangulation())
@@ -43,6 +45,9 @@ class SCIChecker():
 
   def get_subregions(self): # para más adelante
     pass
+    # cuando haga esto tengo que ordenar los semiespacios que definen cada subregión
+    # podría hacerse con scipy.spatial.ConvexHull
+    # eso me ordena los vértices, luego creo los semiespacios
 
   def check_coverage(self) -> bool: # itera sobre los triángulos
     coverageChecker = CoverageChecker(self._geometry, self._predicates)

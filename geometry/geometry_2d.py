@@ -16,6 +16,6 @@ class Geometry2d(AbstractGeometry):
   def create_simplex(self, vertices: tuple[Point2D, Point2D, Point2D]) -> Triangle2D: # crea un simplex
     return Triangle2D(v1 = vertices[0], v2 = vertices[1], v3 = vertices[2])
 
-  def create_halfspace(self, normal: tuple[float, float], offset: float) -> Halfspace2D: 
+  def create_halfspace(self, points: tuple[Point2D, Point2D]) -> Halfspace2D: 
     # crea un semiespacio
-    return Halfspace2D(normal_x = normal[0], normal_y = normal[1], offset = offset)
+    return Halfspace2D(p1 = points[0], p2 = points[1])

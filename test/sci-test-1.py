@@ -1,3 +1,12 @@
+import sys
+import os
+
+# 1. Calculamos la ruta absoluta a la carpeta raíz del proyecto (subiendo un nivel '..')
+ruta_raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+# 2. Inyectamos esa ruta en el radar de búsqueda de Python
+sys.path.insert(0, ruta_raiz)
+
 from geometry.geometry_2d import Geometry2d
 from coverage_checker.predicates_2d import Predicates2d
 from common.enums import OrientResult
@@ -13,41 +22,53 @@ def correr_prueba_c1():
     predicados = Predicates2d()
     checker = CoverageChecker(geometry=geometria, predicates=predicados) 
 
-    # 2. fabricamos los 3 vértices (con IDs inventados 1, 2 y 3)
-    v1 = geometria.create_point((1.0, 1.0)) # Esperado: IN
-    v2 = geometria.create_point((3.0, 1.0)) # Esperado: IN
-    v3 = geometria.create_point((1.0, 4.0)) # Esperado: OUT
+    # 2. fabricamos los 3 vértices de prueba
+    v1 = geometria.create_point((1.0, 1.0)) # Esperado: IN (Adentro de R1)
+    v2 = geometria.create_point((3.0, 1.0)) # Esperado: IN (Adentro de R2)
+    v3 = geometria.create_point((1.0, 4.0)) # Esperado: OUT (Afuera de todo)
 
-    # 3. fabricamos las caras (Halfspaces) de la Subregión 1 [0 a 2]
-    # Ecuación: Normal_X * x + Normal_Y * y <= offset
-    r1_top = geometria.create_halfspace((0.0, 1.0), 2.0)    # y <= 2
-    r1_bot = geometria.create_halfspace((0.0, -1.0), 0.0)   # -y <= 0 (equivale a y >= 0)
-    r1_right = geometria.create_halfspace((1.0, 0.0), 2.0)  # x <= 2
-    r1_left = geometria.create_halfspace((-1.0, 0.0), 0.0)  # -x <= 0 (equivale a x >= 0)
+    # 3. fabricamos las caras (Halfspaces) de la Subregión 1 [x: 0 a 2, y: 0 a 2]
+    # Puntos ordenados en CCW: (0,0) -> (2,0) -> (2,2) -> (0,2)
+    p1_bl = geometria.create_point((0.0, 0.0)) # Bottom-Left
+    p1_br = geometria.create_point((2.0, 0.0)) # Bottom-Right
+    p1_tr = geometria.create_point((2.0, 2.0)) # Top-Right
+    p1_tl = geometria.create_point((0.0, 2.0)) # Top-Left
 
-    # 4. fabricamos las caras de la Subregión 2 [2 a 4]
-    r2_top = geometria.create_halfspace((0.0, 1.0), 2.0)    # y <= 2
-    r2_bot = geometria.create_halfspace((0.0, -1.0), 0.0)   # -y <= 0
-    r2_right = geometria.create_halfspace((1.0, 0.0), 4.0)  # x <= 4
-    r2_left = geometria.create_halfspace((-1.0, 0.0), -2.0) # -x <= -2 (equivale a x >= 2)
+    # Creamos las aristas uniendo los puntos en sentido antihorario
+    r1_bot   = geometria.create_halfspace((p1_bl, p1_br))
+    r1_right = geometria.create_halfspace((p1_br, p1_tr))
+    r1_top   = geometria.create_halfspace((p1_tr, p1_tl))
+    r1_left  = geometria.create_halfspace((p1_tl, p1_bl))
 
-    # 5. Armamos el diccionario que simula la salida de la librería polytope
+    # 4. fabricamos las caras de la Subregión 2 [x: 2 a 4, y: 0 a 2]
+    # Puntos ordenados en CCW: (2,0) -> (4,0) -> (4,2) -> (2,2)
+    p2_bl = geometria.create_point((2.0, 0.0))
+    p2_br = geometria.create_point((4.0, 0.0))
+    p2_tr = geometria.create_point((4.0, 2.0))
+    p2_tl = geometria.create_point((2.0, 2.0))
+
+    r2_bot   = geometria.create_halfspace((p2_bl, p2_br))
+    r2_right = geometria.create_halfspace((p2_br, p2_tr))
+    r2_top   = geometria.create_halfspace((p2_tr, p2_tl))
+    r2_left  = geometria.create_halfspace((p2_tl, p2_bl))
+
+    # 5. Armamos la lista de sets que simula tu PolytopeMap (usando IDs enteros o lista simple)
     polytope_set_mock = [
         {r1_top, r1_bot, r1_right, r1_left},
         {r2_top, r2_bot, r2_right, r2_left}
     ]
 
-    # 6. Ejecutamos el método que escribiste recién
+    # 6. Ejecutamos el método
     print("--- INICIANDO TEST CONDICIÓN C1 ---")
     
     res_v1 = checker.point_out(v1, polytope_set_mock)
-    print(f"Vértice 1 (1,1)  -> Esperado: OrientResult.IN  | Obtenido: {res_v1}")
+    print(f"Vértice 1 (1,1)  -> Esperado: IN  | Obtenido: {res_v1}")
     
     res_v2 = checker.point_out(v2, polytope_set_mock)
-    print(f"Vértice 2 (3,1)  -> Esperado: OrientResult.IN  | Obtenido: {res_v2}")
+    print(f"Vértice 2 (3,1)  -> Esperado: IN  | Obtenido: {res_v2}")
     
     res_v3 = checker.point_out(v3, polytope_set_mock)
-    print(f"Vértice 3 (1,4)  -> Esperado: OrientResult.OUT | Obtenido: {res_v3}")
+    print(f"Vértice 3 (1,4)  -> Esperado: OUT | Obtenido: {res_v3}")
 
 def graficar_escenario_test():
     # Creamos la figura y los ejes

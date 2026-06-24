@@ -21,5 +21,5 @@ class AbstractGeometry(ABC):
     pass
 
   @abstractmethod
-  def create_halfspace(self, normal: tuple[float, ...], offset: float) -> AbstractHalfspace: # crea un semiespacio
+  def create_halfspace(self, points: tuple[AbstractPoint, ...],) -> AbstractHalfspace: # crea un semiespacio
     pass
