@@ -17,7 +17,7 @@ class AbstractGeometry(ABC):
     pass
 
   @abstractmethod
-  def create_simplex(self, vertices: tuple[float, ...]) -> AbstractSimplex: # crea un simplex
+  def create_simplex(self, vertices: tuple[AbstractPoint, ...]) -> AbstractSimplex: # crea un simplex
     pass
 
   @abstractmethod

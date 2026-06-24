@@ -13,7 +13,7 @@ class Geometry2d(AbstractGeometry):
   def create_lpi_point(self, coord: tuple[float, float], hs: Halfspace2D) -> LPIPoint2D: # crea un punto lpi
     return LPIPoint2D(x = coord[0], y = coord[1], halfspace = hs)
 
-  def create_simplex(self, vertices: tuple[float, float, float]) -> Triangle2D: # crea un simplex
+  def create_simplex(self, vertices: tuple[Point2D, Point2D, Point2D]) -> Triangle2D: # crea un simplex
     return Triangle2D(v1 = vertices[0], v2 = vertices[1], v3 = vertices[2])
 
   def create_halfspace(self, normal: tuple[float, float], offset: float) -> Halfspace2D: 

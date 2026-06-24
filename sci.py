@@ -28,8 +28,17 @@ class SCIChecker():
     self._subregions = subregions # esto después vuela
 
   def triangulate_polytope(self): # asignar índices a vértices y guardar todo en variables?
-    triangulator = PolytopeTriangulator(DelaunayTriangulation)
-    self._triangles = triangulator.triangulate(self._polytope)
+    triangulator = PolytopeTriangulator(DelaunayTriangulation())
+    triangles = triangulator.triangulate(self._polytope)
+    self._triangles = []
+    # convertimos a Simplex
+    for t in triangles:
+      # t tiene la forma [[x1, y1], [x2, y2], [x3, y3]]
+      v1 = self._geometry.create_point((t[0][0], t[0][1]))
+      v2 = self._geometry.create_point((t[1][0], t[1][1]))
+      v3 = self._geometry.create_point((t[2][0], t[2][1]))
+      simplex = self._geometry.create_simplex((v1, v2, v3))
+      self._triangles.append(simplex)
     # acá indexar vértices
 
   def get_subregions(self): # para más adelante
