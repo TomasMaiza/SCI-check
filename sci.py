@@ -37,9 +37,9 @@ class SCIChecker():
       v1 = self._geometry.create_point((t[0][0], t[0][1]))
       v2 = self._geometry.create_point((t[1][0], t[1][1]))
       v3 = self._geometry.create_point((t[2][0], t[2][1]))
+      # por acá indexar vértices?
       simplex = self._geometry.create_simplex((v1, v2, v3))
       self._triangles.append(simplex)
-    # acá indexar vértices
 
   def get_subregions(self): # para más adelante
     pass
@@ -53,7 +53,6 @@ class SCIChecker():
         ret = False
         break
     return ret
-
 
   def sci_check(self) -> bool: # hace todo el proceso
     self.triangulate_polytope();

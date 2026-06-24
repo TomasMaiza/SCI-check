@@ -23,7 +23,7 @@ class CoverageChecker():
     for halfspacesSet in polytopeMap:
       counter = 0
 
-      for f in halfspacesSet:
+      for f in halfspacesSet: # en qué orden los tomo?
         ori = self._predicates.orient(v, f)
         if (ori == IN):
           counter += 1
