@@ -1,5 +1,5 @@
 import numpy as np
-from orientresult import OrientResult
+from common.enums import OrientResult
 from geometry.structs_2d.point2d import Point2D
 from geometry.structs_2d.lpipoint2d import LPIPoint2D
 from geometry.structs_2d.halfspace2d import Halfspace2D
