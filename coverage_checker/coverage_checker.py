@@ -40,6 +40,7 @@ class CoverageChecker():
   def envelope_check(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap): # chequea UN triángulo
     vertices = set(triangle.get_vertices())
     
+    ret = IN
     if self.check_c1(vertices, polytopeSet) == OUT:
       ret = OUT
     # check_c2()
