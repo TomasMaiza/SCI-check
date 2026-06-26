@@ -41,7 +41,6 @@ class SCIChecker():
       # si dos vértices tienen la misma coordenada ya estarían marcados en el diccionario
       # como visitados con visitar uno solo
       for v in {v1, v2, v3}:
-        print(f"v = {(v.x, v.y)}: {v in self._verticesIndex.keys()}")
         self._verticesIndex[v] = False # ningún vértice fue chequeado aún
 
       simplex = self._geometry.create_simplex((v1, v2, v3))
