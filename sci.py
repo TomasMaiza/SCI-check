@@ -1,7 +1,7 @@
 from geometry.geometry import AbstractGeometry
 from coverage_checker.predicates import AbstractPredicates
 from common.enums import OrientResult
-from common.types import PolytopeMap
+from common.types import PolytopeMap, VerticesIndex
 from coverage_checker.coverage_checker import CoverageChecker
 from triangulation import PolytopeTriangulator, DelaunayTriangulation
 import polytope as pc
@@ -11,13 +11,10 @@ from scipy.spatial import ConvexHull
 IN = OrientResult.IN
 OUT = OrientResult.OUT
 
-# acá va la interfaz de la librería con la lógica de presentación
-
 '''
 En principio recibe un politopo y sus subregiones.
 Triangula el politopo y debe asignarle índices a los vértices (visitor? hacerlo después?)
 Por ahora no se fija en los índices y hace trabajo de más
-Hay que setear geometría y predicados acá?
 '''
 
 class SCIChecker():
@@ -32,14 +29,21 @@ class SCIChecker():
   def triangulate_polytope(self): # asignar índices a vértices y guardar todo en variables?
     triangulator = PolytopeTriangulator(DelaunayTriangulation())
     triangles = triangulator.triangulate(self._polytope)
-    self._triangles = []
+    self._triangles = [] # lista de triángulos en los que se dividió el politopo
+    self._verticesIndex = {} # diccionario para ver si cada vértice ya se chequeó o no
+    # está bien indexar por puntos o uso tuplas de las coordenadas?
     # convertimos a Simplex
     for t in triangles:
       # t tiene la forma [[x1, y1], [x2, y2], [x3, y3]]
       v1 = self._geometry.create_point((t[0][0], t[0][1]))
       v2 = self._geometry.create_point((t[1][0], t[1][1]))
       v3 = self._geometry.create_point((t[2][0], t[2][1]))
-      # por acá indexar vértices?
+      # si dos vértices tienen la misma coordenada ya estarían marcados en el diccionario
+      # como visitados con visitar uno solo
+      for v in {v1, v2, v3}:
+        print(f"v = {(v.x, v.y)}: {v in self._verticesIndex.keys()}")
+        self._verticesIndex[v] = False # ningún vértice fue chequeado aún
+
       simplex = self._geometry.create_simplex((v1, v2, v3))
       self._triangles.append(simplex)
 
@@ -53,7 +57,7 @@ class SCIChecker():
     coverageChecker = CoverageChecker(self._geometry, self._predicates)
     ret = True
     for t in self._triangles:
-      check = coverageChecker.envelope_check(t, self._subregions)
+      check = coverageChecker.envelope_check(t, self._subregions, self._verticesIndex)
       if check == OUT:
         ret = False
         break

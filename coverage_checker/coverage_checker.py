@@ -7,7 +7,7 @@ from .predicates import AbstractPredicates
 from geometry.abstract_structs.halfspace import AbstractHalfspace
 from geometry.abstract_structs.simplex import AbstractSimplex
 from common.enums import OrientResult
-from common.types import PolytopeMap
+from common.types import PolytopeMap, VerticesIndex
 
 IN = OrientResult.IN
 OUT = OrientResult.OUT
@@ -17,7 +17,7 @@ class CoverageChecker():
     self._geometry = geometry
     self._predicates = predicates
 
-  def point_out(self, v: AbstractPoint, polytopeMap: PolytopeMap):
+  def point_out(self, v: AbstractPoint, polytopeMap: PolytopeMap) -> OrientResult:
     ret = OUT
     
     for halfspacesList in polytopeMap:
@@ -33,25 +33,27 @@ class CoverageChecker():
         break
     
     return ret
-  
+
   def edge_plane_out():
     pass
   
-  def envelope_check(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap): # chequea UN triángulo
+  # chequea UN triángulo
+  def envelope_check(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex) -> OrientResult: 
     vertices = set(triangle.get_vertices())
     
     ret = IN
-    if self.check_c1(vertices, polytopeSet) == OUT:
+    if self.check_c1(vertices, polytopeSet, verticesIndex) == OUT:
       ret = OUT
     # check_c2()
     # check_c3()
     return ret
 
-  def check_c1(self, vertices: set[AbstractPoint], polytopeSet: PolytopeMap):
+  def check_c1(self, vertices: set[AbstractPoint], polytopeSet: PolytopeMap, verticesIndex: VerticesIndex) -> OrientResult:
     ret = IN
     for v in vertices:
-      if self.point_out(v, polytopeSet) == OUT:
+      if not verticesIndex[v] and self.point_out(v, polytopeSet) == OUT:
         ret = OUT
         break
+      verticesIndex[v] = True # pisamos el valor si ya era True y sino lo marcamos por primera vez
     return ret
 
