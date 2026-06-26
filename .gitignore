@@ -1,3 +1,4 @@
 test.py
 __pycache__
 ordenar_vertices.py
+_qhull.pyx

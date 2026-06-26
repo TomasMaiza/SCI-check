@@ -13,8 +13,10 @@ class Predicates2d(AbstractPredicates):
     a, b = f.get_points()
     ori = orientation(a.x, a.y, b.x, b.y, v.x, v.y)
 
-    if (ori == -1):
+    if ori == -1:
       ret = OrientResult.OUT
+    elif ori == 0:
+      ret = OrientResult.ON
     else:
       ret = OrientResult.IN
     return ret

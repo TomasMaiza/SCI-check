@@ -10,6 +10,7 @@ from scipy.spatial import ConvexHull
 
 IN = OrientResult.IN
 OUT = OrientResult.OUT
+ON = OrientResult.ON
 
 '''
 En principio recibe un politopo y sus subregiones.

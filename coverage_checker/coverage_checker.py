@@ -11,6 +11,7 @@ from common.types import PolytopeMap, VerticesIndex
 
 IN = OrientResult.IN
 OUT = OrientResult.OUT
+ON = OrientResult.ON
 
 class CoverageChecker():
   def __init__(self, geometry: AbstractGeometry, predicates: AbstractPredicates) -> None:
