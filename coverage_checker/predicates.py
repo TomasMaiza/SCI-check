@@ -13,7 +13,7 @@ class AbstractPredicates(ABC):
     pass
 
   @abstractmethod
-  def orient_LPI(self) -> OrientResult: # retorna IN, OUT, ON
+  def orient_LPI(self, v1: AbstractPoint, v2: AbstractPoint, f1: AbstractHalfspace, f2: AbstractHalfspace) -> OrientResult: # retorna IN, OUT, ON
     pass
 
   @abstractmethod
