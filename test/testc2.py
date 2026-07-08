@@ -30,7 +30,7 @@ S1_verts = np.array([[1.0, 0.5], [3.0, 0.5], [3.5, 9.5], [1.5, 9.5]])
 S1 = pc.qhull(S1_verts)
 
 # S2: Arriba (Verde) - Cubre los vértices (2,8) y (8,8)
-S2_verts = np.array([[0.5, 7.5], [0.5, 9.5], [9.5, 9.0], [9.5, 7.0]])
+S2_verts = np.array([[0.5, 7.5], [9.5, 7.0], [9.5, 9.0], [0.5, 9.5]])
 S2 = pc.qhull(S2_verts)
 
 # S3: Derecha (Verde) - Cubre los vértices (8,8) y (8,2)
@@ -38,8 +38,13 @@ S3_verts = np.array([[7.0, 0.5], [9.5, 0.5], [9.0, 9.5], [6.5, 9.5]])
 S3 = pc.qhull(S3_verts)
 
 # S4: Abajo (Rojo) - Cubre la arista inferior y colabora en los vértices
-S4_verts = np.array([[0.5, 1.0], [0.5, 3.0], [9.5, 2.5], [9.5, 0.5]])
+S4_verts = np.array([[0.5, 1.0], [9.5, 0.5], [9.5, 2.5], [0.5, 3.0]])
 S4 = pc.qhull(S4_verts)
+
+# S5: Centro (Azul/Violeta) - Cubre el hueco interior y la diagonal de triangulación
+# Sentido Antihorario (CCW) garantizado
+S5_verts = np.array([[3.0, 2.5], [7.0, 2.5], [7.0, 7.5], [3.0, 7.5]])
+S5 = pc.qhull(S5_verts)
 
 def extraer_semiespacios(poly: pc.Polytope, fabrica: Geometry2d):
     """Extrae los vértices del politopo, los ordena y crea Halfspace2D exactos."""
@@ -81,7 +86,7 @@ def plot_escenario(ax, polytope, subregions, titulo, resultado_test):
     ax.add_patch(p_patch)
 
     # Diccionario de colores para mantener la consistencia con tu imagen
-    colores = {1: 'limegreen', 2: 'limegreen', 3: 'limegreen', 4: 'red'}
+    colores = {1: 'limegreen', 2: 'limegreen', 3: 'limegreen', 4: 'red', 5: 'blueviolet'}
 
     # Dibujamos cada subregión
     for sid, subreg in subregions.items():
@@ -113,9 +118,10 @@ def main():
     # CASO 1: Éxito Total (Como en la imagen)
     # ---------------------------------------------------------
     # Todas las subregiones presentes. Vértices y aristas cubiertos.
-    subs_c1_poly = {1: S1, 2: S2, 3: S3, 4: S4}
+    subs_c1_poly = {1: S1, 2: S2, 3: S3, 4: S4, 5: S5}
     subs_c1 = [extraer_semiespacios(S1, geom), extraer_semiespacios(S2, geom),
-               extraer_semiespacios(S3, geom), extraer_semiespacios(S4, geom)]
+               extraer_semiespacios(S3, geom), extraer_semiespacios(S4, geom), 
+               extraer_semiespacios(S5, geom)]
     
     # IMPORTANTE: Metelo en un try/except por si el algoritmo lanza excepción al fallar
     checker_c1 = SCIChecker(geom, preds, P, subs_c1)
@@ -127,7 +133,7 @@ def main():
     # ---------------------------------------------------------
     # Quitamos el rectángulo rojo (ID 4). 
     # Los vértices de abajo siguen estando cubiertos por S1 y S3, pero la arista queda expuesta al medio.
-    subs_c2_poly = {1: S1, 2: S2, 3: S3}
+    subs_c2_poly = {1: S1, 2: S2, 3: S3, 5: S5}
     subs_c2 = [extraer_semiespacios(S1, geom), extraer_semiespacios(S2, geom),
                extraer_semiespacios(S3, geom)]
 

@@ -51,6 +51,7 @@ class CoverageChecker():
       for fp in p:
         ori = self._predicates.orient_LPI(v1, v2, f, fp)
         if ori != IN: # puede ser ON o OUT
+          pts = fp.get_points()
           isInFlag = False
           break
       if isInFlag:
