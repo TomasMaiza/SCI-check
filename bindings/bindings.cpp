@@ -1,5 +1,5 @@
 #include <pybind11/pybind11.h>
-#include "../external/Indirect_Predicates/include/indirect_predicates.h" 
+#include "../external/Indirect_Predicates/include/implicit_point.h" 
 
 namespace py = pybind11;
 

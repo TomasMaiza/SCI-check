@@ -5,7 +5,7 @@ from geometry.structs_2d.lpipoint2d import LPIPoint2D
 from geometry.structs_2d.halfspace2d import Halfspace2D
 from .predicates import AbstractPredicates
 from shewchuk import orientation
-import pyattene
+from . import pyattene
 
 IN = OrientResult.IN
 OUT = OrientResult.OUT

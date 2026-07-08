@@ -25,7 +25,7 @@ class CoverageChecker():
       isInFlag = True
       for f in halfspacesList: # con la lista llegan en orden
         ori = self._predicates.orient(v, f)
-        if ori != OUT: # puede ser ON o OUT. REVISAR QUE DEBERÍA PASAR EN CASO DE ON
+        if ori != IN: # puede ser ON o OUT. REVISAR QUE DEBERÍA PASAR EN CASO DE ON
           isInFlag = False
           break
 

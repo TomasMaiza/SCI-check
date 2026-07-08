@@ -22,7 +22,7 @@ from common.types import PolytopeMap
 
 # A. Politopo central (Cuadrado negro) de (2,2) a (8,8)
 # Lo definimos fácil con los límites X e Y
-P = pc.box2d([2, 8], [2, 8])
+P = pc.box2poly([[2.0, 8.0], [2.0, 8.0]])
 
 # B. Subregiones (Ligeramente rotadas para simular tu imagen)
 # S1: Izquierda (Verde) - Cubre los vértices (2,2) y (2,8)
@@ -40,6 +40,37 @@ S3 = pc.qhull(S3_verts)
 # S4: Abajo (Rojo) - Cubre la arista inferior y colabora en los vértices
 S4_verts = np.array([[0.5, 1.0], [0.5, 3.0], [9.5, 2.5], [9.5, 0.5]])
 S4 = pc.qhull(S4_verts)
+
+def extraer_semiespacios(poly: pc.Polytope, fabrica: Geometry2d):
+    """Extrae los vértices del politopo, los ordena y crea Halfspace2D exactos."""
+    caras = []
+    
+    # poly.V devuelve las coordenadas crudas de los vértices
+    vertices = pc.extreme(poly)
+    
+    # ConvexHull encuentra el perímetro y ordena los vértices en sentido antihorario (CCW)
+    hull = ConvexHull(vertices)
+    indices_ordenados = hull.vertices 
+    cantidad_vertices = len(indices_ordenados)
+    
+    for i in range(cantidad_vertices):
+        # Tomamos el vértice actual y el siguiente (con módulo para cerrar el ciclo)
+        idx_actual = indices_ordenados[i]
+        idx_siguiente = indices_ordenados[(i + 1) % cantidad_vertices]
+        
+        v_actual = vertices[idx_actual]
+        v_siguiente = vertices[idx_siguiente]
+        
+        # Creamos los objetos Point2D usando tu fábrica
+        # Usamos los mismos índices del hull como ID para mantener un rastro
+        p1 = fabrica.create_point((float(v_actual[0]), float(v_actual[1])))
+        p2 = fabrica.create_point((float(v_siguiente[0]), float(v_siguiente[1])))
+        
+        # Creamos el semiespacio a partir de los dos puntos
+        cara = fabrica.create_halfspace((p1, p2))
+        caras.append(cara)
+        
+    return caras
 
 # --- FUNCIÓN AUXILIAR PARA GRAFICAR ---
 def plot_escenario(ax, polytope, subregions, titulo, resultado_test):
@@ -82,19 +113,24 @@ def main():
     # CASO 1: Éxito Total (Como en la imagen)
     # ---------------------------------------------------------
     # Todas las subregiones presentes. Vértices y aristas cubiertos.
-    subs_c1 = {1: S1, 2: S2, 3: S3, 4: S4} # Pasalo por tu PolytopeMap si es necesario
+    subs_c1_poly = {1: S1, 2: S2, 3: S3, 4: S4}
+    subs_c1 = [extraer_semiespacios(S1, geom), extraer_semiespacios(S2, geom),
+               extraer_semiespacios(S3, geom), extraer_semiespacios(S4, geom)]
     
     # IMPORTANTE: Metelo en un try/except por si el algoritmo lanza excepción al fallar
     checker_c1 = SCIChecker(geom, preds, P, subs_c1)
     res_c1 = checker_c1.sci_check() 
-    plot_escenario(axes[0], P, subs_c1, "Caso 1: Cobertura Completa", res_c1)
+    plot_escenario(axes[0], P, subs_c1_poly, "Caso 1: Cobertura Completa", res_c1)
 
     # ---------------------------------------------------------
     # CASO 2: Falla la cobertura de la arista inferior (C2)
     # ---------------------------------------------------------
     # Quitamos el rectángulo rojo (ID 4). 
     # Los vértices de abajo siguen estando cubiertos por S1 y S3, pero la arista queda expuesta al medio.
-    subs_c2 = {1: S1, 2: S2, 3: S3}
+    subs_c2_poly = {1: S1, 2: S2, 3: S3}
+    subs_c2 = [extraer_semiespacios(S1, geom), extraer_semiespacios(S2, geom),
+               extraer_semiespacios(S3, geom)]
+
     checker_c2 = SCIChecker(geom, preds, P, subs_c2)
     
     try:
@@ -102,14 +138,15 @@ def main():
     except Exception as e:
         res_c2 = f"FALLÓ (Como se esperaba)"
     
-    plot_escenario(axes[1], P, subs_c2, "Caso 2: Arista Expuesta", res_c2)
+    plot_escenario(axes[1], P, subs_c2_poly, "Caso 2: Arista Expuesta", res_c2)
 
     # ---------------------------------------------------------
     # CASO 3: Falla la cobertura de un vértice (C1)
     # ---------------------------------------------------------
     # Quitamos el rectángulo rojo (ID 4) y el verde derecho (ID 3).
     # El vértice inferior derecho (8,2) queda completamente al descubierto.
-    subs_c3 = {1: S1, 2: S2}
+    subs_c3_poly = {1: S1, 2: S2}
+    subs_c3 = [extraer_semiespacios(S1, geom), extraer_semiespacios(S2, geom)]
     checker_c3 = SCIChecker(geom, preds, P, subs_c3)
     
     try:
@@ -117,7 +154,7 @@ def main():
     except Exception as e:
         res_c3 = f"FALLÓ (Como se esperaba)"
         
-    plot_escenario(axes[2], P, subs_c3, "Caso 3: Vértice Expuesto", res_c3)
+    plot_escenario(axes[2], P, subs_c3_poly, "Caso 3: Vértice Expuesto", res_c3)
 
     plt.tight_layout()
     plt.show()
