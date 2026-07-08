@@ -80,7 +80,6 @@ class CoverageChecker():
       verticesIndex[v] = True # pisamos el valor si ya era True y sino lo marcamos por primera vez
     return ret
 
-  # en check_c2 ver cómo manejar lo del PS\P
   # analizar si se están verificando cosas dos veces
   def check_c2(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap) -> OrientResult:
     edges = triangle.get_edges() # ACÁ TAMBIÉN SE PODRÍA OPTIMIZAR PARA NO REPETIR ARISTAS

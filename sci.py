@@ -32,7 +32,6 @@ class SCIChecker():
     triangles = triangulator.triangulate(self._polytope)
     self._triangles = [] # lista de triángulos en los que se dividió el politopo
     self._verticesIndex = {} # diccionario para ver si cada vértice ya se chequeó o no
-    # está bien indexar por puntos o uso tuplas de las coordenadas?
     # convertimos a Simplex
     for t in triangles:
       # t tiene la forma [[x1, y1], [x2, y2], [x3, y3]]

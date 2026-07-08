@@ -10,7 +10,7 @@ compile:
 	@cd $(BINDINGS_BUILD_DIR) && cmake .. && $(MAKE)
 
 run: compile
-	@python3 sci.py
+	@python3 test/testc2.py
 
 clean:
 	@rm -rf $(BINDINGS_BUILD_DIR)
