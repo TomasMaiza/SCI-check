@@ -2,3 +2,13 @@ test.py
 __pycache__
 ordenar_vertices.py
 _qhull.pyx
+.vscode
+bindings/build/
+build/
+coverage_checker/*.so
+*.so
+*.py[cod]
+*$py.class
+venv/
+env/
+.venv/
