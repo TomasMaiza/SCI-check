@@ -1,5 +1,6 @@
 from geometry.geometry import AbstractGeometry
 from coverage_checker.predicates import AbstractPredicates
+from geometry.abstract_structs.simplex import AbstractSimplex
 from common.enums import OrientResult
 from common.types import PolytopeMap, VerticesIndex
 from coverage_checker.coverage_checker import CoverageChecker
@@ -7,6 +8,7 @@ from triangulation import PolytopeTriangulator, DelaunayTriangulation
 import polytope as pc
 import numpy as np
 from scipy.spatial import ConvexHull
+from aabbtree import AABB, AABBTree
 
 IN = OrientResult.IN
 OUT = OrientResult.OUT
@@ -62,19 +64,55 @@ class SCIChecker():
     # podría hacerse con scipy.spatial.ConvexHull
     # eso me ordena los vértices, luego creo los semiespacios
 
+  def get_aabb_limits_p(self) -> list[list[tuple[float, float]]]:
+    limits = []
+    for p in self._subregions:
+      p1, p2 = p[0].get_points()
+      xmin = min(p1.x, p2.x)
+      xmax = max(p1.x, p2.x)
+      ymin = min(p1.y, p2.y)
+      ymax = max(p1.y, p2.y)
+      for f in p[1:]:
+        p1, p2 = f.get_points()
+        xmin = min(xmin, p1.x, p2.x)
+        xmax = max(xmax, p1.x, p2.x)
+        ymin = min(ymin, p1.y, p2.y)
+        ymax = max(ymax, p1.y, p2.y)
+      limits.append([(xmin, xmax), (ymin, ymax)])
+    return limits
+  
+  def _get_aabb_limits_t(self, triangle: AbstractSimplex) -> list[tuple[float, float]]:
+    v1, v2, v3 = triangle.get_vertices()
+    xmin = min(v1.x, v2.x, v3.x)
+    xmax = max(v1.x, v2.x, v3.x)
+    ymin = min(v1.y, v2.y, v3.y)
+    ymax = max(v1.y, v2.y, v3.y)
+    return [(xmin, xmax), (ymin, ymax)]
+
+  def create_aabb_tree(self):
+    self._aabbTree = AABBTree() # creo el árbol aabb
+    plimits = self.get_aabb_limits_p() # obtengo los límites
+
+    for i, lim in enumerate(plimits): # lleno el árbol
+        caja = AABB(lim)
+        self._aabbTree.add(caja, i)
+
   def check_coverage(self) -> bool: # itera sobre los triángulos
     coverageChecker = CoverageChecker(self._geometry, self._predicates)
     ret = True
     for t in self._triangles:
-      check = coverageChecker.envelope_check(t, self._subregions, self._verticesIndex, self._edgesIndex)
+      limits = self._get_aabb_limits_t(t)
+      box = AABB(limits)
+      indices = self._aabbTree.overlap_values(box)
+      filtered_map = [self._subregions[i] for i in indices]
+      check = coverageChecker.envelope_check(t, filtered_map, self._verticesIndex, self._edgesIndex)
       if check == OUT:
         ret = False
         break
     return ret
 
   def sci_check(self) -> bool: # hace todo el proceso
-    self.triangulate_polytope();
+    self.triangulate_polytope()
     # get_subregions
-    return self.check_coverage();
-
-  # capaz podría haber alguna función más para graficar
+    self.create_aabb_tree() # estrategia de aceleración 1
+    return self.check_coverage()
