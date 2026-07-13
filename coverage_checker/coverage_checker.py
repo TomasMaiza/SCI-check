@@ -7,7 +7,7 @@ from .predicates import AbstractPredicates
 from geometry.abstract_structs.halfspace import AbstractHalfspace
 from geometry.abstract_structs.simplex import AbstractSimplex
 from common.enums import OrientResult
-from common.types import PolytopeMap, VerticesIndex
+from common.types import PolytopeMap, VerticesIndex, EdgesIndex
 
 IN = OrientResult.IN
 OUT = OrientResult.OUT
@@ -60,14 +60,17 @@ class CoverageChecker():
 
     return ret
   
+  def plane_plane_tri_out(self): # ver si cambiar nombre
+    pass
+  
   # chequea UN triángulo
-  def envelope_check(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex) -> OrientResult: 
+  def envelope_check(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex, edgesIndex: EdgesIndex) -> OrientResult: 
     vertices = set(triangle.get_vertices())
     
     ret = IN
     if self.check_c1(vertices, polytopeSet, verticesIndex) == OUT:
       ret = OUT
-    if self.check_c2(triangle, polytopeSet) == OUT:
+    if self.check_c2(triangle, polytopeSet, edgesIndex) == OUT:
       ret = OUT
     # self.check_c3()
     return ret
@@ -81,14 +84,17 @@ class CoverageChecker():
       verticesIndex[v] = True # pisamos el valor si ya era True y sino lo marcamos por primera vez
     return ret
 
-  # analizar si se están verificando cosas dos veces
-  def check_c2(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap) -> OrientResult:
-    edges = triangle.get_edges() # ACÁ TAMBIÉN SE PODRÍA OPTIMIZAR PARA NO REPETIR ARISTAS
-
+  def check_c2(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, edgesIndex: EdgesIndex) -> OrientResult:
+    allEdges = triangle.get_all_edges()
+    edges, invEdges = allEdges
     for i, p in enumerate(polytopeSet):
       for f in p:
         for e in edges:
-          if self.edge_plane_out(e[0], e[1], f, polytopeSet, i) == OUT:
+          if not edgesIndex[e] and self.edge_plane_out(e[0], e[1], f, polytopeSet, i) == OUT:
             return OUT
-      
+    for e in allEdges:
+      edgesIndex[e] = True
     return IN
+  
+  def check_c3(self):
+    pass
