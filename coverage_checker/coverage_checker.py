@@ -65,7 +65,7 @@ class CoverageChecker():
       # orient_LPI(r, s, f1, f2)
       # calcula la orientación de f1 \cap rs respecto a f2
       # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
-      e = self._geometry.create_halfspace(v1, v2)
+      e = self._geometry.create_halfspace((v1, v2))
       ori = self._predicates.orient_LPI(r, s, f2, e)
       if ori != IN:
         return IN
@@ -90,13 +90,13 @@ class CoverageChecker():
   # chequea UN triángulo
   def envelope_check(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex, edgesIndex: EdgesIndex) -> OrientResult: 
     vertices = set(triangle.get_vertices())
-    
     ret = IN
     if self.check_c1(vertices, polytopeSet, verticesIndex) == OUT:
       ret = OUT
     if self.check_c2(triangle, polytopeSet, edgesIndex) == OUT:
       ret = OUT
-    # self.check_c3()
+    if self.check_c3(triangle, polytopeSet) == OUT:
+      ret = OUT
     return ret
 
   def check_c1(self, vertices: set[AbstractPoint], polytopeSet: PolytopeMap, verticesIndex: VerticesIndex) -> OrientResult:

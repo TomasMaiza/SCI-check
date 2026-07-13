@@ -46,6 +46,24 @@ S4 = pc.qhull(S4_verts)
 S5_verts = np.array([[3.0, 2.5], [7.0, 2.5], [7.0, 7.5], [3.0, 7.5]])
 S5 = pc.qhull(S5_verts)
 
+# S5: Diagonal Ascendente (Cubre de 2,2 a 8,8) - Sentido Antihorario
+S6_verts = np.array([
+    [2.5, 3.5],  # Abajo-Izquierda (Arriba de la diagonal)
+    [3.5, 2.5],  # Abajo-Izquierda (Abajo de la diagonal)
+    [7.5, 6.5],  # Arriba-Derecha (Abajo de la diagonal)
+    [6.5, 7.5]   # Arriba-Derecha (Arriba de la diagonal)
+])
+S6 = pc.qhull(S6_verts)
+
+# S6: Diagonal Descendente (Cubre de 2,8 a 8,2) - Sentido Antihorario
+S7_verts = np.array([
+    [2.5, 6.5],  # Arriba-Izquierda (Abajo de la diagonal)
+    [6.5, 2.5],  # Abajo-Derecha (Abajo de la diagonal)
+    [7.5, 3.5],  # Abajo-Derecha (Arriba de la diagonal)
+    [3.5, 7.5]   # Arriba-Izquierda (Arriba de la diagonal)
+])
+S7 = pc.qhull(S7_verts)
+
 def extraer_semiespacios(poly: pc.Polytope, fabrica: Geometry2d):
     """Extrae los vértices del politopo, los ordena y crea Halfspace2D exactos."""
     caras = []
@@ -86,7 +104,7 @@ def plot_escenario(ax, polytope, subregions, titulo, resultado_test):
     ax.add_patch(p_patch)
 
     # Diccionario de colores para mantener la consistencia con tu imagen
-    colores = {1: 'limegreen', 2: 'limegreen', 3: 'limegreen', 4: 'red', 5: 'blueviolet'}
+    colores = {1: 'limegreen', 2: 'limegreen', 3: 'limegreen', 4: 'red', 5: 'blueviolet', 6: 'pink', 7: 'yellow'}
 
     # Dibujamos cada subregión
     for sid, subreg in subregions.items():
@@ -151,7 +169,7 @@ def main():
     # ---------------------------------------------------------
     # Quitamos el rectángulo rojo (ID 4) y el verde derecho (ID 3).
     # El vértice inferior derecho (8,2) queda completamente al descubierto.
-    subs_c3_poly = {1: S1, 2: S2}
+    '''subs_c3_poly = {1: S1, 2: S2}
     subs_c3 = [extraer_semiespacios(S1, geom), extraer_semiespacios(S2, geom)]
     checker_c3 = SCIChecker(geom, preds, P, subs_c3)
     
@@ -160,7 +178,23 @@ def main():
     except Exception as e:
         res_c3 = f"FALLÓ (Como se esperaba)"
         
-    plot_escenario(axes[2], P, subs_c3_poly, "Caso 3: Vértice Expuesto", res_c3)
+    plot_escenario(axes[2], P, subs_c3_poly, "Caso 3: Vértice Expuesto", res_c3)'''
+
+     # ---------------------------------------------------------
+    # CASO 4: Falla la cobertura del interior (C3)
+    # ---------------------------------------------------------
+    subs_c4_poly = {1: S1, 2: S2, 3: S3, 4: S4, 6: S6, 7: S7}
+    subs_c4 = [extraer_semiespacios(S1, geom), extraer_semiespacios(S2, geom),
+               extraer_semiespacios(S3, geom), extraer_semiespacios(S4, geom), 
+               extraer_semiespacios(S6, geom), extraer_semiespacios(S7, geom)]
+    checker_c4 = SCIChecker(geom, preds, P, subs_c4)
+    
+    try:
+        res_c4 = checker_c4.sci_check()
+    except Exception as e:
+        res_c4 = f"FALLÓ (Como se esperaba)"
+        
+    plot_escenario(axes[2], P, subs_c4_poly, "Caso 3: Interior no cubierto", res_c4)
 
     plt.tight_layout()
     plt.show()
