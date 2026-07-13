@@ -8,6 +8,7 @@ from geometry.abstract_structs.halfspace import AbstractHalfspace
 from geometry.abstract_structs.simplex import AbstractSimplex
 from common.enums import OrientResult
 from common.types import PolytopeMap, VerticesIndex, EdgesIndex
+from aabbtree import AABB, AABBTree
 
 IN = OrientResult.IN
 OUT = OrientResult.OUT
@@ -95,8 +96,8 @@ class CoverageChecker():
       ret = OUT
     if self.check_c2(triangle, polytopeSet, edgesIndex) == OUT:
       ret = OUT
-    if self.check_c3(triangle, polytopeSet) == OUT:
-      ret = OUT
+    #if self.check_c3(triangle, polytopeSet) == OUT:
+    #  ret = OUT
     return ret
 
   def check_c1(self, vertices: set[AbstractPoint], polytopeSet: PolytopeMap, verticesIndex: VerticesIndex) -> OrientResult:
@@ -130,3 +131,20 @@ class CoverageChecker():
             if self.edge_edge_tri_out(triangle, fi, fj, polytopeSet, i, j) == OUT:
               return OUT
     return IN
+
+  def get_aabb_limits(self, polytopeMap: PolytopeMap) -> list[list[tuple[float, float]]]:
+    limits = []
+    for p in polytopeMap:
+      p1, p2 = p[0].get_points()
+      xmin = min(p1.x, p2.x)
+      xmax = max(p1.x, p2.x)
+      ymin = min(p1.y, p2.y)
+      ymax = max(p1.y, p2.y)
+      for f in p[1:]:
+        p1, p2 = f.get_points()
+        xmin = min(xmin, p1.x, p2.x)
+        xmax = max(xmax, p1.x, p2.x)
+        ymin = min(ymin, p1.y, p2.y)
+        ymax = max(ymax, p1.y, p2.y)
+      limits.append([(xmin, xmax), (ymin, ymax)])
+    return limits
