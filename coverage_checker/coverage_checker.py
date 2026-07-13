@@ -111,7 +111,8 @@ class CoverageChecker():
   def check_c2(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, edgesIndex: EdgesIndex) -> OrientResult:
     allEdges = triangle.get_all_edges()
     edges, invEdges = allEdges
-    for i, p in enumerate(polytopeSet):
+    polytopes = enumerate(polytopeSet)
+    for i, p in polytopes:
       for f in p:
         for e in edges:
           if not edgesIndex[e] and self.edge_edge_out(e[0], e[1], f, polytopeSet, i) == OUT:
@@ -120,5 +121,12 @@ class CoverageChecker():
       edgesIndex[e] = True
     return IN
   
-  def check_c3(self):
-    pass
+  def check_c3(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap) -> OrientResult:
+    polytopes = list(enumerate(polytopeSet))
+    for i, pi in polytopes:
+      for j, pj in polytopes[i:]:
+        for fi in pi:
+          for fj in pj:
+            if self.edge_edge_tri_out(triangle, fi, fj, polytopeSet, i, j) == OUT:
+              return OUT
+    return IN
