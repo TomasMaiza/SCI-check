@@ -35,15 +35,14 @@ class CoverageChecker():
     
     return ret
 
-  def edge_plane_out(self, v1: AbstractPoint, v2: AbstractPoint, f: AbstractHalfspace, polytopeMap: PolytopeMap, currentpIndex: int) -> OrientResult:
-    ret = OUT
-    
+  def edge_edge_out(self, v1: AbstractPoint, v2: AbstractPoint, f: AbstractHalfspace, polytopeMap: PolytopeMap, currentpIndex: int) -> OrientResult:
     # primero verificamos la posición de los puntos respecto a f
     ori1 = self._predicates.orient(v1, f)
     ori2 = self._predicates.orient(v2, f)
     if ori1 == ori2 or ori1 == ON or ori2 == ON:
       return IN
     
+    ret = OUT
     for i, p in enumerate(polytopeMap):
       if i == currentpIndex:
         continue
@@ -51,7 +50,6 @@ class CoverageChecker():
       for fp in p:
         ori = self._predicates.orient_LPI(v1, v2, f, fp)
         if ori != IN: # puede ser ON o OUT
-          pts = fp.get_points()
           isInFlag = False
           break
       if isInFlag:
@@ -60,8 +58,34 @@ class CoverageChecker():
 
     return ret
   
-  def plane_plane_tri_out(self): # ver si cambiar nombre
-    pass
+  def edge_edge_tri_out(self, triangle: AbstractSimplex, f1: AbstractHalfspace, f2: AbstractHalfspace, polytopeMap: PolytopeMap, currentpIndex1: int, currentpIndex2: int) -> OrientResult: 
+    edges = triangle.get_edges()
+    r, s = f1.get_points()
+    for v1, v2 in edges:
+      # orient_LPI(r, s, f1, f2)
+      # calcula la orientación de f1 \cap rs respecto a f2
+      # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
+      e = self._geometry.create_halfspace(v1, v2)
+      ori = self._predicates.orient_LPI(r, s, f2, e)
+      if ori != IN:
+        return IN
+
+    ret = OUT
+    for i, p in enumerate(polytopeMap):
+      if i == currentpIndex1 or i == currentpIndex2:
+        continue
+      isInFlag = True
+      for fp in p:
+        ori = self._predicates.orient_LPI(r, s, f2, fp)
+        if ori != IN: # puede ser ON o OUT
+          isInFlag = False
+          break
+      if isInFlag:
+        ret = IN
+        break
+
+    return ret
+
   
   # chequea UN triángulo
   def envelope_check(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex, edgesIndex: EdgesIndex) -> OrientResult: 
@@ -90,7 +114,7 @@ class CoverageChecker():
     for i, p in enumerate(polytopeSet):
       for f in p:
         for e in edges:
-          if not edgesIndex[e] and self.edge_plane_out(e[0], e[1], f, polytopeSet, i) == OUT:
+          if not edgesIndex[e] and self.edge_edge_out(e[0], e[1], f, polytopeSet, i) == OUT:
             return OUT
     for e in allEdges:
       edgesIndex[e] = True
