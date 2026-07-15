@@ -29,9 +29,7 @@ class SCIChecker():
     self._subregions = subregions # esto después vuela
     # en qué orden están las subregiones?
 
-  def triangulate_polytope(self): # asignar índices a vértices y guardar todo en variables?
-    triangulator = PolytopeTriangulator(DelaunayTriangulation())
-    triangles = triangulator.triangulate(self._polytope)
+  def _create_triangles(self, triangles: list[np.ndarray]):
     self._triangles = [] # lista de triángulos en los que se dividió el politopo
     # convertimos a Simplex
     for t in triangles:
@@ -41,6 +39,11 @@ class SCIChecker():
       v3 = self._geometry.create_point((t[2][0], t[2][1]))
       simplex = self._geometry.create_simplex((v1, v2, v3))
       self._triangles.append(simplex)
+
+  def triangulate_polytope(self): # asignar índices a vértices y guardar todo en variables?
+    triangulator = PolytopeTriangulator(DelaunayTriangulation())
+    triangles = triangulator.triangulate(self._polytope)
+    self._create_triangles(triangles)
     self._set_indices()
 
   def _set_indices(self):
