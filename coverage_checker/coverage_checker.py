@@ -90,17 +90,17 @@ class CoverageChecker():
   
   # chequea UN triángulo
   def envelope_check(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex, edgesIndex: EdgesIndex) -> OrientResult: 
-    vertices = set(triangle.get_vertices())
     ret = IN
-    if self.check_c1(vertices, polytopeSet, verticesIndex) == OUT:
+    if self.check_c1(triangle, polytopeSet, verticesIndex) == OUT:
       ret = OUT
-    if self.check_c2(triangle, polytopeSet, edgesIndex) == OUT:
+    elif self.check_c2(triangle, polytopeSet, edgesIndex) == OUT:
       ret = OUT
-    if self.check_c3(triangle, polytopeSet) == OUT:
+    elif self.check_c3(triangle, polytopeSet) == OUT:
       ret = OUT
     return ret
 
-  def check_c1(self, vertices: set[AbstractPoint], polytopeSet: PolytopeMap, verticesIndex: VerticesIndex) -> OrientResult:
+  def check_c1(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex) -> OrientResult:
+    vertices = set(triangle.get_vertices())
     ret = IN
     for v in vertices:
       if not verticesIndex[v] and self.point_out(v, polytopeSet) == OUT:
