@@ -20,7 +20,6 @@ class CoverageChecker():
 
   def point_out(self, v: AbstractPoint, polytopeMap: PolytopeMap) -> OrientResult:
     ret = OUT
-    
     for halfspacesList in polytopeMap:
       isInFlag = True
       for f in halfspacesList: # con la lista llegan en orden
@@ -28,11 +27,9 @@ class CoverageChecker():
         if ori != IN: # puede ser ON o OUT. REVISAR QUE DEBERÍA PASAR EN CASO DE ON
           isInFlag = False
           break
-
       if isInFlag:
         ret = IN
         break
-    
     return ret
 
   def points_on_same_side(self, v1: AbstractPoint, v2: AbstractPoint, f: AbstractHalfspace) -> bool:
@@ -61,7 +58,7 @@ class CoverageChecker():
         break
     return ret
   
-  def implicit_point_in_simplex(self, triangle: AbstractSimplex, f1: AbstractHalfspace, f2: AbstractHalfspace) -> bool:
+  def implicit_point_in_triangle(self, triangle: AbstractSimplex, f1: AbstractHalfspace, f2: AbstractHalfspace) -> bool:
     edges = triangle.get_edges()
     r, s = f1.get_points()
     ret = True
@@ -74,10 +71,8 @@ class CoverageChecker():
         break
     return ret
 
-
-
   def edge_edge_tri_out(self, triangle: AbstractSimplex, f1: AbstractHalfspace, f2: AbstractHalfspace, polytopeMap: PolytopeMap, currentpIndex1: int, currentpIndex2: int) -> OrientResult:
-    if not self.implicit_point_in_simplex(triangle, f1, f2):
+    if not self.implicit_point_in_triangle(triangle, f1, f2):
       return IN
 
     r, s = f1.get_points()
@@ -89,7 +84,6 @@ class CoverageChecker():
 
     return ret
 
-  
   # chequea UN triángulo
   def envelope_check(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex, edgesIndex: EdgesIndex) -> OrientResult: 
     ret = IN
