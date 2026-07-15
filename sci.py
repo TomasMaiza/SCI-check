@@ -97,15 +97,19 @@ class SCIChecker():
         caja = AABB(lim)
         self._aabbTree.add(caja, i)
 
+  def _get_filtered_map(self, triangle: AbstractSimplex):
+    limits = self._get_aabb_limits_t(triangle)
+    box = AABB(limits)
+    indices = self._aabbTree.overlap_values(box)
+    filteredMap = [self._subregions[i] for i in indices]
+    return filteredMap
+
   def check_coverage(self) -> bool: # itera sobre los triángulos
     coverageChecker = CoverageChecker(self._geometry, self._predicates)
     ret = True
     for t in self._triangles:
-      limits = self._get_aabb_limits_t(t)
-      box = AABB(limits)
-      indices = self._aabbTree.overlap_values(box)
-      filtered_map = [self._subregions[i] for i in indices]
-      check = coverageChecker.envelope_check(t, filtered_map, self._verticesIndex, self._edgesIndex)
+      filteredMap = self._get_filtered_map(t)
+      check = coverageChecker.envelope_check(t, filteredMap, self._verticesIndex, self._edgesIndex)
       if check == OUT:
         ret = False
         break
