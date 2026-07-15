@@ -8,7 +8,6 @@ from geometry.abstract_structs.halfspace import AbstractHalfspace
 from geometry.abstract_structs.simplex import AbstractSimplex
 from common.enums import OrientResult
 from common.types import PolytopeMap, VerticesIndex, EdgesIndex
-from aabbtree import AABB, AABBTree
 
 IN = OrientResult.IN
 OUT = OrientResult.OUT
@@ -36,52 +35,55 @@ class CoverageChecker():
     
     return ret
 
-  def edge_edge_out(self, v1: AbstractPoint, v2: AbstractPoint, f: AbstractHalfspace, polytopeMap: PolytopeMap, currentpIndex: int) -> OrientResult:
-    # primero verificamos la posición de los puntos respecto a f
+  def points_on_same_side(self, v1: AbstractPoint, v2: AbstractPoint, f: AbstractHalfspace) -> bool:
     ori1 = self._predicates.orient(v1, f)
     ori2 = self._predicates.orient(v2, f)
-    if ori1 == ori2 or ori1 == ON or ori2 == ON:
+    return ori1 == ori2 or ori1 == ON or ori2 == ON
+
+  def implicit_point_in_polytope(self, v1: AbstractPoint, v2: AbstractPoint, f: AbstractHalfspace, p: list[AbstractHalfspace]) -> bool:
+    ret = True
+    for fp in p:
+      ori = self._predicates.orient_LPI(v1, v2, f, fp)
+      if ori != IN: # puede ser ON o OUT
+        ret = False
+        break
+    return ret
+
+  def edge_edge_out(self, v1: AbstractPoint, v2: AbstractPoint, f: AbstractHalfspace, polytopeMap: PolytopeMap, currentpIndex: int) -> OrientResult:
+    # primero verificamos la posición de los puntos respecto a f
+    if self.points_on_same_side(v1, v2, f):
       return IN
-    
+
     ret = OUT
     for i, p in enumerate(polytopeMap):
-      if i == currentpIndex:
-        continue
-      isInFlag = True
-      for fp in p:
-        ori = self._predicates.orient_LPI(v1, v2, f, fp)
-        if ori != IN: # puede ser ON o OUT
-          isInFlag = False
-          break
-      if isInFlag:
+      if i != currentpIndex and self.implicit_point_in_polytope(v1, v2, f, p):
         ret = IN
         break
-
     return ret
   
-  def edge_edge_tri_out(self, triangle: AbstractSimplex, f1: AbstractHalfspace, f2: AbstractHalfspace, polytopeMap: PolytopeMap, currentpIndex1: int, currentpIndex2: int) -> OrientResult: 
+  def implicit_point_in_simplex(self, triangle: AbstractSimplex, f1: AbstractHalfspace, f2: AbstractHalfspace) -> bool:
     edges = triangle.get_edges()
     r, s = f1.get_points()
+    ret = True
     for v1, v2 in edges:
-      # orient_LPI(r, s, f1, f2)
-      # calcula la orientación de f1 \cap rs respecto a f2
       # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
       e = self._geometry.create_halfspace((v1, v2))
       ori = self._predicates.orient_LPI(r, s, f2, e)
       if ori != IN:
-        return IN
+        ret = False
+        break
+    return ret
 
+
+
+  def edge_edge_tri_out(self, triangle: AbstractSimplex, f1: AbstractHalfspace, f2: AbstractHalfspace, polytopeMap: PolytopeMap, currentpIndex1: int, currentpIndex2: int) -> OrientResult:
+    if not self.implicit_point_in_simplex(triangle, f1, f2):
+      return IN
+
+    r, s = f1.get_points()
     ret = OUT
     for i, p in enumerate(polytopeMap):
-      if i == currentpIndex1 or i == currentpIndex2:
-        continue
-      isInFlag = True
-      for fp in p:
-        ori = self._predicates.orient_LPI(r, s, f2, fp)
-        if ori != IN: # puede ser ON o OUT
-          isInFlag = False
-          break
-      if isInFlag:
+      if i != currentpIndex1 and i != currentpIndex2 and self.implicit_point_in_polytope(r, s, f2, p):
         ret = IN
         break
 
