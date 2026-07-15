@@ -12,3 +12,4 @@ coverage_checker/*.so
 venv/
 env/
 .venv/
+*.png

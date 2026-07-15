@@ -88,11 +88,16 @@ class CoverageChecker():
   def envelope_check(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex, edgesIndex: EdgesIndex) -> OrientResult: 
     ret = IN
     if self.check_c1(triangle, polytopeSet, verticesIndex) == OUT:
+      print("Falla C1")
       ret = OUT
     elif self.check_c2(triangle, polytopeSet, edgesIndex) == OUT:
+      print("Falla C2")
       ret = OUT
     elif self.check_c3(triangle, polytopeSet) == OUT:
+      print("Falla C3")
       ret = OUT
+    else:
+      print("Todo OK")
     return ret
 
   def check_c1(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex) -> OrientResult:
