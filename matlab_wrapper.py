@@ -50,19 +50,23 @@ def guardar_plot_debug(polytope_verts_raw, subregions_verts_raw, filename="/home
     plt.savefig(filename, dpi=150)
     plt.close()
 
-def checking_sci(polytope_verts_raw, subregions_verts_raw):
+def checking_sci(polytope_verts_raw, subregions_verts_raw, dimension): # tipar esto y emprolijar
     """
     Recibe listas crudas desde MATLAB, arma la geometría y corre el SCIChecker.
     """
+
+    dimDict = {2: (Geometry2d, Predicates2d)} # diccionario para la dimensión. MOVER A COMMON.
+
     print(">>> [PYTHON] Entrando al wrapper. Recibiendo datos...", flush=True)
     guardar_plot_debug(polytope_verts_raw, subregions_verts_raw)
     print(">>> [PYTHON] Grafico guardado", flush=True)
     # 1. Convertir los datos crudos a arrays de numpy
-    P_verts = np.round(np.array(polytope_verts_raw, dtype=float), decimals=8) # vértices del politopo
+    P_verts = np.round(np.array(polytope_verts_raw, dtype=float)) # vértices del politopo
     
     # 2. Inicializar tu motor geométrico
-    geom = Geometry2d() # (O como se instancie tu clase)
-    preds = Predicates2d()
+    geomClass, predClass = dimDict[dimension]
+    geom = geomClass()
+    preds = predClass()
     
     # 3. Armar el politopo principal
     P = pc.qhull(P_verts) # se crea el politopo
