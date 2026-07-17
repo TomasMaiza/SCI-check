@@ -13,3 +13,4 @@ venv/
 env/
 .venv/
 *.png
+matlab_wrapper_aux.py

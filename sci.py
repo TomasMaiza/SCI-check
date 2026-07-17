@@ -120,6 +120,6 @@ class SCIChecker():
 
   def sci_check(self) -> bool: # hace todo el proceso
     self.triangulate_polytope()
-    # get_subregions
+    # self.get_subregions
     self.create_aabb_tree() # estrategia de aceleración 1
     return self.check_coverage()
