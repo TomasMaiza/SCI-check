@@ -1,14 +1,21 @@
+import sys
+import os
+
+currentDir = os.path.dirname(os.path.abspath(__file__))
+srcPath = os.path.join(currentDir, 'src')
+
+# 2. Le inyectamos esta ruta al cerebro del intérprete de Python de MATLAB
+if srcPath not in sys.path:
+    sys.path.insert(0, srcPath)
+
 import numpy as np
-from src.sci import SCIChecker
-from src.geometry import *
-from src.coverage_checker import *
+from sci import SCIChecker
+from geometry import *
+from coverage_checker import *
 import polytope as pc
 from scipy.spatial import ConvexHull
 
 class MatlabWrapper:
-  def __init__(self): # por ahora nada
-    pass
-  
   def create_geometry_and_predicates(self, dimension: int):
     # inicializa la geometría y los predicados
     geomClass = GeometryFactory[dimension]
@@ -31,7 +38,7 @@ class MatlabWrapper:
         
       subArray = np.array(sub, dtype=float) # convertimos la subregión a un array de numpy
       hull = ConvexHull(subArray) # ordenamos los vértices en sentido antihorario con ConvexHull
-      sortedVertices = subArray[hull.vertices]
+      sortedVertices = subArray[hull.vertices] # LO DE ORDENAR SE PODRÍA HACER CON UN STRATEGY
         
       numVertices = len(sortedVertices)
       subHalfspaces = []
