@@ -1,12 +1,10 @@
+from coverage_checker import *
 from geometry import AbstractGeometry
-from coverage_checker.predicates import AbstractPredicates
 from geometry.abstract_structs import AbstractSimplex
 from common import OrientResult, PolytopeMap
-from coverage_checker.coverage_checker import CoverageChecker
-from triangulation import PolytopeTriangulator, DelaunayTriangulation
+from triangulation import *
 import polytope as pc
 import numpy as np
-from scipy.spatial import ConvexHull
 from aabbtree import AABB, AABBTree
 
 IN = OrientResult.IN

@@ -1,5 +1,4 @@
 # acá se implementa el módulo que verifica las 3 condiciones iterando sobre cada triángulo
-import polytope as pc
 from .predicates import AbstractPredicates
 from geometry.abstract_structs import *
 from geometry import AbstractGeometry
@@ -9,7 +8,9 @@ IN = OrientResult.IN
 OUT = OrientResult.OUT
 ON = OrientResult.ON
 
-class CoverageChecker():
+
+# Patrón Proxy
+class _CoverageCheckerIntern:
   def __init__(self, geometry: AbstractGeometry, predicates: AbstractPredicates) -> None:
     self._geometry = geometry
     self._predicates = predicates
@@ -80,22 +81,6 @@ class CoverageChecker():
 
     return ret
 
-  # chequea UN triángulo
-  def envelope_check(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex, edgesIndex: EdgesIndex) -> OrientResult: 
-    ret = IN
-    if self.check_c1(triangle, polytopeSet, verticesIndex) == OUT:
-      print("Falla C1")
-      ret = OUT
-    elif self.check_c2(triangle, polytopeSet, edgesIndex) == OUT:
-      print("Falla C2")
-      ret = OUT
-    elif self.check_c3(triangle, polytopeSet) == OUT:
-      print("Falla C3")
-      ret = OUT
-    else:
-      print("Todo OK")
-    return ret
-
   def check_c1(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex) -> OrientResult:
     vertices = triangle.get_vertices()
     ret = IN
@@ -128,3 +113,23 @@ class CoverageChecker():
             if self.edge_edge_tri_out(triangle, fi, fj, polytopeSet, i, j) == OUT:
               return OUT
     return IN
+
+class CoverageChecker:
+  def __init__(self, geometry: AbstractGeometry, predicates: AbstractPredicates) -> None:
+    self._checker = _CoverageCheckerIntern(geometry, predicates)
+
+  # chequea UN triángulo
+  def envelope_check(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex, edgesIndex: EdgesIndex) -> OrientResult: 
+    ret = IN
+    if self._checker.check_c1(triangle, polytopeSet, verticesIndex) == OUT:
+      print("Falla C1")
+      ret = OUT
+    elif self._checker.check_c2(triangle, polytopeSet, edgesIndex) == OUT:
+      print("Falla C2")
+      ret = OUT
+    elif self._checker.check_c3(triangle, polytopeSet) == OUT:
+      print("Falla C3")
+      ret = OUT
+    else:
+      print("Todo OK")
+    return ret

@@ -15,7 +15,7 @@ from scipy.spatial import ConvexHull
 
 # --- IMPORTA TUS CLASES ACÁ ---
 from geometry.geometry_2d import Geometry2d
-from coverage_checker.predicates_2d import Predicates2d
+from coverage_checker.predicates.predicates_2d import Predicates2d
 # Asumo que SCIChecker está en un archivo sci.py o similar:
 from sci import SCIChecker 
 from common.types import PolytopeMap

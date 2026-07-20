@@ -8,7 +8,7 @@ ruta_raiz = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, ruta_raiz)
 
 from geometry.geometry_2d import Geometry2d
-from coverage_checker.predicates_2d import Predicates2d
+from coverage_checker.predicates.predicates_2d import Predicates2d
 from common.enums import OrientResult
 # Asegurate de importar tu clase CoverageChecker/EnvelopeChecker acá
 from coverage_checker.coverage_checker import CoverageChecker 

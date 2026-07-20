@@ -1,21 +1,18 @@
 import numpy as np
 from sci import SCIChecker
 from geometry import *
-from coverage_checker.predicates_2d import Predicates2d
+from coverage_checker import *
 import polytope as pc
 from scipy.spatial import ConvexHull
-import matplotlib.pyplot as plt
 
 class MatlabWrapper:
-  def __init__(self):
-    self._dimDict = { # diccionario para crear la geometría a partir de la dimensión.
-            2: (Geometry2d, Predicates2d)
-            # 3: (Geometry3d, Predicates3d)
-    }
+  def __init__(self): # por ahora nada
+    pass
   
   def create_geometry_and_predicates(self, dimension: int):
     # inicializa la geometría y los predicados
-    geomClass, predClass = self._dimDict[dimension]
+    geomClass = GeometryFactory[dimension]
+    predClass = PredicatesFactory[dimension]
     self._geom = geomClass()
     self._preds = predClass()
   

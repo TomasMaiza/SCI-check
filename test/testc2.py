@@ -14,7 +14,7 @@ import numpy as np
 from scipy.spatial import ConvexHull
 
 from geometry.geometry_2d import Geometry2d
-from coverage_checker.predicates_2d import Predicates2d
+from coverage_checker.predicates.predicates_2d import Predicates2d
 from sci import SCIChecker 
 from common.types import PolytopeMap
 

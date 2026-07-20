@@ -2,7 +2,7 @@ from common import OrientResult
 from geometry.structs_2d import *
 from .predicates import AbstractPredicates
 from shewchuk import orientation
-from . import pyattene
+from .. import pyattene
 
 IN = OrientResult.IN
 OUT = OrientResult.OUT
