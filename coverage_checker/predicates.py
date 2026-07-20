@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
-import numpy as np
-from common.enums import OrientResult
-from geometry.abstract_structs.point import AbstractPoint
-from geometry.abstract_structs.halfspace import AbstractHalfspace
+from common import OrientResult
+from geometry.abstract_structs import *
 
 class AbstractPredicates(ABC):
   # clase para implementar los predicados en dimensión n

@@ -1,8 +1,7 @@
 from geometry import AbstractGeometry
 from coverage_checker.predicates import AbstractPredicates
 from geometry.abstract_structs import AbstractSimplex
-from common.enums import OrientResult
-from common.types import PolytopeMap, VerticesIndex
+from common import OrientResult, PolytopeMap
 from coverage_checker.coverage_checker import CoverageChecker
 from triangulation import PolytopeTriangulator, DelaunayTriangulation
 import polytope as pc

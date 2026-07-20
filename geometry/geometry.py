@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from .abstract_structs import *
-from common.enums import OrientResult
 
 class AbstractGeometry(ABC):
   # clase abstracta para generar estructuras geométricas de dimensión n
