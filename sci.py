@@ -1,21 +1,11 @@
 from coverage_checker import *
 from geometry import AbstractGeometry
 from geometry.abstract_structs import AbstractSimplex
-from common import OrientResult, PolytopeMap
+from common import PolytopeMap, ON, OUT, IN
 from triangulation import *
 import polytope as pc
 import numpy as np
 from aabbtree import AABB, AABBTree
-
-IN = OrientResult.IN
-OUT = OrientResult.OUT
-ON = OrientResult.ON
-
-'''
-En principio recibe un politopo y sus subregiones.
-Triangula el politopo y debe asignarle índices a los vértices (visitor? hacerlo después?)
-Por ahora no se fija en los índices y hace trabajo de más
-'''
 
 class SCIChecker():
   def __init__(self, geometry: AbstractGeometry, 

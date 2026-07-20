@@ -2,11 +2,7 @@
 from .predicates import AbstractPredicates
 from geometry.abstract_structs import *
 from geometry import AbstractGeometry
-from common import OrientResult, PolytopeMap, VerticesIndex, EdgesIndex
-
-IN = OrientResult.IN
-OUT = OrientResult.OUT
-ON = OrientResult.ON
+from common import *
 
 
 # Patrón Proxy

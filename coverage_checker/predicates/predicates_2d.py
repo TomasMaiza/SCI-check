@@ -1,12 +1,8 @@
-from common import OrientResult
+from common import OrientResult, IN, ON, OUT
 from geometry.structs_2d import *
 from .predicates import AbstractPredicates
 from shewchuk import orientation
 from .. import pyattene
-
-IN = OrientResult.IN
-OUT = OrientResult.OUT
-ON = OrientResult.ON
 
 class Predicates2d(AbstractPredicates):
   # clase para implementar los predicados en 2d
