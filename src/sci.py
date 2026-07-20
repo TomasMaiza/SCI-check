@@ -95,7 +95,7 @@ class SCIChecker():
     return filteredMap
 
   def check_coverage(self) -> bool: # itera sobre los triángulos
-    coverageChecker = CoverageChecker(self._geometry, self._predicates)
+    coverageChecker = CoverageChecker(self._geometry, self._predicates) # USAR STRATEGY PARA ESTO Y SUBREGIONES
     ret = True
     for t in self._triangles:
       filteredMap = self._get_filtered_map(t)
@@ -104,6 +104,8 @@ class SCIChecker():
         ret = False
         break
     return ret
+
+  # OFRECER POR SEPARADO TAMBIÉN check_coverage Y get_subregions
 
   def sci_check(self) -> bool: # hace todo el proceso
     self.triangulate_polytope()
