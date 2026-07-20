@@ -1,11 +1,8 @@
 # acá se implementa el módulo que verifica las 3 condiciones iterando sobre cada triángulo
-# usar iterator?
-from geometry.geometry import AbstractGeometry
-from geometry.abstract_structs.point import AbstractPoint
 import polytope as pc
 from .predicates import AbstractPredicates
-from geometry.abstract_structs.halfspace import AbstractHalfspace
-from geometry.abstract_structs.simplex import AbstractSimplex
+from geometry.abstract_structs import *
+from geometry.geometry import AbstractGeometry
 from common.enums import OrientResult
 from common.types import PolytopeMap, VerticesIndex, EdgesIndex
 

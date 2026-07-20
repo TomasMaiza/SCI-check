@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import numpy as np
 from common.enums import OrientResult
 from geometry.abstract_structs.point import AbstractPoint
-from geometry.abstract_structs.lpipoint import AbstractLPIPoint
 from geometry.abstract_structs.halfspace import AbstractHalfspace
 
 class AbstractPredicates(ABC):
