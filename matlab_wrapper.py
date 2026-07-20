@@ -1,7 +1,7 @@
 import numpy as np
-from sci import SCIChecker
-from geometry import *
-from coverage_checker import *
+from src.sci import SCIChecker
+from src.geometry import *
+from src.coverage_checker import *
 import polytope as pc
 from scipy.spatial import ConvexHull
 
