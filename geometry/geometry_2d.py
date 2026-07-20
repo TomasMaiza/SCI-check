@@ -1,8 +1,6 @@
 import numpy as np
 from .geometry import AbstractGeometry
-from .structs_2d.point2d import Point2D
-from .structs_2d.halfspace2d import Halfspace2D
-from .structs_2d.triangle2d import Triangle2D
+from .structs_2d import *
 
 class Geometry2d(AbstractGeometry):
   # geometría 2d

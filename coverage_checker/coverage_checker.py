@@ -2,7 +2,7 @@
 import polytope as pc
 from .predicates import AbstractPredicates
 from geometry.abstract_structs import *
-from geometry.geometry import AbstractGeometry
+from geometry import AbstractGeometry
 from common.enums import OrientResult
 from common.types import PolytopeMap, VerticesIndex, EdgesIndex
 

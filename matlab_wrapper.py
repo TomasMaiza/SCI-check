@@ -1,6 +1,6 @@
 import numpy as np
 from sci import SCIChecker
-from geometry.geometry_2d import Geometry2d
+from geometry import *
 from coverage_checker.predicates_2d import Predicates2d
 import polytope as pc
 from scipy.spatial import ConvexHull

@@ -1,8 +1,6 @@
 from abc import ABC, abstractmethod
 import numpy as np
-from .abstract_structs.point import AbstractPoint
-from .abstract_structs.halfspace import AbstractHalfspace
-from .abstract_structs.simplex import AbstractSimplex
+from .abstract_structs import *
 from common.enums import OrientResult
 
 class AbstractGeometry(ABC):
