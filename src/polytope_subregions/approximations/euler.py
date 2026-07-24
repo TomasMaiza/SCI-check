@@ -1,0 +1,32 @@
+import numpy as np
+import numpy.typing as npt
+import polytope as pc
+from .strategy import ApproximationStrategy
+from affine_system import *
+
+class Euler(ApproximationStrategy):
+  def __init__(self, subsystem: AffineMode, polytope: pc.Polytope):
+    # Inicializa la función de aproximación y la función de error
+    self._A, self._b = subsystem.get_subsystem()
+    self._S = pc.extreme(polytope)
+  
+  def apply_approx(self, s: float, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+    # aplica la función de aproximación
+    return x + s * (self._A @ x + self._b) # el @ hace el producto matricial
+  
+  def error_bound(self, r: float, tau: float) -> float:
+    # calcula el error de la aproximación
+    normA = np.linalg.norm(self._A, ord=2)
+    M = self._get_M(normA)
+    return r * (1 + normA * tau) + M * (np.exp(normA * tau) - 1 - normA * tau)
+
+  def _get_M(self, normA: float):
+    if normA < 1e-12:
+      return 0.0
+    m = -1 # vamos a calcular el valor máximo de una norma así que inicio en un número negativo
+    for x in self._S:
+      norm = np.linalg.norm(self._A @ x + self._b, ord=2)
+      if norm > m:
+        m = norm
+    return 1/normA * m
+    
