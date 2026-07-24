@@ -22,5 +22,12 @@ class SwitchedAffineSystem:
                 )
       self._modes[i] = AffineMode(A, b) # diccionario para mapear un modo a su sistema afín
     
-  def get_mode(self, mode: int) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
+  def get_mode_matrices(self, mode: int) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     return self._modes[mode].get_system()
+
+  def get_subsystem(self, mode: int) -> AffineMode:
+      return self._modes[mode]
+
+  def get_all_modes(self) -> list[int]:
+    # retorna una lista de los modos del sistema
+    return self._modes.keys()

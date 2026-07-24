@@ -6,18 +6,21 @@ from affine_system import *
 from common import PolytopeMap
 from geometry import AbstractHalfspace
 from .approximations import Euler
+from affine_system import SwitchedAffineSystem
 
 class SubregionsStrategy(ABC):
+  @abstractmethod
   def __init__(self):
-    self._approx = Euler
+    pass
 
-  def get_subregion(self) -> list[AbstractHalfspace]:
+  @abstractmethod
+  def get_subregion(self, polytope: pc.Polytope) -> list[AbstractHalfspace]:
     # obtiene la subregión para un modo particular
     pass
 
-  def get_subregions(self, polytope: pc.Polytope, dwellTime: float) -> PolytopeMap:
+  @abstractmethod
+  def get_subregions(self, sas: SwitchedAffineSystem, polytope: pc.Polytope, dwellTime: float, K: int) -> PolytopeMap:
     # recibe un politopo (y todo lo necesario) para devolver la lista de subregiones
-
     pass
 
   
