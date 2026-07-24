@@ -1,6 +1,5 @@
 from coverage_checker import *
-from geometry import AbstractGeometry
-from geometry.abstract_structs import AbstractSimplex
+from geometry import AbstractGeometry, AbstractSimplex
 from common import PolytopeMap, ON, OUT, IN
 from triangulation import *
 import polytope as pc

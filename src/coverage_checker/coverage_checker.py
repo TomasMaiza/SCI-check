@@ -1,7 +1,6 @@
 # acá se implementa el módulo que verifica las 3 condiciones iterando sobre cada triángulo
 from .predicates import AbstractPredicates
-from geometry.abstract_structs import *
-from geometry import AbstractGeometry
+from geometry import *
 from common import *
 
 
