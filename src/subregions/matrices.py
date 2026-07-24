@@ -1,9 +1,11 @@
 import polytope as pc
 import numpy as np
+from affine_system import AffineMode
 
-def sas_augmented_matrix(self, A: np.ndarray, b: np.ndarray) -> np.ndarray:
+def sas_augmented_matrix(self, subsystem: AffineMode) -> np.ndarray:
   # dadas las matrices A y b que definen al sistema afín conmutado (SAS), calcula la matriz aumentada A tilde
-  # toma las matrices para un modo particular
+  # toma el sistema en un modo particular
+  A, b = subsystem.get_subsystem()
   n = A.shape[0] # dimensiones del sistema
   b = b.reshape(n, 1) # asegurar que b sea un vector columna n x 1
   zeros = np.zeros((1, n))  # fila de n ceros (0_{1xn})
