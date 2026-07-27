@@ -14,5 +14,5 @@ class Geometry2d(AbstractGeometry):
     # crea un semiespacio
     return Halfspace2D(points = points)
 
-  def create_halfspace_from_vector(self, normalVector: np.ndarray, b: float) -> AbstractHalfspace: # crea un semiespacio
+  def create_halfspace_from_vector(self, normalVector: np.ndarray, b: float) -> Halfspace2D: # crea un semiespacio
     return Halfspace2D(normalVector = normalVector, b = b)
