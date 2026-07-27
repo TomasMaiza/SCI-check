@@ -42,7 +42,7 @@ def partition_matrices(polytope: pc.Polytope,
   
   Hminus = np.block([
         [homH],
-        [homH @ (I + h/2 * homA)]
+        [homH @ (I - h/2 * homA)]
     ])
 
   c = np.block([

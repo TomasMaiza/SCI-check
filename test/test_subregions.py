@@ -1,7 +1,7 @@
 from src.polytope_subregions import *
 from src.polytope_subregions.approximations import *
 from src.affine_system import *
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_allclose
 import numpy as np
 import polytope as pc
 
@@ -133,10 +133,36 @@ def test_partition_matrices():
     assert not np.isinf(matrix).any(), f"La matriz {i} contiene valores Inf."
 
   # aserciones numéricas
-    # expected_mat1 = np.array([...])
-    # expected_mat2 = np.array([...])
-    # assert_array_equal(result[0], expected_mat1)
-    # assert_array_equal(result[1], expected_mat2)
+  Hplus_actual, Hminus_actual, c_actual = result
+    
+  # homH superior (caja original) + homH @ (I + (h/2)*homA) inferior
+  expected_Hplus = np.array([
+        [ 1.0,    0.0,    1.0   ],
+        [-1.0,    0.0,    1.0   ],
+        [ 0.0,    1.0,    1.0   ],
+        [ 0.0,   -1.0,    1.0   ],
+        [ 0.995,  0.0025, 1.0025],
+        [-0.995, -0.0025, 0.9975],
+        [ 0.01,   0.99,   0.9995],
+        [-0.01,  -0.99,   1.0005]
+  ])
+    
+  expected_Hminus = expected_Hplus.copy() 
+    
+  # Vector c: r arriba, midErrorBound abajo
+  expected_c = np.array([
+        [-0.10], [-0.10], [-0.10], [-0.10],
+        [-0.05], [-0.05], [-0.05], [-0.05]
+  ])
+    
+  assert_allclose(Hplus_actual, expected_Hplus, rtol=1e-5, atol=1e-8, 
+                    err_msg="Hplus no coincide con los valores esperados.")
+                    
+  assert_allclose(Hminus_actual, expected_Hminus, rtol=1e-5, atol=1e-8, 
+                    err_msg="Hminus no coincide con los valores esperados.")
+                    
+  assert_allclose(c_actual, expected_c, rtol=1e-5, atol=1e-8, 
+                    err_msg="El vector c de cotas no coincide.")
 
 def test_euler():
   pass
