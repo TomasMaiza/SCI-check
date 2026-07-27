@@ -22,7 +22,11 @@ def polytope_augmented_matrix(polytope: pc.Polytope) -> np.ndarray:
   c = c.reshape(n, 1) 
   return np.hstack((H, -c)) # matriz H tilde (homH)
 
-def partition_matrices(polytope: pc.Polytope, subsystem: AffineMode, r: float, h: float, midErrorBound: float) -> tuple[np.ndarray]:
+def partition_matrices(polytope: pc.Polytope, 
+                       subsystem: AffineMode, 
+                       r: float, 
+                       h: float, 
+                       midErrorBound: float) -> tuple[np.ndarray]:
   homA = sas_augmented_matrix(subsystem)
   homH = polytope_augmented_matrix(polytope)
 
@@ -32,18 +36,18 @@ def partition_matrices(polytope: pc.Polytope, subsystem: AffineMode, r: float, h
   ones = np.ones((dim, 1), dtype=np.float64)
 
   Hplus = np.block([
-      homH,
-      homH @ (I + h/2 * homA)
+      [homH],
+      [homH @ (I + h/2 * homA)]
   ])
   
   Hminus = np.block([
-        homH,
-        homH @ (I + h/2 * homA)
+        [homH],
+        [homH @ (I + h/2 * homA)]
     ])
 
   c = np.block([
-        -r * ones,
-        -midErrorBound * ones
+        [-r * ones],
+        [-midErrorBound * ones]
     ])
   
   return Hplus, Hminus, c

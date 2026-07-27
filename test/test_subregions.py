@@ -8,12 +8,7 @@ import polytope as pc
 def test_matrices():
   test_sas_augmented_matrix()
   test_polytope_augmented_matrix()
-
-def test_euler():
-  pass
-
-def test_subregions():
-  pass
+  test_partition_matrices()
 
 def test_sas_augmented_matrix():
   # Caso 1: sistema estándar 2d
@@ -104,3 +99,12 @@ def test_polytope_augmented_matrix():
   result_1d = polytope_augmented_matrix(poly_1d)
   assert_array_equal(result_1d, expected_1d,
                      err_msg="Falló el ensamblaje para un politopo 1D (intervalo)")
+
+def test_partition_matrices():
+  pass
+
+def test_euler():
+  pass
+
+def test_subregions():
+  pass
