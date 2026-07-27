@@ -26,6 +26,6 @@ class Halfspace2D(AbstractHalfspace):
     # crea un semiespacio a partir de la representación vectorial (Ax <= b).
     basePoint = (b / np.dot(normalVector, normalVector)) * normalVector
     perpVector = np.array([-normalVector[1], normalVector[0]]) # el vector perpendicular a (x,y) es (-y, x)
-    self.p1 = Point2D((basePoint[0], basePoint[1]))    
+    self.p1 = Point2D(basePoint[0], basePoint[1])    
     p2 = basePoint + perpVector
-    self.p2 = Point2D((p2[0], p2[1]))
+    self.p2 = Point2D(p2[0], p2[1])

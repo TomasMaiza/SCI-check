@@ -4,6 +4,7 @@ from src.affine_system import *
 from numpy.testing import assert_array_equal, assert_allclose
 import numpy as np
 import polytope as pc
+from src.geometry import GeometryFactory, AbstractHalfspace
 
 def test_matrices():
   test_sas_augmented_matrix()
@@ -386,4 +387,47 @@ def test_apply():
                     err_msg="El estado calculado falla para s < 0.")
 
 def test_subregions():
-  pass
+  test_create_halfspaces_list()
+
+def test_create_halfspaces_list():
+  geometry_2d = GeometryFactory[2]()
+  subregions = Subregions(geometry=geometry_2d)
+    
+  # 2. Setup del politopo de prueba
+  A_poly = np.array([[ 1.0,  0.0], 
+                      [-1.0,  0.0], 
+                      [ 0.0,  1.0], 
+                      [ 0.0, -1.0]])
+                       
+  # Mantenemos el estándar de vector columna estricto (4, 1)
+  b_poly = np.array([[1.0], 
+                       [2.0], 
+                       [3.0], 
+                       [4.0]]) 
+                       
+  test_poly = pc.Polytope(A_poly, b_poly)
+    
+  # 3. Ejecución del método
+  # Llamamos al método "protegido" para aislar su validación
+  halfspaces = subregions._create_halfspaces_list(test_poly)
+    
+  # 4. Validaciones
+  # Al inyectarle un politopo con 4 inecuaciones, debe devolver 4 objetos
+  assert len(halfspaces) == 4, "Debe retornar exactamente 4 semiespacios (uno por fila de la matriz A)."
+    
+  for i, hs in enumerate(halfspaces):
+    # Extraemos los valores originales del politopo para esta iteración
+    A_row = A_poly[i]  
+    b_val = float(b_poly[i][0]) 
+        
+    # Armamos los vectores con las coordenadas de los puntos generados
+    p1_coord = np.array([hs.p1.x, hs.p1.y])
+    p2_coord = np.array([hs.p2.x, hs.p2.y])
+        
+    # Validamos que p1 pertenece a la recta original (A_row * p1 = b_val)
+    assert_allclose(np.dot(A_row, p1_coord), b_val, rtol=1e-5, atol=1e-8,
+                    err_msg=f"El punto p1 del semiespacio {i} no corresponde al politopo original.")
+                        
+    # Validamos que p2 pertenece a la recta original (A_row * p2 = b_val)
+    assert_allclose(np.dot(A_row, p2_coord), b_val, rtol=1e-5, atol=1e-8,
+                    err_msg=f"El punto p2 del semiespacio {i} no corresponde al politopo original.")
