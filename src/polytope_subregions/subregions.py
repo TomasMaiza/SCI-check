@@ -24,18 +24,20 @@ class Subregions(SubregionsStrategy):
   def get_subregion(self, subsystem: AffineMode, polytope: pc.Polytope, K: int, h: float) -> list[AbstractHalfspace]:
     # obtiene la subregión para un modo particular
     approx = self._approxMethod(subsystem, polytope)
-    phi = approx.get_matrix(h) # matriz de la aproximación. h ES CONSTANTE? o va h*k?
     r = 0 # r_0
+    phi = approx.get_matrix(h) # matriz de la aproximación
+    phi_k = phi
     subregionA = [] # apilamos las matrices de las inecuaciones
     subregionb = []
     for k in range(0, K + 1):
+      phi_k = phi @ phi_k
       midr = approx.error_bound(r, h/2)
       Hplus, Hminus, c = partition_matrices(polytope, subsystem, r, h, midr)
       if k > 0:
-        subregionA.append(Hminus @ phi)
+        subregionA.append(Hminus @ phi_k)
         subregionb.append(c)
       if k < K:
-        subregionA.append(Hplus @ phi)
+        subregionA.append(Hplus @ phi_k)
         subregionb.append(c)
       r = approx.error_bound(r, abs(h)) # calculamos r_k al final?
     matrixA = np.vstack(subregionA)
