@@ -135,34 +135,44 @@ def test_partition_matrices():
   # aserciones numéricas
   Hplus_actual, Hminus_actual, c_actual = result
     
-  # homH superior (caja original) + homH @ (I + (h/2)*homA) inferior
+  # homH superior (caja original [A, -b]) + homH @ (I + (h/2)*homA) inferior
   expected_Hplus = np.array([
-        [ 1.0,    0.0,    1.0   ],
-        [-1.0,    0.0,    1.0   ],
-        [ 0.0,    1.0,    1.0   ],
-        [ 0.0,   -1.0,    1.0   ],
-        [ 0.995,  0.0025, 1.0025],
-        [-0.995, -0.0025, 0.9975],
-        [ 0.01,   0.99,   0.9995],
-        [-0.01,  -0.99,   1.0005]
+        [ 1.0,    0.0,   -1.0   ],
+        [-1.0,    0.0,   -1.0   ],
+        [ 0.0,    1.0,   -1.0   ],
+        [ 0.0,   -1.0,   -1.0   ],
+        [ 0.995,  0.0025, -0.9975],
+        [-0.995, -0.0025, -1.0025],
+        [ 0.01,   0.99,   -1.0005],
+        [-0.01,  -0.99,   -0.9995]
   ])
     
-  expected_Hminus = expected_Hplus.copy() 
+  # homH superior (caja original [A, -b]) + homH @ (I - (h/2)*homA) inferior
+  expected_Hminus = np.array([
+        [ 1.0,    0.0,   -1.0   ],
+        [-1.0,    0.0,   -1.0   ],
+        [ 0.0,    1.0,   -1.0   ],
+        [ 0.0,   -1.0,   -1.0   ],
+        [ 1.005, -0.0025, -1.0025],
+        [-1.005,  0.0025, -0.9975],
+        [-0.01,   1.01,   -0.9995],
+        [ 0.01,  -1.01,   -1.0005]
+  ])
     
-  # Vector c: r arriba, midErrorBound abajo
+  # Vector c: r arriba, midErrorBound abajo (esto no cambia)
   expected_c = np.array([
         [-0.10], [-0.10], [-0.10], [-0.10],
         [-0.05], [-0.05], [-0.05], [-0.05]
   ])
     
   assert_allclose(Hplus_actual, expected_Hplus, rtol=1e-5, atol=1e-8, 
-                    err_msg="Hplus no coincide con los valores esperados.")
+                  err_msg="Hplus no coincide con los valores esperados.")
                     
   assert_allclose(Hminus_actual, expected_Hminus, rtol=1e-5, atol=1e-8, 
-                    err_msg="Hminus no coincide con los valores esperados.")
+                  err_msg="Hminus no coincide con los valores esperados.")
                     
   assert_allclose(c_actual, expected_c, rtol=1e-5, atol=1e-8, 
-                    err_msg="El vector c de cotas no coincide.")
+                  err_msg="El vector c de cotas no coincide.")
 
 def test_euler():
   pass
