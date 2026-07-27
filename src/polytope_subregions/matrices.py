@@ -31,12 +31,12 @@ def partition_matrices(polytope: pc.Polytope, subsystem: AffineMode, r: float, h
   dim = homH.shape[0]
   ones = np.ones((dim, 1), dtype=np.float64)
 
-  posH = np.block([
+  Hplus = np.block([
       homH,
       homH @ (I + h/2 * homA)
   ])
   
-  negH = np.block([
+  Hminus = np.block([
         homH,
         homH @ (I + h/2 * homA)
     ])
@@ -46,5 +46,5 @@ def partition_matrices(polytope: pc.Polytope, subsystem: AffineMode, r: float, h
         -midErrorBound * ones
     ])
   
-  return posH, negH, c
+  return Hplus, Hminus, c
   

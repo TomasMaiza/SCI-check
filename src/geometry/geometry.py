@@ -13,5 +13,9 @@ class AbstractGeometry(ABC):
     pass
 
   @abstractmethod
-  def create_halfspace(self, points: tuple[AbstractPoint, ...],) -> AbstractHalfspace: # crea un semiespacio
+  def create_halfspace(self, points: tuple[AbstractPoint, ...]) -> AbstractHalfspace: # crea un semiespacio
+    pass
+
+  @abstractmethod
+  def create_halfspace_from_vector(self, normalVector: np.ndarray, b: float) -> AbstractHalfspace: # crea un semiespacio
     pass

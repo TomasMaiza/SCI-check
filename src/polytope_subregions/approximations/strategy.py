@@ -10,11 +10,16 @@ class ApproximationStrategy(ABC):
     pass
 
   @abstractmethod
-  def apply_approx(self, s: float, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+  def apply(self, s: float, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
     # aplica la función de aproximación
     pass
 
   @abstractmethod
   def error_bound(self, r: float, tau: float) -> float:
     # calcula el error de la aproximación
+    pass
+
+  @abstractmethod
+  def get_matrix(self, s: float) -> npt.NDArray[np.float64]:
+    # calcula la matriz de la aproximación tomando el paso s
     pass
