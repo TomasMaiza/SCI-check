@@ -28,6 +28,7 @@ class Euler(ApproximationStrategy):
       return 0.0
     m = -1 # vamos a calcular el valor máximo de una norma así que inicio en un número negativo
     for x in self._S:
+      x = x.reshape(-1, 1) # forzamos a x a ser un vector columna
       norm = np.linalg.norm(self._A @ x + self._b, ord=2)
       if norm > m:
         m = norm

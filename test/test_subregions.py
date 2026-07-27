@@ -175,6 +175,9 @@ def test_partition_matrices():
                   err_msg="El vector c de cotas no coincide.")
 
 def test_euler():
+  test_get_M()
+
+def test_get_M():
   pass
 
 def test_subregions():
