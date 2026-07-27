@@ -101,7 +101,42 @@ def test_polytope_augmented_matrix():
                      err_msg="Falló el ensamblaje para un politopo 1D (intervalo)")
 
 def test_partition_matrices():
-  pass
+  # Seteo politopo 2d (cuadrado)
+  A_poly = np.array([[ 1.0,  0.0], 
+                     [-1.0,  0.0], 
+                     [ 0.0,  1.0], 
+                     [ 0.0, -1.0]])
+  b_poly = np.array([1.0, 1.0, 1.0, 1.0]).reshape(-1, 1) # Vector columna estricto
+  polytope_region = pc.Polytope(A_poly, b_poly)
+    
+  # seteo subsistema afín
+  A_sys = np.array([[-1.0,  0.5], 
+                    [ 2.0, -2.0]])
+  b_sys = np.array([0.5, -0.1]).reshape(-1, 1) # Vector columna estricto
+  subsystem = AffineMode(A_sys, b_sys)
+    
+  # parámetros 
+  r = 0.1             # Escala/radio de la subregión
+  h = 0.01            # Paso de discretización
+  midErrorBound = 0.05 # Cota de error
+    
+  # ejecución
+  result = partition_matrices(polytope_region, subsystem, r, h, midErrorBound)
+    
+  # aserciones estructurales
+  assert isinstance(result, tuple), "El resultado debe ser una tupla."
+  assert len(result) > 0, "La tupla devuelta no debería estar vacía."
+    
+  for i, matrix in enumerate(result):
+    assert isinstance(matrix, np.ndarray), f"El elemento {i} de la tupla no es un np.ndarray."
+    assert not np.isnan(matrix).any(), f"La matriz {i} contiene valores NaN (posible error en la discretización)."
+    assert not np.isinf(matrix).any(), f"La matriz {i} contiene valores Inf."
+
+  # aserciones numéricas
+    # expected_mat1 = np.array([...])
+    # expected_mat2 = np.array([...])
+    # assert_array_equal(result[0], expected_mat1)
+    # assert_array_equal(result[1], expected_mat2)
 
 def test_euler():
   pass
