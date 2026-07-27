@@ -176,6 +176,7 @@ def test_partition_matrices():
 
 def test_euler():
   test_get_M()
+  test_error_bound()
 
 def test_get_M():
   # Caso 1: A_i = 0 (normA < 1e-12)
@@ -221,6 +222,53 @@ def test_get_M():
     
   assert_allclose(result_M, expected_M, rtol=1e-5, atol=1e-8,
                   err_msg="El cálculo de M_i no coincide con el máximo teórico.")
+
+def test_error_bound():
+  # Politopo Caja [-1, 1] x [-1, 1]
+  A_poly = np.array([[ 1.0,  0.0], 
+                       [-1.0,  0.0], 
+                       [ 0.0,  1.0], 
+                       [ 0.0, -1.0]])
+  b_poly = np.array([1.0, 1.0, 1.0, 1.0]).reshape(-1, 1)
+  poly_dummy = pc.Polytope(A_poly, b_poly)
+
+  # Caso 1: Sistema con A nula (normA = 0, M = 0)
+  A_zero = np.zeros((2, 2))
+  b_zero = np.zeros((2, 1))
+  mode_zero = AffineMode(A_zero, b_zero)
+  euler_zero = Euler(mode_zero, poly_dummy)
+    
+  r_val = 0.5
+  tau_val = 0.01
+    
+  # Si normA = 0 y M = 0, la Ec 11 colapsa a: Delta = r * (1 + 0) + 0 = r
+  result_zero = euler_zero.error_bound(r=r_val, tau=tau_val)
+  assert result_zero == r_val, "Si A=0, el error bound debe ser exactamente igual a r."
+
+  # Caso 2: Sistema dinámico general
+  A_sys = np.array([[2.0, 0.0], 
+                      [0.0, 2.0]])
+  b_sys = np.array([[1.0], 
+                      [0.0]])
+  mode_sys = AffineMode(A_sys, b_sys)
+  euler_sys = Euler(mode_sys, poly_dummy)
+    
+  r_val = 0.1
+  tau_val = 0.05
+    
+  # Valores teóricos conocidos de la prueba anterior
+  normA_teorico = 2.0
+  M_teorico = np.sqrt(13) / 2.0
+    
+  # Armamos la ecuación 11 teórica en Python puro para contrastar
+  termino_1 = r_val * (1.0 + normA_teorico * tau_val)
+  termino_2 = M_teorico * (np.exp(normA_teorico * tau_val) - 1.0 - normA_teorico * tau_val)
+  expected_error = termino_1 + termino_2
+    
+  result_sys = euler_sys.error_bound(r=r_val, tau=tau_val)
+    
+  assert_allclose(result_sys, expected_error, rtol=1e-5, atol=1e-8,
+                    err_msg="El error bound no coincide con la Ecuación 11 teórica.")
 
 def test_subregions():
   pass
