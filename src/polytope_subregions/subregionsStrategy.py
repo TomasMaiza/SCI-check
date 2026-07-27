@@ -19,7 +19,11 @@ class SubregionsStrategy(ABC):
     pass
 
   @abstractmethod
-  def get_subregions(self, sas: SwitchedAffineSystem, polytope: pc.Polytope, dwellTime: float, K: int) -> PolytopeMap:
+  def get_subregions(self, 
+                     sas: SwitchedAffineSystem, 
+                     polytope: pc.Polytope, 
+                     dwellTime: float, 
+                     K: int) -> PolytopeMap:
     # recibe un politopo (y todo lo necesario) para devolver la lista de subregiones
     pass
 

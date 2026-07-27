@@ -21,7 +21,11 @@ class Subregions(SubregionsStrategy):
       halfspaces.append(hs)
     return halfspaces
 
-  def get_subregion(self, subsystem: AffineMode, polytope: pc.Polytope, K: int, h: float) -> list[AbstractHalfspace]:
+  def get_subregion(self, 
+                    subsystem: AffineMode, 
+                    polytope: pc.Polytope, 
+                    K: int, 
+                    h: float) -> list[AbstractHalfspace]:
     # obtiene la subregión para un modo particular
     approx = self._approxMethod(subsystem, polytope)
     r = 0 # r_0
@@ -47,7 +51,11 @@ class Subregions(SubregionsStrategy):
     subregionPolytope = pc.reduce(subregionPolytope)
     return self._create_halfspaces_list(subregionPolytope)
 
-  def get_subregions(self, sas: SwitchedAffineSystem, polytope: pc.Polytope, dwellTime: float, K: int) -> PolytopeMap:
+  def get_subregions(self, 
+                     sas: SwitchedAffineSystem, 
+                     polytope: pc.Polytope, 
+                     dwellTime: float, 
+                     K: int) -> PolytopeMap:
     # recibe un politopo (y todo lo necesario) para devolver la lista de subregiones
     h = dwellTime/K
     modes = sas.get_all_modes()
