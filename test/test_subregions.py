@@ -178,7 +178,49 @@ def test_euler():
   test_get_M()
 
 def test_get_M():
-  pass
+  # Caso 1: A_i = 0 (normA < 1e-12)
+  A_zero = np.zeros((2, 2))
+  b_zero = np.zeros((2, 1))
+  mode_zero = AffineMode(A_zero, b_zero)
+    
+  # Caja de [-1, 1] en X e Y
+  A_poly = np.array([[ 1.0,  0.0], 
+                     [-1.0,  0.0], 
+                     [ 0.0,  1.0], 
+                     [ 0.0, -1.0]])
+  b_poly = np.array([1.0, 1.0, 1.0, 1.0]).reshape(-1, 1)
+  poly_dummy = pc.Polytope(A_poly, b_poly)
+    
+  # Instanciamos la clase de Euler
+  euler_zero = Euler(mode_zero, poly_dummy)
+    
+  result_zero = euler_zero._get_M(normA=0.0)
+  assert result_zero == 0.0, "M_i debe ser exactamente 0.0 cuando normA < 1e-12."
+
+  # Caso 2: A_i != 0 (Evaluación de vértices)
+
+  # Sistema: A = [[2, 0], [0, 2]], b = [[1], [0]]
+  # normA (norma 2) = 2.0
+  A_sys = np.array([[2.0, 0.0], 
+                    [0.0, 2.0]])
+  b_sys = np.array([[1.0], 
+                    [0.0]])
+  mode_sys = AffineMode(A_sys, b_sys)
+    
+  # Usamos el mismo politopo dummy: Caja [-1, 1] x [-1, 1]
+  euler_sys = Euler(mode_sys, poly_dummy)
+    
+  normA = np.linalg.norm(A_sys, ord=2)  # Esto es exactamente 2.0
+    
+  # El máximo de ||Ax + b||_2 en esa caja se da en el vértice [1, 1]^T o [1, -1]^T
+  # Ax + b evaluado ahí da [3, 2]^T. Su norma 2 es sqrt(3^2 + 2^2) = sqrt(13).
+  # Entonces M = sqrt(13) / normA = sqrt(13) / 2.
+  expected_M = np.sqrt(13) / 2.0  
+    
+  result_M = euler_sys._get_M(normA=normA)
+    
+  assert_allclose(result_M, expected_M, rtol=1e-5, atol=1e-8,
+                  err_msg="El cálculo de M_i no coincide con el máximo teórico.")
 
 def test_subregions():
   pass
