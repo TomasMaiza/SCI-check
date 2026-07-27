@@ -12,6 +12,9 @@ compile:
 run: compile
 	@PYTHONPATH=./src python3 test/testc2.py
 
+subregions: compile
+	@PYTHONPATH=.:./src pytest test/test_subregions.py -v
+
 clean:
 	@rm -rf $(BINDINGS_BUILD_DIR)
 	@rm -f $(PYTHON_DIR)/pyattene*.so

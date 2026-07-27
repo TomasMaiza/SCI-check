@@ -2,7 +2,10 @@ from geometry.abstract_structs.simplex import AbstractSimplex
 from .point2d import Point2D
 import numpy as np
 from dataclasses import dataclass
-from common.types import Edge
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.common.types import Edge
 
 @dataclass(frozen=True)
 class Triangle2D(AbstractSimplex):
@@ -15,7 +18,7 @@ class Triangle2D(AbstractSimplex):
   def get_vertices(self) -> tuple[Point2D, Point2D, Point2D]: # retorna sus vértices
     return (self.v1, self.v2, self.v3)
 
-  def get_edges(self) -> tuple[Edge, Edge, Edge]: 
+  def get_edges(self) -> tuple['Edge', 'Edge', 'Edge']: 
     # retorna sus aristas
     # cada arista es una tupla de dos puntos
     return ((self.v1, self.v2), (self.v2, self.v3), (self.v3, self.v1))

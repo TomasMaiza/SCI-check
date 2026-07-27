@@ -1,4 +1,4 @@
-from geometry.abstract_structs import *
+from geometry.abstract_structs import AbstractPoint, AbstractHalfspace
 
 type PolytopeMap = list[list[AbstractHalfspace]]
 # diccionario que relaciona cada subregion con un conjunto de los semiespacios que la definen

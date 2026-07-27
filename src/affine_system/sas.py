@@ -5,7 +5,7 @@ from .affine_mode import AffineMode
 
 class SwitchedAffineSystem:
   # Representa el sistema completo con todos sus modos disponibles.
-  def __init__(self, modesDict: Dict[int, (npt.NDArray[np.float64], npt.NDArray[np.float64])]):
+  def __init__(self, modesDict: Dict[int, tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]]):
     if not modesDict:
       raise ValueError("El sistema debe contener al menos un modo.")
     first = True # para tomar la dimensión del primer modo como referencia
