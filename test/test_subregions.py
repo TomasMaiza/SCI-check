@@ -178,6 +178,7 @@ def test_euler():
   test_get_M()
   test_error_bound()
   test_get_matrix()
+  test_apply()
 
 def test_get_M():
   # Caso 1: A_i = 0 (normA < 1e-12)
@@ -330,6 +331,59 @@ def test_get_matrix():
     
   assert_allclose(result_neg, expected_matrix_neg, rtol=1e-5, atol=1e-8,
                     err_msg="La matriz aproximada falla para valores de s negativos (s < 0).")
+
+def test_apply():
+  A_poly = np.array([[ 1.0,  0.0], 
+                       [-1.0,  0.0], 
+                       [ 0.0,  1.0], 
+                       [ 0.0, -1.0]])
+  b_poly = np.array([1.0, 1.0, 1.0, 1.0]).reshape(-1, 1)
+  poly_dummy = pc.Polytope(A_poly, b_poly)
+
+  A_sys = np.array([[2.0, 0.0], 
+                      [0.0, 2.0]])
+  b_sys = np.array([[1.0], 
+                      [0.0]])
+  mode_sys = AffineMode(A_sys, b_sys)
+  euler_sys = Euler(mode_sys, poly_dummy)
+
+  # Definimos un vector de estado de prueba estricto (columna)
+  # x = [1, 1]^T
+  x_val = np.array([[1.0], 
+                      [1.0]])
+
+  # Caso 1: s = 0.0 (El estado no debe cambiar)
+  result_zero = euler_sys.apply(s=0.0, x=x_val)
+    
+  assert_allclose(result_zero, x_val, rtol=1e-5, atol=1e-8,
+                    err_msg="Si s=0, la función apply debe devolver el mismo estado inicial x.")
+
+  # Caso 2: s > 0 (Evolución hacia adelante)
+  s_pos = 0.1
+    
+  # MATEMÁTICA DEL TEST:
+  # A*x + b = [[2, 0], [0, 2]] @ [[1], [1]] + [[1], [0]] 
+  #         = [[2], [2]] + [[1], [0]] = [[3], [2]]
+  # x + 0.1 * [[3], [2]] = [[1], [1]] + [[0.3], [0.2]] = [[1.3], [1.2]]
+  expected_pos = np.array([[1.3], 
+                             [1.2]])
+                             
+  result_pos = euler_sys.apply(s=s_pos, x=x_val)
+    
+  assert_allclose(result_pos, expected_pos, rtol=1e-5, atol=1e-8,
+                    err_msg="El estado calculado falla para s > 0.")
+
+  # Caso 3: s < 0 (Evolución hacia atrás)
+  s_neg = -0.1
+    
+  # x - 0.1 * [[3], [2]] = [[1], [1]] - [[0.3], [0.2]] = [[0.7], [0.8]]
+  expected_neg = np.array([[0.7], 
+                             [0.8]])
+                             
+  result_neg = euler_sys.apply(s=s_neg, x=x_val)
+    
+  assert_allclose(result_neg, expected_neg, rtol=1e-5, atol=1e-8,
+                    err_msg="El estado calculado falla para s < 0.")
 
 def test_subregions():
   pass
