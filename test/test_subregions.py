@@ -177,6 +177,7 @@ def test_partition_matrices():
 def test_euler():
   test_get_M()
   test_error_bound()
+  test_get_matrix()
 
 def test_get_M():
   # Caso 1: A_i = 0 (normA < 1e-12)
@@ -269,6 +270,66 @@ def test_error_bound():
     
   assert_allclose(result_sys, expected_error, rtol=1e-5, atol=1e-8,
                     err_msg="El error bound no coincide con la Ecuación 11 teórica.")
+
+def test_get_matrix():
+  A_poly = np.array([[ 1.0,  0.0], 
+                       [-1.0,  0.0], 
+                       [ 0.0,  1.0], 
+                       [ 0.0, -1.0]])
+  b_poly = np.array([1.0, 1.0, 1.0, 1.0]).reshape(-1, 1)
+  poly_dummy = pc.Polytope(A_poly, b_poly)
+
+  A_sys = np.array([[2.0, 0.0], 
+                      [0.0, 2.0]])
+  b_sys = np.array([[1.0], 
+                      [0.0]])
+  mode_sys = AffineMode(A_sys, b_sys)
+  euler_sys = Euler(mode_sys, poly_dummy)
+
+  # Caso 1: s = 0.0 (Debe devolver la matriz Identidad)
+  dim = euler_sys._homA.shape[0]
+  expected_identity = np.eye(dim, dtype=np.float64)
+    
+  result_zero = euler_sys.get_matrix(s=0.0)
+    
+  assert_allclose(result_zero, expected_identity, rtol=1e-5, atol=1e-8,
+                    err_msg="Si s=0, la matriz de aproximación debe ser exactamente la Identidad.")
+
+  # Caso 2: s > 0 (Aproximación de Euler estándar)
+  s_val = 0.1
+    
+  # MATEMÁTICA DEL TEST:
+  # homA teórica esperada para A_sys y b_sys:
+  # [[2.0, 0.0, 1.0],
+  #  [0.0, 2.0, 0.0],
+  #  [0.0, 0.0, 0.0]]
+  #
+  # I + 0.1 * homA debería dar como resultado:
+  expected_matrix = np.array([
+        [1.2, 0.0, 0.1],
+        [0.0, 1.2, 0.0],
+        [0.0, 0.0, 1.0]
+  ], dtype=np.float64)
+    
+  result_s = euler_sys.get_matrix(s=s_val)
+    
+  assert_allclose(result_s, expected_matrix, rtol=1e-5, atol=1e-8,
+                    err_msg="La matriz aproximada no coincide con el cálculo I + s*homA.")
+  
+  # Caso 3: s < 0 (Aproximación con flujo temporal negativo)
+  s_neg = -0.1
+    
+  # I - 0.1 * homA
+  expected_matrix_neg = np.array([
+        [0.8, 0.0, -0.1],
+        [0.0, 0.8,  0.0],
+        [0.0, 0.0,  1.0]
+  ], dtype=np.float64)
+    
+  result_neg = euler_sys.get_matrix(s=s_neg)
+    
+  assert_allclose(result_neg, expected_matrix_neg, rtol=1e-5, atol=1e-8,
+                    err_msg="La matriz aproximada falla para valores de s negativos (s < 0).")
 
 def test_subregions():
   pass
