@@ -392,6 +392,7 @@ def test_subregions():
   pass
   # test_create_halfspaces_list()
   # test_get_subregion()
+  # test_get_subregions()
 
 def test_create_halfspaces_list():
   geometry_2d = GeometryFactory[2]()
@@ -544,3 +545,49 @@ def test_get_subregion():
     assert hasattr(hs, 'p1') and hasattr(hs, 'p2'), "Faltan los puntos geométricos."
     assert hs.p1 is not None and hs.p2 is not None, "Los puntos no pueden ser nulos."
 
+def test_get_subregions():
+  geometry_2d = GeometryFactory[2]()
+  subregions = Subregions(geometry=geometry_2d)
+    
+  # Caja inicial de [-1, 1]
+  A_poly = np.array([[ 1.0,  0.0], [-1.0,  0.0], [ 0.0,  1.0], [ 0.0, -1.0]])
+  b_poly = np.array([[1.0], [1.0], [1.0], [1.0]]) 
+  test_poly = pc.Polytope(A_poly, b_poly)
+
+  # 2. Configuración de matrices para los modos
+  # Modo 0: Sistema estático (sin dinámica)
+  A_static = np.zeros((2, 2))
+  b_static = np.zeros((2, 1))
+    
+  # Modo 1: Sistema con deriva constante
+  A_drift = np.zeros((2, 2))
+  b_drift = np.array([[0.5], [0.0]])
+
+  # 3. Instanciamos el SwitchedAffineSystem REAL
+  modes_dict = {
+    0: (A_static, b_static),
+    1: (A_drift, b_drift)
+  }
+  real_sas = SwitchedAffineSystem(modes_dict)
+
+  # 4. Ejecución del orquestador principal
+  dwell_time = 1.0
+  K_steps = 2
+    
+  polytope_list = subregions.get_subregions(
+        sas=real_sas, 
+        polytope=test_poly, 
+        dwellTime=dwell_time, 
+        K=K_steps
+    )
+    
+  # 5. Validaciones estructurales y geométricas
+  assert isinstance(polytope_list, list), "Debe retornar una lista."
+  assert len(polytope_list) == 2, "Debe contener subregiones para exactamente 2 modos."
+    
+  # Validamos el acceso directo por índice (0 y 1)
+  for i in range(len(polytope_list)):
+    halfspaces = polytope_list[i]
+    assert isinstance(halfspaces, list), f"El valor en el índice {i} debe ser una lista."
+    assert len(halfspaces) > 0, f"El politopo resultante para el modo {i} está vacío."
+    assert hasattr(halfspaces[0], 'p1'), "Los elementos de la lista deben ser semiespacios válidos."
