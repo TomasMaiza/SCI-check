@@ -477,3 +477,70 @@ def test_get_subregion():
     assert hasattr(hs, 'p1'), f"El semiespacio {i} no tiene el atributo p1."
     assert hasattr(hs, 'p2'), f"El semiespacio {i} no tiene el atributo p2."
     assert hs.p1 is not None and hs.p2 is not None, "Los puntos del semiespacio están vacíos."
+
+  # CASO 2: Sistema dinámico con deriva constante (Drift)
+  # A nula, pero el sistema se mueve a la derecha a 0.5 unidades/seg
+  A_sys_drift = np.array([[0.0, 0.0], 
+                            [0.0, 0.0]])
+  b_sys_drift = np.array([[0.5], 
+                            [0.0]])
+  drift_subsystem = AffineMode(A_sys_drift, b_sys_drift)
+
+  K_steps_drift = 1
+  h_step_drift = 1.0 # 1 segundo entero para que el desplazamiento sea notorio
+    
+  halfspaces_drift = subregions.get_subregion(
+        subsystem=drift_subsystem, 
+        polytope=test_poly, # Reutilizamos la caja de [-1, 1]
+        K=K_steps_drift, 
+        h=h_step_drift
+    )
+    
+  # Validaciones básicas
+  assert isinstance(halfspaces_drift, list), "Debe retornar una lista."
+  assert len(halfspaces_drift) > 0, "El politopo recortado no debe estar vacío."
+    
+  for i, hs in enumerate(halfspaces_drift):
+    assert hasattr(hs, 'p1') and hasattr(hs, 'p2'), "Faltan los puntos geométricos."
+    assert hs.p1 is not None and hs.p2 is not None, "Los puntos no pueden ser nulos."
+
+  # Validación geométrica avanzada (opcional pero recomendada):
+  # Como el politopo se tuvo que haber recortado, es muy probable que 
+  # la cantidad de semiespacios haya cambiado o que las inecuaciones 
+  # resultantes (luego de pc.reduce) reflejen el nuevo límite en x <= 0.5.
+  print(f"\nCaso estático generó {len(halfspaces)} semiespacios.")
+  print(f"Caso con deriva generó {len(halfspaces_drift)} semiespacios.")
+
+  # CASO 3: Sistema contractivo (Estable) con A y b no nulos
+  # Matriz A con autovalores negativos (-0.5 y -1.5) que atrae al estado.
+  # Los términos cruzados (0.5) prueban que x e y interactúen bien.
+  A_sys_stable = np.array([[-1.0,  0.5], 
+                             [ 0.5, -1.0]])
+                             
+  # Deriva leve que desplaza el punto de equilibrio fuera del origen
+  b_sys_stable = np.array([[ 0.1], 
+                             [-0.1]])
+                             
+  stable_subsystem = AffineMode(A_sys_stable, b_sys_stable)
+
+  # Le damos 5 pasos enteros de propagación hacia el futuro
+  K_steps_stable = 5  
+  h_step_stable = 0.1 
+    
+  # Esta es la prueba definitiva de la propagación del error y la 
+  # acumulación de matrices Phi_k a lo largo del tiempo.
+  halfspaces_stable = subregions.get_subregion(
+        subsystem=stable_subsystem, 
+        polytope=test_poly, # Seguimos usando la caja centrada de [-1, 1]
+        K=K_steps_stable, 
+        h=h_step_stable
+    )
+    
+  # Validaciones 
+  assert isinstance(halfspaces_stable, list), "Debe retornar una lista."
+  assert len(halfspaces_stable) > 0, "El politopo contractivo no debe estar vacío."
+    
+  for i, hs in enumerate(halfspaces_stable):
+    assert hasattr(hs, 'p1') and hasattr(hs, 'p2'), "Faltan los puntos geométricos."
+    assert hs.p1 is not None and hs.p2 is not None, "Los puntos no pueden ser nulos."
+
