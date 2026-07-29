@@ -9,6 +9,7 @@ class SwitchedAffineSystem:
     if not modesDict:
       raise ValueError("El sistema debe contener al menos un modo.")
     first = True # para tomar la dimensión del primer modo como referencia
+    self._modes = {}
     for i in modesDict.keys():
       A, b = modesDict[i]
       if first:
@@ -23,11 +24,13 @@ class SwitchedAffineSystem:
       self._modes[i] = AffineMode(A, b) # diccionario para mapear un modo a su sistema afín
     
   def get_mode_matrices(self, mode: int) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
-    return self._modes[mode].get_system()
+    # retorna las matrices A y b del modo indicado
+    return self._modes[mode].get_subsystem()
 
   def get_subsystem(self, mode: int) -> AffineMode:
-      return self._modes[mode]
+    # retorna el subsistema del modo indicado  
+    return self._modes[mode]
 
   def get_all_modes(self) -> list[int]:
-    # retorna una lista de los modos del sistema
+    # retorna una lista de los modos (índices) del sistema
     return self._modes.keys()
