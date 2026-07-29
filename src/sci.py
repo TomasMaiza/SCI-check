@@ -5,14 +5,21 @@ from triangulation import *
 import polytope as pc
 import numpy as np
 from aabbtree import AABB, AABBTree
+from affine_system import SwitchedAffineSystem
+from polytope_subregions import Subregions
 
 class SCIChecker():
-  def __init__(self, geometry: AbstractGeometry, 
-               predicates: AbstractPredicates, polytope: pc.Polytope, subregions: PolytopeMap):
+  def __init__(self, 
+               geometry: AbstractGeometry, 
+               predicates: AbstractPredicates, 
+               polytope: pc.Polytope, 
+               sas: SwitchedAffineSystem):
     self._geometry = geometry
     self._predicates = predicates
     self._polytope = polytope
-    self._subregions = subregions # esto después vuela
+    self._sas = sas
+    # hacer strategy para subregions y para el envelope_check?
+    self._subregionsAlgorithm = Subregions(geometry)
     # en qué orden están las subregiones?
 
   def _create_triangles(self, triangles: list[np.ndarray]):
@@ -47,11 +54,8 @@ class SCIChecker():
         self._edgesIndex[e] = False
       
 
-  def get_subregions(self): # para más adelante
-    pass
-    # cuando haga esto tengo que ordenar los semiespacios que definen cada subregión
-    # podría hacerse con scipy.spatial.ConvexHull
-    # eso me ordena los vértices, luego creo los semiespacios
+  def get_subregions(self, dwellTime: float, K: int):
+    self._subregions = self._subregionsAlgorithm.get_subregions(self._sas, self._polytope, dwellTime, K)
 
   def get_aabb_limits_p(self) -> list[list[tuple[float, float]]]:
     limits = []
@@ -97,7 +101,8 @@ class SCIChecker():
     coverageChecker = CoverageChecker(self._geometry, self._predicates) # USAR STRATEGY PARA ESTO Y SUBREGIONES
     ret = True
     for t in self._triangles:
-      filteredMap = self._get_filtered_map(t)
+      # filteredMap = self._get_filtered_map(t)
+      filteredMap = self._subregions
       check = coverageChecker.envelope_check(t, filteredMap, self._verticesIndex, self._edgesIndex)
       if check == OUT:
         ret = False
@@ -106,8 +111,13 @@ class SCIChecker():
 
   # OFRECER POR SEPARADO TAMBIÉN check_coverage Y get_subregions
 
-  def sci_check(self) -> bool: # hace todo el proceso
+  def consult_subregions(self) -> PolytopeMap:
+    return self._subregions
+
+  def sci_check(self, dwellTime: float, K: int) -> bool: # hace todo el proceso
     self.triangulate_polytope()
-    # self.get_subregions
-    self.create_aabb_tree() # estrategia de aceleración 1
+    self.get_subregions(dwellTime, K)
+    print(f"Numero de subregiones: {len(self._subregions)}")
+    # print(f"Tamaño de la 4: {len(self._subregions[4])}")
+    # self.create_aabb_tree() # estrategia de aceleración 1
     return self.check_coverage()

@@ -6,17 +6,23 @@ from common import *
 
 # Patrón Proxy
 class _CoverageCheckerIntern:
-  def __init__(self, geometry: AbstractGeometry, predicates: AbstractPredicates) -> None:
+  def __init__(self, 
+               geometry: AbstractGeometry, 
+               predicates: AbstractPredicates) -> None:
     self._geometry = geometry
     self._predicates = predicates
 
-  def point_out(self, v: AbstractPoint, polytopeMap: PolytopeMap) -> OrientResult:
+  def point_out(self, 
+                v: AbstractPoint, 
+                polytopeMap: PolytopeMap) -> OrientResult:
     ret = OUT
     for halfspacesList in polytopeMap:
       isInFlag = True
+      if len(halfspacesList) == 0:
+        isInFlag = False
       for f in halfspacesList: # con la lista llegan en orden
         ori = self._predicates.orient(v, f)
-        if ori != IN: # puede ser ON o OUT. REVISAR QUE DEBERÍA PASAR EN CASO DE ON
+        if ori == OUT: # puede ser ON o OUT. REVISAR QUE DEBERÍA PASAR EN CASO DE ON
           isInFlag = False
           break
       if isInFlag:
@@ -24,21 +30,35 @@ class _CoverageCheckerIntern:
         break
     return ret
 
-  def points_on_same_side(self, v1: AbstractPoint, v2: AbstractPoint, f: AbstractHalfspace) -> bool:
+  def points_on_same_side(self, 
+                          v1: AbstractPoint, 
+                          v2: AbstractPoint, 
+                          f: AbstractHalfspace) -> bool:
     ori1 = self._predicates.orient(v1, f)
     ori2 = self._predicates.orient(v2, f)
     return ori1 == ori2 or ori1 == ON or ori2 == ON
 
-  def implicit_point_in_polytope(self, v1: AbstractPoint, v2: AbstractPoint, f: AbstractHalfspace, p: list[AbstractHalfspace]) -> bool:
+  def implicit_point_in_polytope(self, 
+                                 v1: AbstractPoint, 
+                                 v2: AbstractPoint, 
+                                 f: AbstractHalfspace, 
+                                 p: list[AbstractHalfspace]) -> bool:
     ret = True
+    if len(p) == 0:
+      ret = False
     for fp in p:
       ori = self._predicates.orient_LPI(v1, v2, f, fp)
-      if ori != IN: # puede ser ON o OUT
+      if ori == OUT: # puede ser ON o OUT
         ret = False
         break
     return ret
 
-  def edge_edge_out(self, v1: AbstractPoint, v2: AbstractPoint, f: AbstractHalfspace, polytopeMap: PolytopeMap, currentpIndex: int) -> OrientResult:
+  def edge_edge_out(self, 
+                    v1: AbstractPoint, 
+                    v2: AbstractPoint, 
+                    f: AbstractHalfspace, 
+                    polytopeMap: PolytopeMap, 
+                    currentpIndex: int) -> OrientResult:
     # primero verificamos la posición de los puntos respecto a f
     if self.points_on_same_side(v1, v2, f):
       return IN
@@ -50,7 +70,10 @@ class _CoverageCheckerIntern:
         break
     return ret
   
-  def implicit_point_in_triangle(self, triangle: AbstractSimplex, f1: AbstractHalfspace, f2: AbstractHalfspace) -> bool:
+  def implicit_point_in_triangle(self, 
+                                 triangle: AbstractSimplex, 
+                                 f1: AbstractHalfspace, 
+                                 f2: AbstractHalfspace) -> bool:
     edges = triangle.get_edges()
     r, s = f1.get_points()
     ret = True
@@ -58,12 +81,18 @@ class _CoverageCheckerIntern:
       # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
       e = self._geometry.create_halfspace((v1, v2))
       ori = self._predicates.orient_LPI(r, s, f2, e)
-      if ori != IN:
+      if ori == OUT:
         ret = False
         break
     return ret
 
-  def edge_edge_tri_out(self, triangle: AbstractSimplex, f1: AbstractHalfspace, f2: AbstractHalfspace, polytopeMap: PolytopeMap, currentpIndex1: int, currentpIndex2: int) -> OrientResult:
+  def edge_edge_tri_out(self, 
+                        triangle: AbstractSimplex, 
+                        f1: AbstractHalfspace, 
+                        f2: AbstractHalfspace, 
+                        polytopeMap: PolytopeMap, 
+                        currentpIndex1: int, 
+                        currentpIndex2: int) -> OrientResult:
     if not self.implicit_point_in_triangle(triangle, f1, f2):
       return IN
 
@@ -76,7 +105,10 @@ class _CoverageCheckerIntern:
 
     return ret
 
-  def check_c1(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex) -> OrientResult:
+  def check_c1(self, 
+               triangle: AbstractSimplex, 
+               polytopeSet: PolytopeMap, 
+               verticesIndex: VerticesIndex) -> OrientResult:
     vertices = triangle.get_vertices()
     ret = IN
     for v in vertices:
@@ -86,7 +118,10 @@ class _CoverageCheckerIntern:
       verticesIndex[v] = True # pisamos el valor si ya era True y sino lo marcamos por primera vez
     return ret
 
-  def check_c2(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, edgesIndex: EdgesIndex) -> OrientResult:
+  def check_c2(self, 
+               triangle: AbstractSimplex, 
+               polytopeSet: PolytopeMap, 
+               edgesIndex: EdgesIndex) -> OrientResult:
     allEdges = triangle.get_all_edges()
     edges, invEdges = allEdges
     polytopes = enumerate(polytopeSet)
@@ -99,7 +134,9 @@ class _CoverageCheckerIntern:
       edgesIndex[e] = True
     return IN
   
-  def check_c3(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap) -> OrientResult:
+  def check_c3(self, 
+               triangle: AbstractSimplex, 
+               polytopeSet: PolytopeMap) -> OrientResult:
     polytopes = list(enumerate(polytopeSet))
     for i, pi in polytopes:
       for j, pj in polytopes[i:]:
@@ -110,11 +147,17 @@ class _CoverageCheckerIntern:
     return IN
 
 class CoverageChecker:
-  def __init__(self, geometry: AbstractGeometry, predicates: AbstractPredicates) -> None:
+  def __init__(self, 
+               geometry: AbstractGeometry, 
+               predicates: AbstractPredicates) -> None:
     self._checker = _CoverageCheckerIntern(geometry, predicates)
 
   # chequea UN triángulo
-  def envelope_check(self, triangle: AbstractSimplex, polytopeSet: PolytopeMap, verticesIndex: VerticesIndex, edgesIndex: EdgesIndex) -> OrientResult: 
+  def envelope_check(self, 
+                     triangle: AbstractSimplex, 
+                     polytopeSet: PolytopeMap, 
+                     verticesIndex: VerticesIndex, 
+                     edgesIndex: EdgesIndex) -> OrientResult: 
     ret = IN
     if self._checker.check_c1(triangle, polytopeSet, verticesIndex) == OUT:
       print("Falla C1")

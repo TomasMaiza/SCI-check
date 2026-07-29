@@ -1,6 +1,7 @@
 import numpy as np
 import numpy.typing as npt
 import polytope as pc
+from scipy.spatial import ConvexHull
 from .subregionsStrategy import SubregionsStrategy
 from affine_system import *
 from common import PolytopeMap
@@ -14,10 +15,26 @@ class Subregions(SubregionsStrategy):
     self._approxMethod = Euler
     self._geometry = geometry
 
-  def _create_halfspaces_list(self, subregionPolytope: pc.Polytope) -> list[AbstractHalfspace]:
+  def get_polytope_vertices_CCW(self, subregionPolytope: pc.Polytope) -> list[list[float]]:
+    # Extrae y ordena los vértices del politopo en sentido antihorario (CCW).
+    vertices = pc.extreme(subregionPolytope) # obtengo los vértices del politopo
+    if vertices is None or len(vertices) < 3:
+        return vertices.tolist() if vertices is not None else []
+    hull = ConvexHull(vertices) # ordenamos los vértices en sentido antihorario con ConvexHull
+    sortedVertices = vertices[hull.vertices]
+    return sortedVertices.tolist()
+    
+
+  def _create_halfspaces_list(self, subregionPolytope: pc.Polytope) -> list:
+    sortedVertices = self.get_polytope_vertices_CCW(subregionPolytope)    
+    numVertices = len(sortedVertices)
     halfspaces = []
-    for A, b in zip(subregionPolytope.A, subregionPolytope.b):
-      hs = self._geometry.create_halfspace_from_vector(A, float(b))
+    for i in range(numVertices): # iteramos para armar los bordes del politopo (v1, v2)
+      v1 = sortedVertices[i]
+      v2 = sortedVertices[(i + 1) % numVertices]
+      p1 = self._geometry.create_point(v1)
+      p2 = self._geometry.create_point(v2)
+      hs = self._geometry.create_halfspace((p1, p2))
       halfspaces.append(hs)
     return halfspaces
 
@@ -68,6 +85,7 @@ class Subregions(SubregionsStrategy):
     for i in modes:
       subsystem = sas.get_subsystem(i)
       halfspaces = self.get_subregion(subsystem, polytope, K, h)
+      #if len(halfspaces) != 0:
       polytopeMap.append(halfspaces)
     return polytopeMap
 

@@ -10,7 +10,7 @@ compile:
 	@cd $(BINDINGS_BUILD_DIR) && cmake .. && $(MAKE)
 
 run: compile
-	@PYTHONPATH=./src python3 test/testc2.py
+	@PYTHONPATH=./src python3 test/test_alg.py
 
 subregions: compile
 	@PYTHONPATH=.:./src pytest test/test_subregions.py -v
