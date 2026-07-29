@@ -7,9 +7,10 @@ import polytope as pc
 from src.geometry import GeometryFactory, AbstractHalfspace
 
 def test_matrices():
-  test_sas_augmented_matrix()
-  test_polytope_augmented_matrix()
-  test_partition_matrices()
+  pass
+  # test_sas_augmented_matrix()
+  # test_polytope_augmented_matrix()
+  # test_partition_matrices()
 
 def test_sas_augmented_matrix():
   # Caso 1: sistema estándar 2d
@@ -176,10 +177,11 @@ def test_partition_matrices():
                   err_msg="El vector c de cotas no coincide.")
 
 def test_euler():
-  test_get_M()
-  test_error_bound()
-  test_get_matrix()
-  test_apply()
+  pass
+  # test_get_M()
+  # test_error_bound()
+  # test_get_matrix()
+  # test_apply()
 
 def test_get_M():
   # Caso 1: A_i = 0 (normA < 1e-12)
@@ -387,7 +389,9 @@ def test_apply():
                     err_msg="El estado calculado falla para s < 0.")
 
 def test_subregions():
-  test_create_halfspaces_list()
+  pass
+  # test_create_halfspaces_list()
+  # test_get_subregion()
 
 def test_create_halfspaces_list():
   geometry_2d = GeometryFactory[2]()
@@ -431,3 +435,45 @@ def test_create_halfspaces_list():
     # Validamos que p2 pertenece a la recta original (A_row * p2 = b_val)
     assert_allclose(np.dot(A_row, p2_coord), b_val, rtol=1e-5, atol=1e-8,
                     err_msg=f"El punto p2 del semiespacio {i} no corresponde al politopo original.")
+
+def test_get_subregion():
+  geometry_2d = GeometryFactory[2]()
+  subregions = Subregions(geometry=geometry_2d)
+    
+  # Caja de [-1, 1] bien centrada
+  A_poly = np.array([[ 1.0,  0.0], 
+                       [-1.0,  0.0], 
+                       [ 0.0,  1.0], 
+                       [ 0.0, -1.0]])
+  b_poly = np.array([[1.0], 
+                       [1.0], 
+                       [1.0], 
+                       [1.0]]) 
+  test_poly = pc.Polytope(A_poly, b_poly)
+
+  # Sistema estático: A y b nulos. El estado se queda quieto.
+  A_sys = np.array([[0.0, 0.0], 
+                      [0.0, 0.0]])
+  b_sys = np.array([[0.0], 
+                      [0.0]])
+  test_subsystem = AffineMode(A_sys, b_sys)
+
+  # 2. Ejecución con K=1 para probar la iteración
+  K_steps = 1
+  h_step = 0.1
+    
+  halfspaces = subregions.get_subregion(
+        subsystem=test_subsystem, 
+        polytope=test_poly, 
+        K=K_steps, 
+        h=h_step
+    )
+
+  # 3. Validaciones estructurales
+  assert isinstance(halfspaces, list), "El método debe retornar una lista."
+  assert len(halfspaces) > 0, "El politopo resultante no debería estar vacío (lista vacía)."
+    
+  for i, hs in enumerate(halfspaces):
+    assert hasattr(hs, 'p1'), f"El semiespacio {i} no tiene el atributo p1."
+    assert hasattr(hs, 'p2'), f"El semiespacio {i} no tiene el atributo p2."
+    assert hs.p1 is not None and hs.p2 is not None, "Los puntos del semiespacio están vacíos."

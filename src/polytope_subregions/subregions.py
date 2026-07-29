@@ -32,21 +32,26 @@ class Subregions(SubregionsStrategy):
     phi = approx.get_matrix(h) # matriz de la aproximación
     dim = phi.shape[0]
     phi_k = np.eye(dim, dtype=np.float64) # matriz de la aproximación para el paso k
-    subregionA = [] # apilamos las matrices de las inecuaciones
-    subregionb = []
+    subregionH = [] # apilamos las matrices de las inecuaciones
+    subregionc = []
     for k in range(0, K + 1):
       midr = approx.error_bound(r, h/2)
       Hplus, Hminus, c = partition_matrices(polytope, subsystem, r, h, midr)
       if k > 0:
-        subregionA.append(Hminus @ phi_k)
-        subregionb.append(c)
+        subregionH.append(Hminus @ phi_k)
+        subregionc.append(c)
       if k < K:
-        subregionA.append(Hplus @ phi_k)
-        subregionb.append(c)
+        subregionH.append(Hplus @ phi_k)
+        subregionc.append(c)
       r = approx.error_bound(r, abs(h)) # r para el próximo paso
       phi_k = phi @ phi_k
-    matrixA = np.vstack(subregionA)
-    matrixb = np.vstack(subregionb)
+    matrixH = np.vstack(subregionH)
+    matrixc = np.vstack(subregionc)
+    # cómo obtengo cada A y b?
+    # Idea: obtengo A y b separando la última columna de matrixH y me queda que Ax <= c - b
+    matrixA, matrixb = np.hsplit(matrixH, [dim - 1]) # obtiene A y b separando la últ col de H
+    matrixb = matrixc - matrixb
+    # fin
     subregionPolytope = pc.Polytope(matrixA, matrixb)
     subregionPolytope = pc.reduce(subregionPolytope)
     return self._create_halfspaces_list(subregionPolytope)
