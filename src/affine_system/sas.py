@@ -33,4 +33,4 @@ class SwitchedAffineSystem:
 
   def get_all_modes(self) -> list[int]:
     # retorna una lista de los modos (índices) del sistema
-    return self._modes.keys()
+    return list(self._modes.keys())
