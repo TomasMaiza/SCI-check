@@ -1,5 +1,6 @@
 import polytope as pc
 import numpy as np
+import numpy.typing as npt
 from affine_system import AffineMode
 
 def sas_augmented_matrix(subsystem: AffineMode) -> np.ndarray:
@@ -51,4 +52,11 @@ def partition_matrices(polytope: pc.Polytope,
     ])
   
   return Hplus, Hminus, c
+
+def augmented_x(x: npt.NDArray[np.float64]) -> np.ndarray:
+  # aumenta la matriz x a [x, 1]^T
+  return np.block([ # matriz x tilde (homx)
+      [x],
+      [1]
+  ])
   
