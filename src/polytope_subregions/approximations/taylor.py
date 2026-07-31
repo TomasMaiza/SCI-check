@@ -9,11 +9,15 @@ from math import factorial
 class Taylor(ApproximationStrategy):
   def __init__(self, 
                subsystem: AffineMode, 
-               polytope: pc.Polytope):
+               polytope: pc.Polytope,
+               scaling: int,
+               order: int):
     # Inicializa la función de aproximación y la función de error
     self._A, self._b = subsystem.get_subsystem()
     self._homA = sas_augmented_matrix(subsystem)
     self._S = pc.extreme(polytope)
+    self._s = scaling
+    self._M = order
     verticesAug = np.hstack((self._S, np.ones((self._S.shape[0], 1))))
     self._R_S = float(np.max(np.linalg.norm(verticesAug, ord=2, axis=1)))
   
@@ -43,7 +47,18 @@ class Taylor(ApproximationStrategy):
 
   def error_sequence(self, h: float, K: int) -> list[float]:
     # calcula la secuencia de errores para el método
-    pass
+    normHomA = np.linalg.norm(self._homA, ord=2)
+    Cerr = self._get_C_err(normHomA, h)
+    errorSeq = []
+    for k in range(0, K + 1):
+      r = k * Cerr * np.exp(normHomA * h * k)
+      errorSeq.append(r)
+    return errorSeq
+
+  def _get_C_err(self, normHomA: float, h: float):
+    num = (h * normHomA)**(self._M + 1) * self._R_S
+    den = self._s**self._M * factorial(self._M + 1)
+    return num / den
   
   def get_matrix(self, h: float, s: int, order: int) -> npt.NDArray[np.float64]:
     # calcula la matriz de la aproximación tomando el paso s

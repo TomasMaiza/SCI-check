@@ -6,11 +6,6 @@ import polytope as pc
 
 class ApproximationStrategy(ABC):
   @abstractmethod
-  def __init__(self, subsystem: AffineMode, polytope: pc.Polytope):
-    # Inicializa la función de aproximación y la función de error
-    pass
-
-  @abstractmethod
   def apply(self, s: float, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
     # aplica la función de aproximación
     pass
