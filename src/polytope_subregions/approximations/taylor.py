@@ -14,6 +14,8 @@ class Taylor(ApproximationStrategy):
     self._A, self._b = subsystem.get_subsystem()
     self._homA = sas_augmented_matrix(subsystem)
     self._S = pc.extreme(polytope)
+    verticesAug = np.hstack((self._S, np.ones((self._S.shape[0], 1))))
+    self._R_S = float(np.max(np.linalg.norm(verticesAug, ord=2, axis=1)))
   
   def apply(self, h: float, s: int, order: int, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
     # aplica la función de aproximación
@@ -39,7 +41,8 @@ class Taylor(ApproximationStrategy):
         m = norm
     return 1/normA * m
 
-  def get_error_step():
+  def error_sequence(self):
+    # calcula la secuencia de errores para el método
     pass
   
   def get_matrix(self, h: float, s: int, order: int) -> npt.NDArray[np.float64]:

@@ -46,12 +46,14 @@ class Subregions(SubregionsStrategy):
     # obtiene la subregión para un modo particular
     approx = self._approxMethod(subsystem, polytope)
     r = 0 # r_0
+    errorSeq = approx.error_sequence()
     phi = approx.get_matrix(h) # matriz de la aproximación
     dim = phi.shape[0]
     phi_k = np.eye(dim, dtype=np.float64) # matriz de la aproximación para el paso k
     subregionH = [] # apilamos las matrices de las inecuaciones
     subregionc = []
     for k in range(0, K + 1):
+      r = errorSeq[k]
       midr = approx.error_bound(r, h/2)
       Hplus, Hminus, c = partition_matrices(polytope, subsystem, r, h, midr)
       if k > 0:
@@ -60,7 +62,7 @@ class Subregions(SubregionsStrategy):
       if k < K:
         subregionH.append(Hplus @ phi_k)
         subregionc.append(c)
-      r = approx.error_bound(r, abs(h)) # r para el próximo paso
+      # r = approx.error_bound(r, abs(h)) # r para el próximo paso
       phi_k = phi @ phi_k
     matrixH = np.vstack(subregionH)
     matrixc = np.vstack(subregionc)

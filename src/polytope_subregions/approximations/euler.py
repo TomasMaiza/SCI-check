@@ -34,8 +34,15 @@ class Euler(ApproximationStrategy):
         m = norm
     return 1/normA * m
 
-  def get_error_step():
-    pass
+  def error_sequence(self, h: float, K: int) -> list[float]:
+    # calcula la secuencia de errores para el método
+    errorSeq = []
+    r = 0 # r0
+    for k in range(0, K):
+      errorSeq.append(r)
+      r = self.error_bound(r, abs(h))
+    errorSeq.append(r) # appendeamos r_k
+    return errorSeq
 
   def get_matrix(self, s: float) -> npt.NDArray[np.float64]:
     # calcula la matriz de la aproximación tomando el paso s con la matriz aumentada

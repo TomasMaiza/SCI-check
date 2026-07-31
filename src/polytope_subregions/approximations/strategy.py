@@ -21,6 +21,11 @@ class ApproximationStrategy(ABC):
     pass
 
   @abstractmethod
+  def error_sequence(self):
+    # calcula la secuencia de errores para el método
+    pass
+
+  @abstractmethod
   def get_matrix(self, s: float) -> npt.NDArray[np.float64]:
     # calcula la matriz de la aproximación tomando el paso s
     pass
