@@ -34,6 +34,9 @@ class Euler(ApproximationStrategy):
         m = norm
     return 1/normA * m
 
+  def get_error_step():
+    pass
+
   def get_matrix(self, s: float) -> npt.NDArray[np.float64]:
     # calcula la matriz de la aproximación tomando el paso s con la matriz aumentada
     dim = self._homA.shape[0]
