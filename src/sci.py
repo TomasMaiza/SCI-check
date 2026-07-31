@@ -109,15 +109,13 @@ class SCIChecker():
         break
     return ret
 
-  # OFRECER POR SEPARADO TAMBIÉN check_coverage Y get_subregions
-
-  def consult_subregions(self) -> PolytopeMap:
-    return self._subregions
-
-  def sci_check(self, dwellTime: float, K: int) -> bool: # hace todo el proceso
+  def sci_check(self, dwellTime: float, K: int) -> tuple[bool, PolytopeMap]: # hace todo el proceso
     self.triangulate_polytope()
     self.get_subregions(dwellTime, K)
-    print(f"Numero de subregiones: {len(self._subregions)}")
+    # print(f"Numero de subregiones: {len(self._subregions)}")
     # print(f"Tamaño de la 4: {len(self._subregions[4])}")
     # self.create_aabb_tree() # estrategia de aceleración 1
-    return self.check_coverage()
+    cov = self.check_coverage()
+    subregions = self._subregions
+    self._subregions = [] # reinicializamos para un próximo chequeo con otros parámetros
+    return cov, subregions

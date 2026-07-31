@@ -7,17 +7,15 @@ from sci import SCIChecker
 from geometry import GeometryFactory
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
+from common import PolytopeMap
 
 
-def plot_filled_scenario(title: str, original_poly: pc.Polytope, checker: 'SCIChecker', coverage_result: bool):
+def plot_filled_scenario(title: str, original_poly: pc.Polytope, checker: 'SCIChecker', coverage_result: bool, subregions_map: PolytopeMap):
     """Grafica el politopo y las subregiones con relleno traslúcido."""
     fig, ax = plt.subplots(figsize=(10, 8))
     
     # 1. Dibujamos la caja original S como referencia (fondo gris)
     original_poly.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
-    
-    # 2. Obtenemos las subregiones
-    subregions_map = checker.consult_subregions()
     
     # Colores base para imitar la paleta de MATLAB
     colors = ['#1f77b4', '#ff7f0e', '#d62728', '#9467bd', '#2ca02c'] 
@@ -106,36 +104,36 @@ def run_matlab_validation():
     # =================================================================
     print("Ejecutando Experimento K=3 (h ≈ 0.067)...")
     checker_k3 = SCIChecker(geometry=geometry_2d, 
-                            predicates=predicates_2d, 
-                            polytope=base_polytope, 
-                            sas=sas)
+                                    predicates=predicates_2d, 
+                                    polytope=base_polytope, 
+                                    sas=sas)
     
-    result_k3 = checker_k3.sci_check(dwellTime=dwell_time, K=3)
-    plot_filled_scenario("K = 3 (h = 0.067)", base_polytope, checker_k3, result_k3)
+    result_k3, sub_k3 = checker_k3.sci_check(dwellTime=dwell_time, K=3)
+    plot_filled_scenario("K = 3 (h = 0.067)", base_polytope, checker_k3, result_k3, sub_k3)
 
     # =================================================================
     # Experimento 2: K = 12 (NO debería cubrir)
     # =================================================================
     print("\nEjecutando Experimento K=12 (h ≈ 0.017)...")
     checker_k12 = SCIChecker(geometry=geometry_2d, 
-                             predicates=predicates_2d, 
-                             polytope=base_polytope, 
-                             sas=sas)
+                                        predicates=predicates_2d, 
+                                        polytope=base_polytope, 
+                                        sas=sas)
     
-    result_k12 = checker_k12.sci_check(dwellTime=dwell_time, K=12)
-    plot_filled_scenario("K = 12 (h = 0.017)", base_polytope, checker_k12, result_k12)
+    result_k12, sub_k12 = checker_k12.sci_check(dwellTime=dwell_time, K=12)
+    plot_filled_scenario("K = 12 (h = 0.017)", base_polytope, checker_k12, result_k12, sub_k12)
 
     # =================================================================
     # Experimento 3: K = 350 (Debería cubrir?)
     # =================================================================
     print("\nEjecutando Experimento K=350 (h ≈ )...")
     checker_k350 = SCIChecker(geometry=geometry_2d, 
-                                 predicates=predicates_2d, 
-                                 polytope=base_polytope, 
-                                 sas=sas)
+                                        predicates=predicates_2d, 
+                                        polytope=base_polytope, 
+                                        sas=sas)
         
-    result_k350 = checker_k350.sci_check(dwellTime=dwell_time, K=350)
-    plot_filled_scenario("K = 350 (h = )", base_polytope, checker_k350, result_k350)
+    result_k350, sub_k350 = checker_k350.sci_check(dwellTime=dwell_time, K=350)
+    plot_filled_scenario("K = 350 (h = )", base_polytope, checker_k350, result_k350, sub_k350)
 
 if __name__ == "__main__":
     run_matlab_validation()
