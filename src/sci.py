@@ -1,4 +1,4 @@
-from coverage_checker import *
+from coverage_checker import CoverageCheckStrategy, CoverageChecker, AbstractPredicates
 from geometry import AbstractGeometry, AbstractSimplex
 from common import PolytopeMap, ON, OUT, IN
 from triangulation import *
@@ -6,7 +6,7 @@ import polytope as pc
 import numpy as np
 from aabbtree import AABB, AABBTree
 from affine_system import SwitchedAffineSystem
-from polytope_subregions import Subregions
+from polytope_subregions import SubregionsStrategy, Subregions
 
 class SCIChecker():
   def __init__(self, 
@@ -18,9 +18,8 @@ class SCIChecker():
     self._predicates = predicates
     self._polytope = polytope
     self._sas = sas
-    # hacer strategy para subregions y para el envelope_check?
     self._subregionsAlgorithm = Subregions(geometry)
-    # en qué orden están las subregiones?
+    self._coverageChecker = CoverageChecker(geometry, predicates)
 
   def _create_triangles(self, triangles: list[np.ndarray]):
     self._triangles = [] # lista de triángulos en los que se dividió el politopo
@@ -98,12 +97,11 @@ class SCIChecker():
     return filteredMap
 
   def check_coverage(self) -> bool: # itera sobre los triángulos
-    coverageChecker = CoverageChecker(self._geometry, self._predicates) # USAR STRATEGY PARA ESTO Y SUBREGIONES
     ret = True
     for t in self._triangles:
       # filteredMap = self._get_filtered_map(t)
       filteredMap = self._subregions
-      check = coverageChecker.envelope_check(t, filteredMap, self._verticesIndex, self._edgesIndex)
+      check = self._coverageChecker.envelope_check(t, filteredMap, self._verticesIndex, self._edgesIndex)
       if check == OUT:
         ret = False
         break

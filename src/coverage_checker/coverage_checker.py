@@ -2,6 +2,7 @@
 from .predicates import AbstractPredicates
 from geometry import *
 from common import *
+from .strategy import CoverageCheckStrategy
 
 
 # Patrón Proxy
@@ -146,7 +147,7 @@ class _CoverageCheckerIntern:
               return OUT
     return IN
 
-class CoverageChecker:
+class CoverageChecker(CoverageCheckStrategy):
   def __init__(self, 
                geometry: AbstractGeometry, 
                predicates: AbstractPredicates) -> None:

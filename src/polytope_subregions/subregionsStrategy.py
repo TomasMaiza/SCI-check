@@ -5,7 +5,6 @@ import polytope as pc
 from affine_system import *
 from common import PolytopeMap
 from geometry import AbstractHalfspace
-from .approximations import Euler
 from affine_system import SwitchedAffineSystem
 
 class SubregionsStrategy(ABC):
