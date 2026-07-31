@@ -21,7 +21,7 @@ class ApproximationStrategy(ABC):
     pass
 
   @abstractmethod
-  def error_sequence(self):
+  def error_sequence(self, h: float, K: int) -> list[float]:
     # calcula la secuencia de errores para el método
     pass
 

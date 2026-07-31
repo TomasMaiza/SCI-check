@@ -46,7 +46,7 @@ class Subregions(SubregionsStrategy):
     # obtiene la subregión para un modo particular
     approx = self._approxMethod(subsystem, polytope)
     r = 0 # r_0
-    errorSeq = approx.error_sequence()
+    errorSeq = approx.error_sequence(h, K)
     phi = approx.get_matrix(h) # matriz de la aproximación
     dim = phi.shape[0]
     phi_k = np.eye(dim, dtype=np.float64) # matriz de la aproximación para el paso k
