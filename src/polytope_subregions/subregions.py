@@ -6,13 +6,13 @@ from .subregionsStrategy import SubregionsStrategy
 from affine_system import *
 from common import PolytopeMap
 from geometry import AbstractHalfspace, AbstractGeometry
-from .approximations import Euler
+from .approximations import Euler, Taylor
 from affine_system import SwitchedAffineSystem, AffineMode
 from .matrices import partition_matrices
 
 class Subregions(SubregionsStrategy):
   def __init__(self, geometry: AbstractGeometry):
-    self._approxMethod = Euler
+    self._approxMethod = Taylor
     self._geometry = geometry
 
   def get_polytope_vertices_CCW(self, subregionPolytope: pc.Polytope) -> list[list[float]]:
@@ -44,7 +44,7 @@ class Subregions(SubregionsStrategy):
                     K: int, 
                     h: float) -> list[AbstractHalfspace]:
     # obtiene la subregión para un modo particular
-    approx = self._approxMethod(subsystem, polytope)
+    approx = self._approxMethod(subsystem, polytope, 1, 4)
     r = 0 # r_0
     errorSeq = approx.error_sequence(h, K)
     phi = approx.get_matrix(h) # matriz de la aproximación

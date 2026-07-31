@@ -132,7 +132,7 @@ def run_matlab_validation():
                                         polytope=base_polytope, 
                                         sas=sas)
         
-    result_k350, sub_k350 = checker_k350.sci_check(dwellTime=dwell_time, K=350)
+    result_k350, sub_k350 = checker_k350.sci_check(dwellTime=dwell_time, K=35)
     plot_filled_scenario("K = 350 (h = )", base_polytope, checker_k350, result_k350, sub_k350)
 
 if __name__ == "__main__":

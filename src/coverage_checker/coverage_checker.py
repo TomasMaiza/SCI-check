@@ -75,9 +75,17 @@ class _CoverageCheckerIntern:
                                  triangle: AbstractSimplex, 
                                  f1: AbstractHalfspace, 
                                  f2: AbstractHalfspace) -> bool:
+    # determina si un punto (intersección de dos semiespacios) pertenece a un triángulo
     edges = triangle.get_edges()
     r, s = f1.get_points()
     ret = True
+    '''
+    ori1 = self._predicates.orient(r, f2)
+    ori2 = self._predicates.orient(s, f2)
+    if ori1 == ON and ori2 == ON:
+      print("Paralelas")
+      return True
+    '''
     for v1, v2 in edges:
       # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
       e = self._geometry.create_halfspace((v1, v2))
@@ -142,7 +150,7 @@ class _CoverageCheckerIntern:
     for i, pi in polytopes:
       for j, pj in polytopes[i:]:
         for fi in pi:
-          for fj in pj:
+          for fj in pj: # problema con caras paralelas?
             if self.edge_edge_tri_out(triangle, fi, fj, polytopeSet, i, j) == OUT:
               return OUT
     return IN
