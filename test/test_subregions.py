@@ -4,6 +4,7 @@ from src.affine_system import *
 from numpy.testing import assert_array_equal, assert_allclose
 import numpy as np
 import polytope as pc
+import math
 from src.geometry import GeometryFactory, AbstractHalfspace
 
 def test_matrices():
@@ -182,8 +183,9 @@ def test_euler():
   # test_error_bound()
   # test_get_matrix()
   # test_apply()
+  # test_error_sequence()
 
-def test_get_M():
+def test_euler_get_M():
   # Caso 1: A_i = 0 (normA < 1e-12)
   A_zero = np.zeros((2, 2))
   b_zero = np.zeros((2, 1))
@@ -228,7 +230,7 @@ def test_get_M():
   assert_allclose(result_M, expected_M, rtol=1e-5, atol=1e-8,
                   err_msg="El cálculo de M_i no coincide con el máximo teórico.")
 
-def test_error_bound():
+def test_euler_error_bound():
   # Politopo Caja [-1, 1] x [-1, 1]
   A_poly = np.array([[ 1.0,  0.0], 
                        [-1.0,  0.0], 
@@ -275,7 +277,7 @@ def test_error_bound():
   assert_allclose(result_sys, expected_error, rtol=1e-5, atol=1e-8,
                     err_msg="El error bound no coincide con la Ecuación 11 teórica.")
 
-def test_get_matrix():
+def test_euler_get_matrix():
   A_poly = np.array([[ 1.0,  0.0], 
                        [-1.0,  0.0], 
                        [ 0.0,  1.0], 
@@ -335,7 +337,7 @@ def test_get_matrix():
   assert_allclose(result_neg, expected_matrix_neg, rtol=1e-5, atol=1e-8,
                     err_msg="La matriz aproximada falla para valores de s negativos (s < 0).")
 
-def test_apply():
+def test_euler_apply():
   A_poly = np.array([[ 1.0,  0.0], 
                        [-1.0,  0.0], 
                        [ 0.0,  1.0], 
@@ -388,6 +390,275 @@ def test_apply():
   assert_allclose(result_neg, expected_neg, rtol=1e-5, atol=1e-8,
                     err_msg="El estado calculado falla para s < 0.")
 
+def test_euler_error_sequence():
+    # Politopo Caja [-1, 1] x [-1, 1]
+    A_poly = np.array([[ 1.0,  0.0], 
+                       [-1.0,  0.0], 
+                       [ 0.0,  1.0], 
+                       [ 0.0, -1.0]])
+    b_poly = np.array([1.0, 1.0, 1.0, 1.0]).reshape(-1, 1)
+    poly_dummy = pc.Polytope(A_poly, b_poly)
+
+    # ---------------------------------------------------------
+    # Caso 1: Sistema con A nula (normA = 0, M_i = 0)
+    # ---------------------------------------------------------
+    A_zero = np.zeros((2, 2))
+    b_zero = np.zeros((2, 1))
+    mode_zero = AffineMode(A_zero, b_zero)
+    euler_zero = Euler(mode_zero, poly_dummy)
+    
+    h_1 = 0.1
+    K_1 = 3
+    seq_zero = euler_zero.error_sequence(h_1, K_1)
+    
+    assert len(seq_zero) == K_1 + 1, "Caso 1: La secuencia debe tener K + 1 elementos"
+    assert all(math.isclose(r, 0.0) for r in seq_zero), "Caso 1: Para un sistema nulo, el error debe ser 0.0 en todos los pasos"
+
+    # ---------------------------------------------------------
+    # Caso 2: Sistema con A identidad (normA = 1) para cálculo manual
+    # ---------------------------------------------------------
+    A_id = np.eye(2)
+    b_id = np.zeros((2, 1))
+    mode_id = AffineMode(A_id, b_id)
+    euler_id = Euler(mode_id, poly_dummy)
+    
+    h_2 = 0.5
+    K_2 = 2
+    seq_id = euler_id.error_sequence(h_2, K_2)
+    
+    # Cálculo manual esperado
+    # normA = 1.0. 
+    # El vértice más lejano en la caja [-1, 1]x[-1, 1] tiene norma 2 igual a sqrt(2).
+    # M_i = max ||Ax+b|| / ||A|| = sqrt(2) / 1.0 = sqrt(2)
+    normA = 1.0
+    M_i = math.sqrt(2)
+    tau = abs(h_2)
+    
+    r0 = 0.0
+    term_exp = math.exp(normA * tau) - 1 - normA * tau
+    
+    # r_{k+1} = r_k * (1 + normA*tau) + M_i * term_exp
+    r1 = r0 * (1 + normA * tau) + M_i * term_exp
+    r2 = r1 * (1 + normA * tau) + M_i * term_exp
+    expected_seq_id = [r0, r1, r2]
+    
+    assert len(seq_id) == K_2 + 1, "Caso 2: Longitud de secuencia incorrecta"
+    for r_calc, r_exp in zip(seq_id, expected_seq_id):
+        assert math.isclose(r_calc, r_exp, rel_tol=1e-9), f"Caso 2: Falló el cálculo recursivo. Esperado: {r_exp}, Obtenido: {r_calc}"
+
+    # ---------------------------------------------------------
+    # Caso 3: Validación de abs(h) y crecimiento monótono
+    # ---------------------------------------------------------
+    h_3 = -0.2  # Paso negativo
+    K_3 = 5
+    seq_neg = euler_id.error_sequence(h_3, K_3)
+    seq_pos = euler_id.error_sequence(abs(h_3), K_3)
+    
+    # Validar que ingresar -h es exactamente igual a ingresar +h
+    for r_neg, r_pos in zip(seq_neg, seq_pos):
+        assert math.isclose(r_neg, r_pos, rel_tol=1e-9), "Caso 3: El método no está aplicando abs(h) de forma correcta"
+    
+    # Validar que el error siempre crezca a medida que k avanza
+    assert all(seq_pos[i] < seq_pos[i+1] for i in range(len(seq_pos)-1)), "Caso 3: El error acumulado debe crecer estrictamente en cada paso"
+
+def test_taylor():
+  pass
+  # test_get_M()
+  # test_error_bound()
+  # test_get_matrix()
+  # test_apply()
+  # test_error_sequence()
+
+def test_taylor_error_bound():
+  # 1. Setup Polytope (Caja [-1, 1] x [-1, 1])
+    A_poly = np.array([[ 1.0,  0.0], 
+                       [-1.0,  0.0], 
+                       [ 0.0,  1.0], 
+                       [ 0.0, -1.0]])
+    b_poly = np.array([[1.0], [1.0], [1.0], [1.0]])
+    test_poly = pc.Polytope(A_poly, b_poly)
+    
+    # Parámetros de Taylor (arbitrarios para este test porque error_bound no los usa directamente)
+    scaling = 10
+    order = 4
+
+    # ---------------------------------------------------------
+    # Caso 1 y 2: Sistema con A identidad (normA = 1)
+    # ---------------------------------------------------------
+    A_id = np.eye(2)
+    b_id = np.zeros((2, 1))
+    mode_id = AffineMode(A_id, b_id)
+    taylor_id = Taylor(mode_id, test_poly, scaling, order)
+    
+    # Calculamos M_i manualmente: max ||Ix + 0||_2 / ||I||_2 = sqrt(2) / 1.0 = sqrt(2)
+    normA_id = 1.0
+    M_i = math.sqrt(2)
+    
+    # Prueba 1: r = 0.0 (Primer paso)
+    r_1 = 0.0
+    tau_1 = 0.5
+    expected_1 = r_1 * (1 + normA_id * tau_1) + M_i * (math.exp(normA_id * tau_1) - 1 - normA_id * tau_1)
+    calc_1 = taylor_id.error_bound(r_1, tau_1)
+    
+    assert math.isclose(calc_1, expected_1, rel_tol=1e-9), f"Falla Prueba 1. Esperado: {expected_1}, Obtenido: {calc_1}"
+
+    # Prueba 2: r > 0 (Pasos intermedios, el error arrastrado afecta el resultado)
+    r_2 = 0.1
+    tau_2 = 0.2
+    expected_2 = r_2 * (1 + normA_id * tau_2) + M_i * (math.exp(normA_id * tau_2) - 1 - normA_id * tau_2)
+    calc_2 = taylor_id.error_bound(r_2, tau_2)
+    
+    assert math.isclose(calc_2, expected_2, rel_tol=1e-9), f"Falla Prueba 2. Esperado: {expected_2}, Obtenido: {calc_2}"
+
+    # ---------------------------------------------------------
+    # Caso 3: Matriz Nula (normA = 0)
+    # ---------------------------------------------------------
+    A_zero = np.zeros((2, 2))
+    b_zero = np.zeros((2, 1))
+    mode_zero = AffineMode(A_zero, b_zero)
+    taylor_zero = Taylor(mode_zero, test_poly, scaling, order)
+    
+    # Prueba 3: Con A = 0, la fórmula colapsa a: r * (1 + 0) + M * (1 - 1 - 0) = r
+    r_3 = 1.5
+    tau_3 = 0.5
+    expected_3 = r_3 # El error no crece si no hay dinámica
+    calc_3 = taylor_zero.error_bound(r_3, tau_3)
+    
+    assert math.isclose(calc_3, expected_3, rel_tol=1e-9), f"Falla Prueba 3. Esperado: {expected_3}, Obtenido: {calc_3}"
+
+def test_taylor_get_matrix():
+  # 1. Setup Polytope (Caja [-1, 1] x [-1, 1])
+    A_poly = np.array([[ 1.0,  0.0], 
+                       [-1.0,  0.0], 
+                       [ 0.0,  1.0], 
+                       [ 0.0, -1.0]])
+    b_poly = np.array([[1.0], [1.0], [1.0], [1.0]])
+    test_poly = pc.Polytope(A_poly, b_poly)
+
+    # ---------------------------------------------------------
+    # Caso 1: Sistema con dinámica nula (A=0, b=0)
+    # ---------------------------------------------------------
+    A_zero = np.zeros((2, 2))
+    b_zero = np.zeros((2, 1))
+    mode_zero = AffineMode(A_zero, b_zero)
+    taylor_zero = Taylor(mode_zero, test_poly, scaling=5, order=4)
+    
+    h_1 = 0.5
+    calc_Phi_zero = taylor_zero.get_matrix(h_1)
+    
+    # Si la dinámica es 0, la transición de estado es la matriz Identidad
+    expected_Phi_zero = np.eye(3)
+    assert_allclose(calc_Phi_zero, expected_Phi_zero, rtol=1e-9, atol=1e-9,
+                    err_msg="Falla Caso 1: La matriz para un sistema nulo debe ser la Identidad 3x3")
+
+    # ---------------------------------------------------------
+    # Caso 2: Colapso a Euler (M=1, s=1)
+    # ---------------------------------------------------------
+    A_id = np.eye(2)
+    b_id = np.array([[1.0], [2.0]])
+    mode_id = AffineMode(A_id, b_id)
+    taylor_euler = Taylor(mode_id, test_poly, scaling=1, order=1)
+    
+    h_2 = 0.2
+    homA_id = np.array([[1.0, 0.0, 1.0], 
+                        [0.0, 1.0, 2.0], 
+                        [0.0, 0.0, 0.0]])
+    
+    calc_Phi_euler = taylor_euler.get_matrix(h_2)
+    expected_Phi_euler = np.eye(3) + homA_id * h_2
+    
+    assert_allclose(calc_Phi_euler, expected_Phi_euler, rtol=1e-9, atol=1e-9,
+                    err_msg="Falla Caso 2: Con M=1 y s=1, el resultado debe ser igual a (I + A_tilde * h)")
+
+    # ---------------------------------------------------------
+    # Caso 3: Matriz Nilpotente (A^2 = 0)
+    # ---------------------------------------------------------
+    # Para A = [0 1; 0 0], homA al cuadrado es una matriz de ceros.
+    A_nil = np.array([[0.0, 1.0], 
+                      [0.0, 0.0]])
+    b_nil = np.array([[1.0], 
+                      [0.0]])
+    mode_nil = AffineMode(A_nil, b_nil)
+    
+    # Usamos valores altos de M y s, el resultado debe ser matemáticamente exacto igual
+    taylor_nil = Taylor(mode_nil, test_poly, scaling=8, order=5)
+    
+    h_3 = 0.5
+    homA_nil = np.array([[0.0, 1.0, 1.0], 
+                         [0.0, 0.0, 0.0], 
+                         [0.0, 0.0, 0.0]])
+    
+    calc_Phi_nil = taylor_nil.get_matrix(h_3)
+    # Como homA^2 = 0, la serie de Taylor (y expm) es exactamente I + homA * h
+    expected_Phi_nil = np.eye(3) + homA_nil * h_3
+    
+    assert_allclose(calc_Phi_nil, expected_Phi_nil, rtol=1e-9, atol=1e-9,
+                    err_msg="Falla Caso 3: Para matriz nilpotente, la aproximación se rompió por el escalado")
+
+def test_taylor_error_sequence():
+  # 1. Setup Polytope (Caja [-1, 1] x [-1, 1])
+    # Su R_S será la norma de [1, 1, 1] = sqrt(1^2 + 1^2 + 1^2) = sqrt(3)
+    A_poly = np.array([[ 1.0,  0.0], 
+                       [-1.0,  0.0], 
+                       [ 0.0,  1.0], 
+                       [ 0.0, -1.0]])
+    b_poly = np.array([[1.0], [1.0], [1.0], [1.0]])
+    test_poly = pc.Polytope(A_poly, b_poly)
+
+    # ---------------------------------------------------------
+    # Caso 1: Dinámica Nula (A=0, b=0)
+    # ---------------------------------------------------------
+    A_zero = np.zeros((2, 2))
+    b_zero = np.zeros((2, 1))
+    mode_zero = AffineMode(A_zero, b_zero)
+    taylor_zero = Taylor(mode_zero, test_poly, scaling=10, order=4)
+    
+    K_1 = 3
+    h_1 = 0.1
+    seq_zero = taylor_zero.error_sequence(h_1, K_1)
+    
+    assert len(seq_zero) == K_1 + 1, "Caso 1: La secuencia debe tener K + 1 elementos."
+    assert all(math.isclose(r, 0.0) for r in seq_zero), "Caso 1: Si la dinámica es nula, el error de Taylor debe ser exactamente 0.0 en todo k."
+
+    # ---------------------------------------------------------
+    # Caso 2: Validación matemática exacta con A=Identidad
+    # ---------------------------------------------------------
+    A_id = np.eye(2)
+    b_id = np.zeros((2, 1))
+    mode_id = AffineMode(A_id, b_id)
+    
+    s = 2
+    M = 2
+    taylor_id = Taylor(mode_id, test_poly, scaling=s, order=M)
+    
+    K_2 = 2
+    h_2 = 0.5
+    seq_id = taylor_id.error_sequence(h_2, K_2)
+    
+    # --- Cálculo Manual ---
+    # normHomA es la norma 2 de diag(1, 1, 0) = 1.0
+    normHomA = 1.0 
+    R_S = math.sqrt(3.0) 
+    
+    # C_err = ((h * normHomA)**(M+1) * R_S) / (s**M * factorial(M+1))
+    num = (h_2 * normHomA)**(M + 1) * R_S
+    den = (s**M) * math.factorial(M + 1)
+    C_err_manual = num / den
+    
+    expected_seq = []
+    for k in range(K_2 + 1):
+        r_k = k * C_err_manual * math.exp(normHomA * h_2 * k)
+        expected_seq.append(r_k)
+        
+    assert len(seq_id) == K_2 + 1, "Caso 2: Longitud incorrecta."
+    for calc, exp in zip(seq_id, expected_seq):
+        assert math.isclose(calc, exp, rel_tol=1e-9), f"Caso 2: Falla el cálculo en la secuencia. Esperado: {exp}, Obtenido: {calc}"
+
+    # ---------------------------------------------------------
+    # Caso 3: La condición inicial siempre es 0
+    # ---------------------------------------------------------
+    assert math.isclose(seq_id[0], 0.0, abs_tol=1e-12), "Caso 3: El error inicial en k=0 siempre debe ser 0 para no encoger la región inicial."
+
 def test_subregions():
   pass
   # test_create_halfspaces_list()
@@ -400,42 +671,47 @@ def test_create_halfspaces_list():
     
   # 2. Setup del politopo de prueba
   A_poly = np.array([[ 1.0,  0.0], 
-                      [-1.0,  0.0], 
-                      [ 0.0,  1.0], 
-                      [ 0.0, -1.0]])
+                     [-1.0,  0.0], 
+                     [ 0.0,  1.0], 
+                     [ 0.0, -1.0]])
                        
-  # Mantenemos el estándar de vector columna estricto (4, 1)
   b_poly = np.array([[1.0], 
-                       [2.0], 
-                       [3.0], 
-                       [4.0]]) 
+                     [2.0], 
+                     [3.0], 
+                     [4.0]]) 
                        
   test_poly = pc.Polytope(A_poly, b_poly)
     
   # 3. Ejecución del método
-  # Llamamos al método "protegido" para aislar su validación
   halfspaces = subregions._create_halfspaces_list(test_poly)
     
   # 4. Validaciones
-  # Al inyectarle un politopo con 4 inecuaciones, debe devolver 4 objetos
-  assert len(halfspaces) == 4, "Debe retornar exactamente 4 semiespacios (uno por fila de la matriz A)."
+  assert len(halfspaces) == 4, "Debe retornar exactamente 4 semiespacios."
     
-  for i, hs in enumerate(halfspaces):
-    # Extraemos los valores originales del politopo para esta iteración
-    A_row = A_poly[i]  
-    b_val = float(b_poly[i][0]) 
-        
-    # Armamos los vectores con las coordenadas de los puntos generados
+  # Validamos arista por arista de forma independiente del índice
+  for hs in halfspaces:
     p1_coord = np.array([hs.p1.x, hs.p1.y])
     p2_coord = np.array([hs.p2.x, hs.p2.y])
+    
+    found_matching_hyperplane = False
+    
+    # Buscamos en qué cara del politopo original encajan estos dos puntos
+    for j in range(len(A_poly)):
+        A_row = A_poly[j]
+        b_val = float(b_poly[j][0])
         
-    # Validamos que p1 pertenece a la recta original (A_row * p1 = b_val)
-    assert_allclose(np.dot(A_row, p1_coord), b_val, rtol=1e-5, atol=1e-8,
-                    err_msg=f"El punto p1 del semiespacio {i} no corresponde al politopo original.")
-                        
-    # Validamos que p2 pertenece a la recta original (A_row * p2 = b_val)
-    assert_allclose(np.dot(A_row, p2_coord), b_val, rtol=1e-5, atol=1e-8,
-                    err_msg=f"El punto p2 del semiespacio {i} no corresponde al politopo original.")
+        # Evaluamos si ambos puntos cumplen la ecuación de la recta de esta cara
+        p1_on_line = np.isclose(np.dot(A_row, p1_coord), b_val, rtol=1e-5, atol=1e-8)
+        p2_on_line = np.isclose(np.dot(A_row, p2_coord), b_val, rtol=1e-5, atol=1e-8)
+        
+        if p1_on_line and p2_on_line:
+            found_matching_hyperplane = True
+            break # Encontramos la cara correcta, no hace falta seguir buscando
+            
+    assert found_matching_hyperplane, (
+        f"El semiespacio formado por p1={p1_coord} y p2={p2_coord} "
+        f"no corresponde a ninguna de las caras del politopo original."
+    )
 
 def test_get_subregion():
   geometry_2d = GeometryFactory[2]()
