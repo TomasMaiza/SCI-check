@@ -21,10 +21,10 @@ class Taylor(ApproximationStrategy):
     verticesAug = np.hstack((self._S, np.ones((self._S.shape[0], 1))))
     self._R_S = float(np.max(np.linalg.norm(verticesAug, ord=2, axis=1)))
   
-  def apply(self, h: float, s: int, order: int, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+  def apply(self, h: float, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
     # aplica la función de aproximación
     homx = augmented_x(x)
-    Phi = self.get_matrix(h, s, order)
+    Phi = self.get_matrix(h, self._s, self._M)
     return Phi @ homx
 
   def error_bound(self, r: float, tau: float) -> float:
@@ -60,16 +60,16 @@ class Taylor(ApproximationStrategy):
     den = self._s**self._M * factorial(self._M + 1)
     return num / den
   
-  def get_matrix(self, h: float, s: int, order: int) -> npt.NDArray[np.float64]:
+  def get_matrix(self, h: float) -> npt.NDArray[np.float64]:
     # calcula la matriz de la aproximación tomando el paso s
-    tau = h / s
+    tau = h / self._s
     dim = self._homA.shape[0]
     I = np.eye(dim, dtype=np.float64)
     Q = I.copy()
     term = I.copy()
-    for j in range(1, order + 1):
+    for j in range(1, self._M + 1):
       term = term @ (self._homA * tau) / j
       Q = Q + term
             
     # Squaring: Elevamos la matriz del micro-paso a la potencia s
-    return np.linalg.matrix_power(Q, s)
+    return np.linalg.matrix_power(Q, self._s)
