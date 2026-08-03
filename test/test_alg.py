@@ -126,14 +126,14 @@ def run_matlab_validation():
     # =================================================================
     # Experimento 3: K = 350 (Debería cubrir?)
     # =================================================================
-    print("\nEjecutando Experimento K=350 (h ≈ )...")
+    print("\nEjecutando Experimento K=35 (h ≈ )...")
     checker_k350 = SCIChecker(geometry=geometry_2d, 
                                         predicates=predicates_2d, 
                                         polytope=base_polytope, 
                                         sas=sas)
         
     result_k350, sub_k350 = checker_k350.sci_check(dwellTime=dwell_time, K=35)
-    plot_filled_scenario("K = 350 (h = )", base_polytope, checker_k350, result_k350, sub_k350)
+    plot_filled_scenario("K = 35 (h = )", base_polytope, checker_k350, result_k350, sub_k350)
 
 if __name__ == "__main__":
     run_matlab_validation()

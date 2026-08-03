@@ -90,7 +90,7 @@ class _CoverageCheckerIntern:
       # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
       e = self._geometry.create_halfspace((v1, v2))
       ori = self._predicates.orient_LPI(r, s, f2, e)
-      if ori == OUT:
+      if ori != IN:
         ret = False
         break
     return ret
@@ -150,7 +150,7 @@ class _CoverageCheckerIntern:
     for i, pi in polytopes:
       for j, pj in polytopes[i:]:
         for fi in pi:
-          for fj in pj: # problema con caras paralelas?
+          for fj in pj:
             if self.edge_edge_tri_out(triangle, fi, fj, polytopeSet, i, j) == OUT:
               return OUT
     return IN
