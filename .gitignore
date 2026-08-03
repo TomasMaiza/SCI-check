@@ -1,7 +1,5 @@
 test.py
 __pycache__
-ordenar_vertices.py
-_qhull.pyx
 .vscode
 bindings/build/
 build/
@@ -12,5 +10,3 @@ coverage_checker/*.so
 venv/
 env/
 .venv/
-*.png
-matlab_wrapper_aux.py

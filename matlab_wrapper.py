@@ -28,6 +28,7 @@ class MatlabWrapperSCI:
   def create_polytope(self, polytopeVerticesRaw: list[list[float]]):
     # se inicializa el politopo
     polytopeVertices = np.array(polytopeVerticesRaw, dtype=float) # vértices del politopo
+    # polytopeVertices = np.round(polytopeVertices, decimals=8)
     self._polytope = pc.qhull(polytopeVertices) # se crea el politopo
 
   def create_sas(self, systemRaw: list[tuple[list[list[float]], list[float]]]):
