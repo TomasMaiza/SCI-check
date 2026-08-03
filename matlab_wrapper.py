@@ -32,7 +32,7 @@ class MatlabWrapperSCI:
     modesDict = {}
     for mode, (ARaw, bRaw) in enumerate(systemRaw):
       A = np.array(ARaw, dtype=np.float64)
-      b = np.array(bRaw, dtype=np.float64)
+      b = np.array(bRaw, dtype=np.float64).reshape(-1, 1)
       modesDict[mode] = (A, b)
     self._sas = SwitchedAffineSystem(modesDict)
 
