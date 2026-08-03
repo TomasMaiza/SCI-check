@@ -46,6 +46,6 @@ class MatlabWrapperSCI:
     self.create_geometry_and_predicates(dimension)
     self.create_polytope(polytopeVerticesRaw)
     self.create_sas(systemRaw)
-    checker = SCIChecker(self._geom, self._preds, self._polytope, self._subregions, self._sas)
+    checker = SCIChecker(self._geom, self._preds, self._polytope, self._sas)
     isSCI, subregions = checker.sci_check(dwellTime, K)
     return isSCI
