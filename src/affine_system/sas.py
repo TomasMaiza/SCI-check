@@ -22,6 +22,12 @@ class SwitchedAffineSystem:
                     f"dimensión {dimension}, pero se esperaba {expectedDimension}."
                 )
       self._modes[i] = AffineMode(A, b) # diccionario para mapear un modo a su sistema afín
+
+  def add_mode(self, modeID: int, subsystem: AffineMode):
+    # permite agregar modos manualmente
+    if modeID in self._modes.keys():
+      raise ValueError(f"Mode {modeID} already in system.")
+    self._modes[modeID] = subsystem
     
   def get_mode_matrices(self, mode: int) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
     # retorna las matrices A y b del modo indicado
