@@ -4,10 +4,6 @@ from geometry import AbstractSimplex
 
 class CoverageCheckStrategy(ABC):
   @abstractmethod
-  def __init__(self):
-    pass
-
-  @abstractmethod
   def envelope_check(self, 
                      triangle: AbstractSimplex, 
                      polytopeSet: PolytopeMap, 

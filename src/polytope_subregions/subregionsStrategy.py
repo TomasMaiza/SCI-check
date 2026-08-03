@@ -9,10 +9,6 @@ from affine_system import SwitchedAffineSystem
 
 class SubregionsStrategy(ABC):
   @abstractmethod
-  def __init__(self):
-    pass
-
-  @abstractmethod
   def get_subregion(self, polytope: pc.Polytope) -> list[AbstractHalfspace]:
     # obtiene la subregión para un modo particular
     pass
