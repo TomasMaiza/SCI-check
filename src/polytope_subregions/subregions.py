@@ -44,7 +44,7 @@ class Subregions(SubregionsStrategy):
                     K: int, 
                     h: float) -> list[AbstractHalfspace]:
     # obtiene la subregión para un modo particular
-    approx = self._approxMethod(subsystem, polytope, 1, 4)
+    approx = self._approxMethod(subsystem, polytope, scaling=1, order=4)
     r = 0 # r_0
     errorSeq = approx.error_sequence(h, K)
     phi = approx.get_matrix(h) # matriz de la aproximación

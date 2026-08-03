@@ -84,7 +84,7 @@ class _CoverageCheckerIntern:
     ori2 = self._predicates.orient(s, f2)
     if ori1 == ON and ori2 == ON:
       print("Paralelas")
-      return True
+      return False
     '''
     for v1, v2 in edges:
       # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
