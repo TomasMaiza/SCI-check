@@ -13,13 +13,13 @@ class SwitchedAffineSystem:
     for i in modesDict.keys():
       A, b = modesDict[i]
       if first:
-        expectedDimension = A.shape[0]
+        self._dimension = A.shape[0]
         first = False
       dimension = A.shape[0]
-      if dimension != expectedDimension:
+      if dimension != self._dimension:
         raise ValueError(
                     f"Inconsistencia de dimensiones: El modo {i} tiene "
-                    f"dimensión {dimension}, pero se esperaba {expectedDimension}."
+                    f"dimensión {dimension}, pero se esperaba {self._dimension}."
                 )
       self._modes[i] = AffineMode(A, b) # diccionario para mapear un modo a su sistema afín
 
@@ -27,6 +27,12 @@ class SwitchedAffineSystem:
     # permite agregar modos manualmente
     if modeID in self._modes.keys():
       raise ValueError(f"Mode {modeID} already in system.")
+    dimension = subsystem.A.shape[0]
+    if dimension != self._dimension:
+      raise ValueError(
+          f"Inconsistencia de dimensiones: El modo {modeID} tiene "
+          f"dimensión {dimension}, pero se esperaba {self._dimension}."
+      )
     self._modes[modeID] = subsystem
     
   def get_mode_matrices(self, mode: int) -> tuple[npt.NDArray[np.float64], npt.NDArray[np.float64]]:
