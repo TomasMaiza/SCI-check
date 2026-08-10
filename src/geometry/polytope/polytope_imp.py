@@ -8,7 +8,8 @@ from geometry import AbstractPoint, AbstractHalfspace
 
 class PolytopeImp:
   # implementación de politopos usando la librería polytope
-
+  polytope: pc.Polytope
+   
   def __init__(self, 
                vertices: Optional['tuple[AbstractPoint, ...]'] = None, 
                A: Optional['np.ndarray'] = None, 
