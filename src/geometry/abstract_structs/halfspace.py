@@ -6,13 +6,6 @@ from geometry.abstract_structs.point import AbstractPoint
 class AbstractHalfspace(ABC):
   # representación de un semiespacio en un espacio n-dimensional
   @abstractmethod
-  def __init__(self, 
-               points: Optional['tuple[AbstractPoint, ...]'], 
-               normalVector: Optional['np.ndarray'], 
-               b: Optional['float']):
-    pass
-
-  @abstractmethod
   def get_points(self) -> tuple[AbstractPoint, ...]: # retorna los puntos que definen el semiespacio
     pass
 

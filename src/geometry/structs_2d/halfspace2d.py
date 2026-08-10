@@ -8,7 +8,8 @@ class Halfspace2D(AbstractHalfspace):
   p1: Point2D
   p2: Point2D
 
-  def __init__(self, points: Optional['tuple[Point2D, Point2D]'] = None, 
+  def __init__(self, 
+               points: Optional['tuple[Point2D, Point2D]'] = None, 
                normalVector: Optional[np.ndarray] = None, 
                b: Optional[float] = None):
     if normalVector is None and b is None:
@@ -17,7 +18,7 @@ class Halfspace2D(AbstractHalfspace):
     elif points is None:
       self.create_from_normal_vector(normalVector, b)
     else:
-      raise ValueError("Inicialización inválida: Debes proveer (p1, p2) o (normalVector, b).")
+      raise ValueError("Inicialización inválida: Proveer (p1, p2) o (normalVector, b).")
 
   def get_points(self) -> tuple[Point2D, Point2D]: 
     return self.p1, self.p2
