@@ -1,8 +1,7 @@
 from coverage_checker import CoverageCheckStrategy, CoverageChecker, AbstractPredicates
-from geometry import AbstractGeometry, AbstractSimplex
+from geometry import AbstractGeometry, AbstractSimplex, Polytope
 from common import PolytopeMap, ON, OUT, IN
 from triangulation import *
-import polytope as pc
 import numpy as np
 from aabbtree import AABB, AABBTree
 from affine_system import SwitchedAffineSystem
@@ -12,7 +11,7 @@ class SCIChecker():
   def __init__(self, 
                geometry: AbstractGeometry, 
                predicates: AbstractPredicates, 
-               polytope: pc.Polytope, 
+               polytope: Polytope, 
                sas: SwitchedAffineSystem):
     self._geometry = geometry
     self._predicates = predicates

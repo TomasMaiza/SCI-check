@@ -1,11 +1,10 @@
 import numpy as np
 import numpy.typing as npt
-import polytope as pc
 from scipy.spatial import ConvexHull
 from .subregionsStrategy import SubregionsStrategy
 from affine_system import *
 from common import PolytopeMap
-from geometry import AbstractHalfspace, AbstractGeometry
+from geometry import AbstractHalfspace, AbstractGeometry, Polytope
 from .approximations import Euler, Taylor
 from affine_system import SwitchedAffineSystem, AffineMode
 from .matrices import partition_matrices
