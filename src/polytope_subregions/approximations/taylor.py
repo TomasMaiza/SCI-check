@@ -1,21 +1,21 @@
 import numpy as np
 import numpy.typing as npt
-import polytope as pc
 from .strategy import ApproximationStrategy
 from affine_system import *
 from polytope_subregions.matrices import sas_augmented_matrix, augmented_x
 from math import factorial
+from geometry import Polytope
 
 class Taylor(ApproximationStrategy):
   def __init__(self, 
                subsystem: AffineMode, 
-               polytope: pc.Polytope,
+               polytope: Polytope,
                scaling: int,
                order: int):
     # Inicializa la función de aproximación y la función de error
     self._A, self._b = subsystem.get_subsystem()
     self._homA = sas_augmented_matrix(subsystem)
-    self._S = pc.extreme(polytope)
+    self._S = polytope.get_vertices()
     self._s = scaling
     self._M = order
     verticesAug = np.hstack((self._S, np.ones((self._S.shape[0], 1))))

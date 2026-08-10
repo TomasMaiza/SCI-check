@@ -1,16 +1,16 @@
 import numpy as np
 import numpy.typing as npt
-import polytope as pc
 from .strategy import ApproximationStrategy
 from affine_system import *
 from polytope_subregions.matrices import sas_augmented_matrix
+from geometry import Polytope
 
 class Euler(ApproximationStrategy):
-  def __init__(self, subsystem: AffineMode, polytope: pc.Polytope):
+  def __init__(self, subsystem: AffineMode, polytope: Polytope):
     # Inicializa la función de aproximación y la función de error
     self._A, self._b = subsystem.get_subsystem()
     self._homA = sas_augmented_matrix(subsystem)
-    self._S = pc.extreme(polytope)
+    self._S = polytope.get_vertices()
   
   def apply(self, s: float, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
     # aplica la función de aproximación
