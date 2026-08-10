@@ -1,9 +1,16 @@
 from abc import ABC, abstractmethod
 import numpy as np
+from typing import Optional
 from geometry import AbstractPoint, AbstractHalfspace
 
 class Polytope(ABC):
   # Clase abstracta para representar politopos
+
+  def __init__(self, 
+               vertices: Optional['tuple[AbstractPoint, ...]'] = None, 
+               A: Optional['np.ndarray'] = None, 
+               b: Optional['np.ndarray'] = None):
+    pass
 
   @abstractmethod
   def get_vertices(self) -> np.ndarray:

@@ -14,9 +14,9 @@ class Subregions(SubregionsStrategy):
     self._approxMethod = Taylor
     self._geometry = geometry
 
-  def get_polytope_vertices_CCW(self, subregionPolytope: pc.Polytope) -> list[list[float]]:
+  def get_polytope_vertices_CCW(self, subregionPolytope: Polytope) -> list[list[float]]:
     # Extrae y ordena los vértices del politopo en sentido antihorario (CCW).
-    vertices = pc.extreme(subregionPolytope) # obtengo los vértices del politopo
+    vertices = subregionPolytope.get_vertices() # obtengo los vértices del politopo
     if vertices is None or len(vertices) < 3:
         return vertices.tolist() if vertices is not None else []
     hull = ConvexHull(vertices) # ordenamos los vértices en sentido antihorario con ConvexHull
@@ -24,7 +24,7 @@ class Subregions(SubregionsStrategy):
     return sortedVertices.tolist()
     
 
-  def _create_halfspaces_list(self, subregionPolytope: pc.Polytope) -> list[AbstractHalfspace]:
+  def _create_halfspaces_list(self, subregionPolytope: Polytope) -> list[AbstractHalfspace]:
     sortedVertices = self.get_polytope_vertices_CCW(subregionPolytope)    
     numVertices = len(sortedVertices)
     halfspaces = []
@@ -39,7 +39,7 @@ class Subregions(SubregionsStrategy):
 
   def get_subregion(self, 
                     subsystem: AffineMode, 
-                    polytope: pc.Polytope, 
+                    polytope: Polytope, 
                     K: int, 
                     h: float) -> list[AbstractHalfspace]:
     # obtiene la subregión para un modo particular
@@ -68,13 +68,13 @@ class Subregions(SubregionsStrategy):
     # obtengo A y b separando la última columna de matrixH y me queda que Ax <= c - b
     matrixA, matrixb = np.hsplit(matrixH, [dim - 1]) # obtiene A y b separando la últ col de H
     matrixb = matrixc - matrixb
-    subregionPolytope = pc.Polytope(matrixA, matrixb)
-    subregionPolytope = pc.reduce(subregionPolytope)
+    subregionPolytope = Polytope(A = matrixA, b = matrixb)
+    subregionPolytope = subregionPolytope.reduce()
     return self._create_halfspaces_list(subregionPolytope)
 
   def get_subregions(self, 
                      sas: SwitchedAffineSystem, 
-                     polytope: pc.Polytope, 
+                     polytope: Polytope, 
                      dwellTime: float, 
                      K: int) -> PolytopeMap:
     # recibe un politopo (y todo lo necesario) para devolver la lista de subregiones
