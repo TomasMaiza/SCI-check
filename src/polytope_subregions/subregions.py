@@ -25,7 +25,7 @@ class Subregions(SubregionsStrategy):
     return sortedVertices.tolist()
     
 
-  def _create_halfspaces_list(self, subregionPolytope: pc.Polytope) -> list:
+  def _create_halfspaces_list(self, subregionPolytope: pc.Polytope) -> list[AbstractHalfspace]:
     sortedVertices = self.get_polytope_vertices_CCW(subregionPolytope)    
     numVertices = len(sortedVertices)
     halfspaces = []

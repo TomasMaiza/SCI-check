@@ -6,18 +6,13 @@ class AbstractPolytope(ABC):
   # Clase abstracta para representar politopos
 
   @abstractmethod
-  def get_vertices(self) -> list[AbstractPoint]:
+  def get_vertices(self) -> np.ndarray:
     # permite obtener los vértices del politopo
     pass
 
   @abstractmethod
   def get_hrep(self) -> tuple[np.ndarray, np.ndarray]:
     # permite obtener las matrices A y b que definen al politopo
-    pass
-
-  @abstractmethod
-  def get_halfspaces(self) -> list[AbstractHalfspace]:
-    # retorna la lista de los semiespacios que definen al politopo
     pass
 
   @abstractmethod
