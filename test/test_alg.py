@@ -1,21 +1,20 @@
 import numpy as np
-import polytope as pc
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from scipy.spatial import ConvexHull
 from sci import SCIChecker
-from geometry import GeometryFactory
+from geometry import GeometryFactory, Polytope, PolytopeImp
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
 from common import PolytopeMap
 
 
-def plot_filled_scenario(title: str, original_poly: pc.Polytope, checker: 'SCIChecker', coverage_result: bool, subregions_map: PolytopeMap):
+def plot_filled_scenario(title: str, original_poly: Polytope, checker: 'SCIChecker', coverage_result: bool, subregions_map: PolytopeMap):
     """Grafica el politopo y las subregiones con relleno traslúcido."""
     fig, ax = plt.subplots(figsize=(10, 8))
     
     # 1. Dibujamos la caja original S como referencia (fondo gris)
-    original_poly.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
+    original_poly.polytope.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
     
     # Colores base para imitar la paleta de MATLAB
     colors = ['#1f77b4', '#ff7f0e', '#d62728', '#9467bd', '#2ca02c'] 
@@ -75,7 +74,7 @@ def run_matlab_validation():
                        [ 0.0,  1.0], 
                        [ 0.0, -1.0]])
     b_poly = np.array([[1.0], [1.0], [1.0], [1.0]]) 
-    base_polytope = pc.Polytope(A_poly, b_poly)
+    base_polytope = PolytopeImp(A = A_poly, b = b_poly)
 
     # --- 2. Definición del Sistema Afín Conmutado ---
     rho = 10.15
