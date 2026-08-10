@@ -1,7 +1,7 @@
-import polytope as pc
 import numpy as np
 import numpy.typing as npt
 from affine_system import AffineMode
+from geometry import Polytope
 
 def sas_augmented_matrix(subsystem: AffineMode) -> np.ndarray:
   # dadas las matrices A y b que definen al sistema afín conmutado (SAS), calcula la matriz aumentada A tilde
@@ -15,15 +15,14 @@ def sas_augmented_matrix(subsystem: AffineMode) -> np.ndarray:
       [zeros, 0]
   ])
 
-def polytope_augmented_matrix(polytope: pc.Polytope) -> np.ndarray:
+def polytope_augmented_matrix(polytope: Polytope) -> np.ndarray:
   # dado el politopo Hx <= c calcula la matriz aumentada H tilde
-  H = polytope.A
-  c = polytope.b
+  H, c = polytope.get_hrep()
   n = H.shape[0]
   c = c.reshape(n, 1) 
   return np.hstack((H, -c)) # matriz H tilde (homH)
 
-def partition_matrices(polytope: pc.Polytope, 
+def partition_matrices(polytope: Polytope, 
                        subsystem: AffineMode, 
                        r: float, 
                        h: float, 
