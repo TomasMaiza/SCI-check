@@ -10,5 +10,5 @@ __all__ = ["AbstractGeometry",
            "AbstractHalfspace", 
            "AbstractPoint", 
            "AbstractSimplex",
-           "AbstractPolytope",
+           "Polytope",
            "PolytopeImp"]

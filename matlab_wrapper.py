@@ -40,7 +40,7 @@ class MatlabWrapperSCI:
 
   def plot_filled_scenario(self, 
                            title: str, 
-                           original_poly: AbstractPolytope, 
+                           original_poly: Polytope, 
                            coverage_result: bool, 
                            subregions_map: list):
     # Grafica el politopo y las subregiones

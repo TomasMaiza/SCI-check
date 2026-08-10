@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 from geometry import AbstractPoint, AbstractHalfspace
 
-class AbstractPolytope(ABC):
+class Polytope(ABC):
   # Clase abstracta para representar politopos
 
   @abstractmethod
@@ -16,18 +16,18 @@ class AbstractPolytope(ABC):
     pass
 
   @abstractmethod
-  def intersect(self, p: 'AbstractPolytope') -> 'AbstractPolytope':
+  def intersect(self, p: 'Polytope') -> 'Polytope':
     # permite intersecar el politopo con otro
     pass
 
   @abstractmethod
-  def union(self, p: 'AbstractPolytope') -> list['AbstractPolytope']:
+  def union(self, p: 'Polytope') -> list['Polytope']:
     # permite calcular la unión del politopo con otro
     # retorna una lista por si la región resultante no es convexa
     pass
 
   @abstractmethod
-  def difference(self, p: 'AbstractPolytope') -> list['AbstractPolytope']:
+  def difference(self, p: 'Polytope') -> list['Polytope']:
     # permite calcular la diferencia entre dos politopos
     pass
 
@@ -43,7 +43,7 @@ class AbstractPolytope(ABC):
     pass
 
   @abstractmethod
-  def subset(self, p: 'AbstractPolytope') -> bool:
+  def subset(self, p: 'Polytope') -> bool:
     # retorna si el politopo es subconjunto de p
     pass
 

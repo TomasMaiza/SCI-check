@@ -1,15 +1,15 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from typing import Optional
-from .polytope import AbstractPolytope
+from .polytope import Polytope
 import polytope as pc
 from scipy.spatial import ConvexHull
 from geometry import AbstractPoint, AbstractHalfspace
 
-class PolytopeImp:
+class PolytopeImp(Polytope):
   # implementación de politopos usando la librería polytope
   polytope: pc.Polytope
-   
+
   def __init__(self, 
                vertices: Optional['tuple[AbstractPoint, ...]'] = None, 
                A: Optional['np.ndarray'] = None, 
