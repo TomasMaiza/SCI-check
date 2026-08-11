@@ -9,7 +9,6 @@ if TYPE_CHECKING:
 class AbstractSimplex(ABC):
   # clase para representar  el triángulo
     
-  @property
   @abstractmethod
   def get_vertices(self) -> tuple['AbstractPoint', ...]: # retorna sus vértices
     pass

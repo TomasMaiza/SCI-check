@@ -118,7 +118,7 @@ class _CoverageCheckerIntern:
                triangle: AbstractSimplex, 
                polytopeSet: PolytopeMap, 
                verticesIndex: VerticesIndex) -> OrientResult:
-    vertices = triangle.get_vertices
+    vertices = triangle.get_vertices()
     ret = IN
     for v in vertices:
       if not verticesIndex[v] and self.point_out(v, polytopeSet) == OUT:
