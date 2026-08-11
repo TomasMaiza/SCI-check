@@ -17,7 +17,7 @@ class PolytopeImp(Polytope):
     if A is not None and b is not None and vertices is None:
       self.polytope = pc.Polytope(A, b)
     elif A is None and b is None and vertices is not None and len(vertices) > 2:
-      pointsArray = np.array([[v.x, v.y] for v in vertices])
+      pointsArray = np.array([list(v.get_point()) for v in vertices])
       self.polytope = pc.qhull(pointsArray)    
     else:
       raise ValueError("Inicialización inválida: Proveer vértices o (A, b)")
@@ -31,7 +31,7 @@ class PolytopeImp(Polytope):
     return self.polytope.A, self.polytope.b
   
 
-  def _map_polytopes_from_pc(self, pcList: list[pc.Polytope]) -> 'PolytopeImp':
+  def _map_polytopes_from_pc(self, pcList: list[pc.Polytope]) -> list['PolytopeImp']:
     # toma una lista de pc.Polytope y retorna una de PolytopeImp
     polyList = []
     for p in pcList:

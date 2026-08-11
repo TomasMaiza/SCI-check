@@ -9,4 +9,4 @@ class Point2D(AbstractPoint):
   y: float
 
   def get_point(self) -> tuple[float, float]: # retorna la representación vectorial del punto
-    return ([self.x, self.y])
+    return (self.x, self.y)
