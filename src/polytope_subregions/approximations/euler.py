@@ -18,11 +18,11 @@ class Euler(ApproximationStrategy):
   
   def error_bound(self, r: float, tau: float) -> float:
     # calcula el error de la aproximación
-    normA = np.linalg.norm(self._A, ord=2)
+    normA = float(np.linalg.norm(self._A, ord=2))
     M = self._get_M(normA)
     return r * (1 + normA * tau) + M * (np.exp(normA * tau) - 1 - normA * tau)
 
-  def _get_M(self, normA: float):
+  def _get_M(self, normA: float) -> float:
     # auxiliar para calcular M
     if normA < 1e-12:
       return 0.0
@@ -32,7 +32,7 @@ class Euler(ApproximationStrategy):
       norm = np.linalg.norm(self._A @ x + self._b, ord=2)
       if norm > m:
         m = norm
-    return 1/normA * m
+    return float(1/normA * m)
 
   def error_sequence(self, h: float, K: int) -> list[float]:
     # calcula la secuencia de errores para el método
