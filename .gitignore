@@ -10,3 +10,5 @@ coverage_checker/*.so
 venv/
 env/
 .venv/
+.mypy_cache
+.pytest_cache
