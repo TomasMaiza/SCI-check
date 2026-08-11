@@ -15,6 +15,7 @@ from scipy.spatial import ConvexHull
 from geometry import *
 from coverage_checker import *
 from affine_system import *
+from common import PolytopeMap, SerializedPolytopeMap
 
 class MatlabWrapperSCI:
   def create_geometry_and_predicates(self, dimension: int):
@@ -37,6 +38,17 @@ class MatlabWrapperSCI:
       b = np.array(bRaw, dtype=np.float64).reshape(-1, 1)
       modesDict[mode] = (A, b)
     self._sas = SwitchedAffineSystem(modesDict)
+
+  def _serialize_polytope_map(self, map: PolytopeMap) -> SerializedPolytopeMap:
+    subregions = []
+    for halfspacesList in map:
+      modePoints = []
+      if halfspacesList:
+        for hs in halfspacesList:
+          p1, p2 = hs.get_points()
+          modePoints.append([p1.x, p1.y])
+          modePoints.append([p2.x, p2.y])        
+      subregions.append(modePoints)
 
   def plot_filled_scenario(self, 
                            title: str, 
@@ -103,12 +115,13 @@ class MatlabWrapperSCI:
                    systemRaw: list[tuple[list[list[float]], list[float]]],  # lista de tuplas (A, b)
                    dwellTime: float, 
                    K: int, 
-                   dimension: int) -> bool:
-    # recibe listas crudas desde MATLAB, arma la geometría y corre el SCIChecker.
+                   dimension: int) -> tuple[bool, SerializedPolytopeMap]:
+    # recibe listas crudas desde MATLAB, arma la geometría y corre el SCIChecker
     self.create_geometry_and_predicates(dimension)
     self.create_polytope(polytopeVerticesRaw)
     self.create_sas(systemRaw)
     checker = SCIChecker(self._geom, self._preds, self._polytope, self._sas)
     isSCI, subregions = checker.sci_check(dwellTime, K)
     self.plot_filled_scenario(f"K = {K}", self._polytope, isSCI, subregions)
-    return isSCI
+    serializedSubregions = self._serialize_polytope_map(subregions)
+    return isSCI, serializedSubregions
