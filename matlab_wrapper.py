@@ -46,9 +46,10 @@ class MatlabWrapperSCI:
       if halfspacesList:
         for hs in halfspacesList:
           p1, p2 = hs.get_points()
-          modePoints.append([p1.x, p1.y])
-          modePoints.append([p2.x, p2.y])        
+          modePoints.append(list(p1.get_point()))
+          modePoints.append(list(p2.get_point()))        
       subregions.append(modePoints)
+    return subregions
 
   def plot_filled_scenario(self, 
                            title: str, 

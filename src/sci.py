@@ -25,10 +25,8 @@ class SCIChecker():
     # convertimos a Simplex
     for t in triangles:
       # t tiene la forma [[x1, y1], [x2, y2], [x3, y3]]
-      v1 = self._geometry.create_point((t[0][0], t[0][1]))
-      v2 = self._geometry.create_point((t[1][0], t[1][1]))
-      v3 = self._geometry.create_point((t[2][0], t[2][1]))
-      simplex = self._geometry.create_simplex((v1, v2, v3))
+      puntos = tuple(self._geometry.create_point(tuple(v)) for v in t)
+      simplex = self._geometry.create_simplex(puntos)
       self._triangles.append(simplex)
 
   def triangulate_polytope(self): # asignar índices a vértices y guardar todo en variables?
@@ -55,6 +53,7 @@ class SCIChecker():
   def get_subregions(self, dwellTime: float, K: int):
     self._subregions = self._subregionsAlgorithm.get_subregions(self._sas, self._polytope, dwellTime, K)
 
+  '''
   def get_aabb_limits_p(self) -> list[list[tuple[float, float]]]:
     limits = []
     for p in self._subregions:
@@ -70,7 +69,7 @@ class SCIChecker():
         ymin = min(ymin, p1.y, p2.y)
         ymax = max(ymax, p1.y, p2.y)
       limits.append([(xmin, xmax), (ymin, ymax)])
-    return limits
+    return limits*/
   
   def _get_aabb_limits_t(self, triangle: AbstractSimplex) -> list[tuple[float, float]]:
     v1, v2, v3 = triangle.get_vertices()
@@ -94,6 +93,7 @@ class SCIChecker():
     indices = self._aabbTree.overlap_values(box)
     filteredMap = [self._subregions[i] for i in indices]
     return filteredMap
+  '''
 
   def check_coverage(self) -> bool: # itera sobre los triángulos
     ret = True
