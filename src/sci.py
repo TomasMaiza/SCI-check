@@ -26,7 +26,7 @@ class SCIChecker():
     for t in triangles:
       # t tiene la forma [[x1, y1], [x2, y2], [x3, y3]]
       puntos = tuple(self._geometry.create_point(tuple(v)) for v in t)
-      simplex = self._geometry.create_simplex(puntos)
+      simplex = self._geometry.create_simplex(puntos) # habría que chequear que es triángulo...
       self._triangles.append(simplex)
 
   def triangulate_polytope(self): # asignar índices a vértices y guardar todo en variables?

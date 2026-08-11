@@ -26,7 +26,7 @@ def partition_matrices(polytope: Polytope,
                        subsystem: AffineMode, 
                        r: float, 
                        h: float, 
-                       midErrorBound: float) -> tuple[np.ndarray]:
+                       midErrorBound: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
   homA = sas_augmented_matrix(subsystem)
   homH = polytope_augmented_matrix(polytope)
 
@@ -54,8 +54,5 @@ def partition_matrices(polytope: Polytope,
 
 def augmented_x(x: npt.NDArray[np.float64]) -> np.ndarray:
   # aumenta la matriz x a [x, 1]^T
-  return np.block([ # matriz x tilde (homx)
-      [x],
-      [1]
-  ])
+  return np.vstack((x, [1])) # matriz x tilde (homx)
   
