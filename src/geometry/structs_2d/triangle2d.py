@@ -23,10 +23,10 @@ class Triangle2D(AbstractSimplex):
     # cada arista es una tupla de dos puntos
     return ((self.v1, self.v2), (self.v2, self.v3), (self.v3, self.v1))
 
-  def get_inverse_edges(self):
+  def get_inverse_edges(self) -> tuple['Edge', 'Edge', 'Edge']:
     # retorna las aristas con el sentido invertido
     return ((self.v2, self.v1), (self.v3, self.v2), (self.v1, self.v3))
 
-  def get_all_edges(self):
+  def get_all_edges(self) -> tuple[tuple['Edge', 'Edge', 'Edge'], tuple['Edge', 'Edge', 'Edge']]:
     # retorna las aristas en ambos sentidos
     return self.get_edges(), self.get_inverse_edges()
