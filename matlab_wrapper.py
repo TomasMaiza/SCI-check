@@ -55,13 +55,13 @@ class MatlabWrapperSCI:
                            title: str, 
                            original_poly: Polytope, 
                            coverage_result: bool, 
-                           subregions_map: list):
+                           subregions_map: list): 
     # Grafica el politopo y las subregiones
     fig, ax = plt.subplots(figsize=(10, 8))
     
     # 1. Dibujamos la caja original S como referencia (fondo gris)
     try:
-        original_poly.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
+        original_poly.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2) # type: ignore
     except Exception:
         pass # Por si la librería polytope vuelve a fallar con el original
     
@@ -99,8 +99,8 @@ class MatlabWrapperSCI:
                 print(f"No se pudo rellenar el Modo {mode_idx}: {e}")
 
     ax.set_title(f"{title}\nResultado de Cobertura: {coverage_result}", fontsize=14)
-    ax.set_xlim([-1.5, 1.5]) 
-    ax.set_ylim([-1.5, 1.5])
+    ax.set_xlim([-1.5, 1.5]) # type: ignore
+    ax.set_ylim([-1.5, 1.5]) # type: ignore
     ax.grid(True, linestyle='--', alpha=0.5)
     
     handles, labels = ax.get_legend_handles_labels()

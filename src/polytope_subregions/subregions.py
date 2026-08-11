@@ -31,34 +31,32 @@ class Subregions(SubregionsStrategy):
     for i in range(numVertices): # iteramos para armar los bordes del politopo (v1, v2)
       v1 = sortedVertices[i]
       v2 = sortedVertices[(i + 1) % numVertices]
-      p1 = self._geometry.create_point(v1)
-      p2 = self._geometry.create_point(v2)
+      p1 = self._geometry.create_point(tuple(v1))
+      p2 = self._geometry.create_point(tuple(v2))
       hs = self._geometry.create_halfspace((p1, p2))
       halfspaces.append(hs)
     return halfspaces
 
   def get_subregion(self, 
                     subsystem: AffineMode, 
-                    polytope: Polytope, 
-                    K: int, 
-                    h: float) -> list[AbstractHalfspace]:
+                    polytope: Polytope) -> list[AbstractHalfspace]:
     # obtiene la subregión para un modo particular
     approx = self._approxMethod(subsystem, polytope, scaling=1, order=4)
     r = 0 # r_0
-    errorSeq = approx.error_sequence(h, K)
-    phi = approx.get_matrix(h) # matriz de la aproximación
+    errorSeq = approx.error_sequence(self._h, self._K)
+    phi = approx.get_matrix(self._h) # matriz de la aproximación
     dim = phi.shape[0]
     phi_k = np.eye(dim, dtype=np.float64) # matriz de la aproximación para el paso k
     subregionH = [] # apilamos las matrices de las inecuaciones
     subregionc = []
-    for k in range(0, K + 1):
+    for k in range(0, self._K + 1):
       r = errorSeq[k]
-      midr = approx.error_bound(r, h/2)
-      Hplus, Hminus, c = partition_matrices(polytope, subsystem, r, h, midr)
+      midr = approx.error_bound(r, self._h/2)
+      Hplus, Hminus, c = partition_matrices(polytope, subsystem, r, self._h, midr)
       if k > 0:
         subregionH.append(Hminus @ phi_k)
         subregionc.append(c)
-      if k < K:
+      if k < self._K:
         subregionH.append(Hplus @ phi_k)
         subregionc.append(c)
       # r = approx.error_bound(r, abs(h)) # r para el próximo paso
@@ -79,11 +77,13 @@ class Subregions(SubregionsStrategy):
                      K: int) -> PolytopeMap:
     # recibe un politopo (y todo lo necesario) para devolver la lista de subregiones
     h = dwellTime/K
+    self._K = K
+    self._h = h
     modes = sas.get_all_modes()
     polytopeMap = [] # inicializo el mapa de politopos para cada modo
     for i in modes:
       subsystem = sas.get_subsystem(i)
-      halfspaces = self.get_subregion(subsystem, polytope, K, h)
+      halfspaces = self.get_subregion(subsystem, polytope)
       #if len(halfspaces) != 0:
       polytopeMap.append(halfspaces)
     return polytopeMap

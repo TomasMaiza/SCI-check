@@ -8,7 +8,7 @@ from affine_system import SwitchedAffineSystem
 
 class SubregionsStrategy(ABC):
   @abstractmethod
-  def get_subregion(self, polytope: Polytope) -> list[AbstractHalfspace]:
+  def get_subregion(self, subsystem: AffineMode, polytope: Polytope) -> list[AbstractHalfspace]:
     # obtiene la subregión para un modo particular
     pass
 
