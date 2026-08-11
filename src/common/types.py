@@ -3,6 +3,8 @@ from geometry.abstract_structs import AbstractPoint, AbstractHalfspace
 type PolytopeMap = list[list[AbstractHalfspace]]
 # diccionario que relaciona cada subregion con un conjunto de los semiespacios que la definen
 
+type SerializedPolytopeMap = list[list[list[float]]] # lista de subespacios para matlab
+
 type Edge = tuple[AbstractPoint, AbstractPoint] # una arista es una tupla de puntos
 
 type VerticesIndex = dict[AbstractPoint, bool]
