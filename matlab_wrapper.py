@@ -15,7 +15,7 @@ from scipy.spatial import ConvexHull
 from geometry import *
 from coverage_checker import *
 from affine_system import *
-from common import PolytopeMap, SerializedPolytopeMap
+from common import PolytopeMap, SerializedPolytopeMap, setup_logger
 
 class MatlabWrapperSCI:
   def create_geometry_and_predicates(self, dimension: int):
@@ -118,6 +118,7 @@ class MatlabWrapperSCI:
                    K: int, 
                    dimension: int) -> tuple[bool, SerializedPolytopeMap]:
     # recibe listas crudas desde MATLAB, arma la geometría y corre el SCIChecker
+    setup_logger()
     self.create_geometry_and_predicates(dimension)
     self.create_polytope(polytopeVerticesRaw)
     self.create_sas(systemRaw)
