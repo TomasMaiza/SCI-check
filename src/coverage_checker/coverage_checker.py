@@ -1,4 +1,3 @@
-# acá se implementa el módulo que verifica las 3 condiciones iterando sobre cada triángulo
 from .predicates import AbstractPredicates
 from geometry import *
 from common import *
@@ -24,7 +23,7 @@ class _CoverageCheckerIntern:
         isInFlag = False
       for f in halfspacesList: # con la lista llegan en orden
         ori = self._predicates.orient(v, f)
-        if ori == OUT: # puede ser ON o OUT. REVISAR QUE DEBERÍA PASAR EN CASO DE ON
+        if ori == OUT:
           isInFlag = False
           break
       if isInFlag:
@@ -50,7 +49,7 @@ class _CoverageCheckerIntern:
       ret = False
     for fp in p:
       ori = self._predicates.orient_LPI(v1, v2, f, fp)
-      if ori == OUT: # puede ser ON o OUT
+      if ori == OUT:
         ret = False
         break
     return ret
@@ -80,13 +79,6 @@ class _CoverageCheckerIntern:
     edges = triangle.get_edges()
     r, s = f1.get_points()
     ret = True
-    '''
-    ori1 = self._predicates.orient(r, f2)
-    ori2 = self._predicates.orient(s, f2)
-    if ori1 == ON and ori2 == ON:
-      print("Paralelas")
-      return False
-    '''
     for v1, v2 in edges:
       # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
       e = self._geometry.create_halfspace((v1, v2))
