@@ -3,7 +3,7 @@ from .geometry import AbstractGeometry
 from .structs_3d import *
 
 class Geometry3d(AbstractGeometry):
-  # geometría 2d
+  # geometría 3d
   def create_point(self, coord: tuple[float, ...]) -> Point3D: # crea un punto
     return Point3D(x = coord[0], y = coord[1])
 
