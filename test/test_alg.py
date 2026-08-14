@@ -6,7 +6,7 @@ from sci import SCIChecker
 from geometry import GeometryFactory, Polytope, PolytopeImp
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
-from common import PolytopeMap
+from common import PolytopeMap, setup_logger
 
 
 def plot_filled_scenario(title: str, original_poly: Polytope, checker: 'SCIChecker', coverage_result: bool, subregions_map: PolytopeMap):
@@ -135,4 +135,5 @@ def run_matlab_validation():
     plot_filled_scenario("K = 11 (h = )", base_polytope, checker_k350, result_k350, sub_k350)
 
 if __name__ == "__main__":
+    setup_logger()
     run_matlab_validation()
