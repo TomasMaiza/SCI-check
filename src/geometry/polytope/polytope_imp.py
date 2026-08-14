@@ -29,7 +29,6 @@ class PolytopeImp(Polytope):
   def get_hrep(self) -> tuple[np.ndarray, np.ndarray]:
     # permite obtener las matrices A y b que definen al politopo
     return self.polytope.A, self.polytope.b
-  
 
   def _map_polytopes_from_pc(self, pcList: list[pc.Polytope]) -> list['PolytopeImp']:
     # toma una lista de pc.Polytope y retorna una de PolytopeImp

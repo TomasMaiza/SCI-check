@@ -107,8 +107,8 @@ class SCIChecker():
     return ret
 
   def sci_check(self, dwellTime: float, K: int) -> tuple[bool, PolytopeMap]: # hace todo el proceso
-    self.triangulate_polytope()
     self.get_subregions(dwellTime, K)
+    self.triangulate_polytope()
     # print(f"Numero de subregiones: {len(self._subregions)}")
     # print(f"Tamaño de la 4: {len(self._subregions[4])}")
     # self.create_aabb_tree() # estrategia de aceleración 1

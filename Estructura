@@ -1,0 +1,133 @@
+SCI-check/
+│
+├── src/                          # Código fuente principal de la librería Python
+│   ├── sci.py                    # Punto de entrada principal (clase SCIChecker)
+│   ├── common/                   # Estructuras de datos base, tipos y geometría elemental
+│   │   ├── __init__.py
+│   │   └── types.py              # Definición de tipos y estructuras geométricas (polítopos, halfspaces)
+│   ├── coverage_checker/         # Núcleo del algoritmo de verificación de cobertura
+│   │   ├── __init__.py
+│   │   ├── coverage_checker.py   # Lógica principal del checker de cobertura
+│   │   ├── pyattene.*.so         # Módulo compilado en C++ (el que acabamos de compilar)
+│   │   └── predicates/           # Predicados geométricos (robustos y exactos)
+│   │       ├── predicates.py     # Clase abstracta de predicados
+│   │       ├── predicates_2d.py  # Implementaciones específicas en 2D
+│   │       └── ...
+│   └── bindings/                 # Código fuente para conectar C++ con Python
+│       ├── CMakeLists.txt        # Configuración de compilación (CMake)
+│       ├── bindings.cpp          # Definición de los enlaces con pybind11
+│       └── build/                # Carpeta temporal donde se compila el proyecto
+│
+├── test/                         # Casos de prueba y scripts de experimentación
+│   └── test_alg.py               # Script principal que ejecuta los experimentos (ej. K=3)
+│
+└── README.md                     # Documentación general del proyecto
+
+
+
+SCI-check/
+│
+├── Flujo de Ejecución y Componentes
+│   │
+│   ├── 1. El Lanzador (test/test_alg.py)
+│   │   └── Punto de partida para correr las pruebas. Importa la clase principal SCIChecker 
+│   │       y define los parámetros del experimento (como el valor de K o la resolución h).
+│   │
+│   ├── 2. La Fachada de la Librería (src/sci.py)
+│   │   └── Interfaz pública principal del paquete. Toma las peticiones de los tests 
+│   │       y coordina el flujo general utilizando las estructuras de datos y el motor de verificación.
+│   │
+│   ├── 3. El Verificador de Cobertura (src/coverage_checker/)
+│   │   ├── Contiene la lógica matemática y algorítmica central.
+│   │   ├── Utiliza librerías externas de Python como polytope (para operaciones con regiones politopales) 
+│   │       y aabbtree (para búsquedas espaciales eficientes).
+│   │   └── Depende de los predicados geométricos (predicates_2d.py), los cuales deciden de qué lado 
+│   │       de una línea o curva se encuentra un punto de manera robusta.
+│   │
+│   └── 4. El Motor en C++ (src/bindings/ y pyattene)
+│       ├── Utiliza el archivo binario compilado (pyattene.*.so).
+│       ├── Ejecuta operaciones geométricas pesadas (como las predicciones de Shewchuk y cálculos 
+│       │   de orientación con aritmética exacta) escritas en C++ dentro de external/ o referenciadas por bindings.
+│       └── Mediante pybind11, permite que Python llame a estas funciones a velocidad nativa, 
+│           evitando los cuellos de botella de Python puro.
+
+
+
+
+
+ SCI-check / Parámetros Completos del Experimento
+│
+├── 1. Parámetros Principales de Configuración
+│   ├── Parámetro K (Grado o Cota del Experimento):
+│   │   └── Representa un índice o valor discreto clave (nivel de refinamiento, orden de aproximación 
+│   │       o número de iteraciones/fases). Modificar K cambia la complejidad estructural del análisis.
+│   │
+│   └── Resolución Espacial h (Paso de Discretización):
+│       └── Define la granularidad o tamaño de celda con el que se evalúa el espacio continuo (ej. h ≈ 0.067). 
+│           Un h más pequeño genera una malla más fina y precisa, pero aumenta el costo computacional.
+│
+├── 2. Parámetros Geométricos y Espaciales
+│   ├── Dominio Espacial (Bounding Box / Espacio de Trabajo):
+│   │   └── Coordenadas límite (mínimas y máximas en los ejes X e Y) que delimitan el área total 
+│   │       donde el algoritmo busca polítopos y evalúa la cobertura.
+│   │
+│   └── Estructuras de Particionamiento (Polítopos):
+│       └── Conjunto de semiplanos (AbstractHalfspace y PolytopeMap) que configuran las regiones 
+│           geométricas analizadas para fragmentar el espacio en subregiones convexas.
+│
+└── 3. Parámetros Algorítmicos y de Control
+    ├── Estrategia de Verificación (CoverageCheckStrategy):
+    │   └── Enfoque algorítmico o heurístico seleccionado para recorrer y validar las condiciones 
+    │       de cobertura (estrategias exhaustivas, basadas en optimización o árboles de búsqueda).
+    │
+    └── Tolerancias Numéricas y Predicados Exactos:
+        └── Parámetros internos que manejan la robustez mediante el motor de C++ y rutinas de Shewchuk, 
+            evitando errores de redondeo al clasificar puntos y fronteras espaciales.
+            
+            
+SCI-check / Partes No Chequeadas Numéricamente (Brechas para Garantías Formales)
+│
+├── 1. Errores de Redondeo en Librerías Externas de Python (Polytope / SciPy)
+│   ├── El problema: Aunque el motor en C++ usa aritmética exacta para los predicados geométricos, 
+│   │   el uso de la librería externa "polytope" y del optimizador de SciPy (linprog) depende 
+│   │   de aritmética flotante estándar (IEEE 754).
+│   └── Implicación para las garantías: Las intersecciones de polítopos y la resolución de programas 
+│       lineales pueden acumular pequeños errores de redondeo, lo que podría desviar ligeramente 
+│       los límites teóricos de las regiones analizadas.
+│
+├── 2. Aproximación Discreta del Espacio Continuo (Resolución h)
+│   ├── El problema: El análisis se realiza sobre una malla o paso discretizado (como h ≈ 0.067) 
+│   │   o mediante particiones finas, pero no puede explorar un continuo infinito de manera infinita.
+│   └── Implicación para las garantías: Entre los puntos de muestreo o por debajo de la resolución 
+│       del paso h, podrían existir micro-violaciones de cobertura o comportamientos anómalos 
+│       que el algoritmo no alcance a detectar.
+│
+├── 3. Conversión de Tipos y Fronteras en los Bindings de Pybind11
+│   ├── El problema: Al transferir datos complejos estructurados desde Python hacia el módulo nativo 
+│   │   en C++ (pyattene) a través de la capa de enlaces, se realizan conversiones de tipos de datos.
+│   └── Implicación para las garantías: Si bien las primitivas geométricas centrales son robustas, 
+│       cualquier desajuste en la precisión de los números flotantes al cruzar la frontera entre 
+│       Python y C++ podría introducir una brecha en la solidez formal si no está totalmente acotada.
+│
+└── 4. Hipótesis del Modelo Matemático del Sistema Híbrido
+    ├── El problema: Las garantías formales dependen de que el modelo matemático inicial refleje 
+    │   fielmente la realidad física o el sistema dinámico simulado.
+    └── Implicación para las garantías: Si el modelo subyacente (ecuaciones diferenciales, transiciones 
+        o dinámicas del sistema) tiene incertidumbres no modeladas, perturbaciones externas no acotadas 
+        o errores de abstracción, el resultado del checker ("Falla C3") es matemáticamente correcto 
+        para el modelo, pero no necesariamente absoluto para el mundo físico real.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
