@@ -59,7 +59,6 @@ class Subregions(SubregionsStrategy):
       if k < self._K:
         subregionH.append(Hplus @ phi_k)
         subregionc.append(c)
-      # r = approx.error_bound(r, abs(h)) # r para el próximo paso
       phi_k = phi @ phi_k
     matrixH = np.vstack(subregionH)
     matrixc = np.vstack(subregionc)
@@ -75,7 +74,7 @@ class Subregions(SubregionsStrategy):
                      polytope: Polytope, 
                      dwellTime: float, 
                      K: int) -> PolytopeMap:
-    # recibe un politopo (y todo lo necesario) para devolver la lista de subregiones
+    # recibe un politopo, el sistema y los parámetros para devolver la lista de subregiones
     h = dwellTime/K
     self._K = K
     self._h = h
