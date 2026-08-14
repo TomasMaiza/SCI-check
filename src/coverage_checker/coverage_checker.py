@@ -162,14 +162,14 @@ class CoverageChecker(CoverageCheckStrategy):
                      edgesIndex: EdgesIndex) -> OrientResult: 
     ret = IN
     if self._checker.check_c1(triangle, polytopeSet, verticesIndex) == OUT:
-      log.warning("Falla C1")
+      log.info("Falla C1")
       ret = OUT
     elif self._checker.check_c2(triangle, polytopeSet, edgesIndex) == OUT:
-      log.warning("Falla C2")
+      log.info("Falla C2")
       ret = OUT
     elif self._checker.check_c3(triangle, polytopeSet) == OUT:
-      log.warning("Falla C3")
+      log.info("Falla C3")
       ret = OUT
     else:
-      log.warning("Todo OK")
+      log.info("Todo OK")
     return ret
