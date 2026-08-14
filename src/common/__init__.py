@@ -1,6 +1,6 @@
 from .enums import *
 from .types import *
-from .logger import setup_logger
+from .logger import *
 
 IN = OrientResult.IN
 OUT = OrientResult.OUT
@@ -15,4 +15,5 @@ __all__ = ["OrientResult",
            "ON", 
            "OUT", 
            "IN",
-           "setup_logger"]
+           "setup_logger",
+           "log"]

@@ -3,6 +3,7 @@ from .predicates import AbstractPredicates
 from geometry import *
 from common import *
 from .strategy import CoverageCheckStrategy
+import logging
 
 
 # Patrón Proxy

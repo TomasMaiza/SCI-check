@@ -22,3 +22,5 @@ def setup_logger():
   logger.addHandler(consoleHandler)
   logger.addHandler(fileHandler)
   return logger
+
+log = logging.getLogger("SCIChecker")
