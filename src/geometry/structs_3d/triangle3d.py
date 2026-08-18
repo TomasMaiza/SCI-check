@@ -8,7 +8,7 @@ if TYPE_CHECKING:
     from src.common.types import Edge
 
 @dataclass(frozen=True)
-class Triangle2D(AbstractSimplex):
+class Triangle3D(AbstractSimplex):
   # clase para representar el triángulo en 2D
 
   v1: Point3D # vértices
