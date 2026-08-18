@@ -14,5 +14,9 @@ class AbstractPredicates(ABC):
     pass
 
   @abstractmethod
-  def orient_TPI(self) -> OrientResult: # retorna IN, OUT, ON
+  def orient_TPI(self, 
+                 triangle: AbstractSimplex, 
+                 f1: AbstractHalfspace, 
+                 f2: AbstractHalfspace, 
+                 f3: AbstractHalfspace) -> OrientResult: # retorna IN, OUT, ON
     pass
