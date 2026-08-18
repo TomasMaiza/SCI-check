@@ -46,5 +46,31 @@ class Predicates2d(AbstractPredicates):
       ret = OrientResult.OUT
     return ret
 
-  def orient_TPI(self) -> OrientResult: # retorna IN, OUT, ON
+  def orient_TPI(self, 
+                 triangle: Triangle2D, 
+                 f1: Halfspace2D, 
+                 f2: Halfspace2D, 
+                 f3: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
     pass
+
+  def implicit_point_in_triangle(self, 
+                                   triangle: Triangle2D, 
+                                   f1: Halfspace2D, 
+                                   f2: Halfspace2D) -> bool: 
+    # retorna si un punto implícito está en el plano de un triángulo
+    r, s = f1.get_points()
+    t, u = f2.get_points()
+    a, b, c = triangle.get_vertices()
+
+    rExp = pyattene.ExplicitPoint2D(r.x, r.y)
+    sExp = pyattene.ExplicitPoint2D(s.x, s.y)
+    
+    tExp = pyattene.ExplicitPoint2D(t.x, t.y)
+    uExp = pyattene.ExplicitPoint2D(u.x, u.y)
+
+    aExp = pyattene.ExplicitPoint2D(a.x, a.y)
+    bExp = pyattene.ExplicitPoint2D(b.x, b.y)
+    cExp = pyattene.ExplicitPoint2D(c.x, c.y)
+
+    pImp = pyattene.ImplicitPoint2D_SSI(rExp, sExp, tExp, uExp)
+    return pyattene.pointInTriangle(pImp, aExp, bExp, cExp)

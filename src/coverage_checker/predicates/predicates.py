@@ -10,7 +10,11 @@ class AbstractPredicates(ABC):
     pass
 
   @abstractmethod
-  def orient_LPI(self, v1: AbstractPoint, v2: AbstractPoint, f1: AbstractHalfspace, f2: AbstractHalfspace) -> OrientResult: # retorna IN, OUT, ON
+  def orient_LPI(self, 
+                 v1: AbstractPoint, 
+                 v2: AbstractPoint, 
+                 f1: AbstractHalfspace, 
+                 f2: AbstractHalfspace) -> OrientResult: # retorna IN, OUT, ON
     pass
 
   @abstractmethod
@@ -19,4 +23,12 @@ class AbstractPredicates(ABC):
                  f1: AbstractHalfspace, 
                  f2: AbstractHalfspace, 
                  f3: AbstractHalfspace) -> OrientResult: # retorna IN, OUT, ON
+    pass
+
+  @abstractmethod
+  def implicit_point_in_triangle(self, 
+                                 triangle: AbstractSimplex, 
+                                 f1: AbstractHalfspace, 
+                                 f2: AbstractHalfspace) -> OrientResult: 
+    # retorna si un punto implícito está en el plano de un triángulo
     pass

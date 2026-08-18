@@ -89,3 +89,29 @@ class Predicates3d(AbstractPredicates):
     else:
       ret = OrientResult.OUT
     return ret
+
+  def implicit_point_in_triangle(self, 
+                                 triangle: Triangle3D, 
+                                 f1: Halfspace3D, 
+                                 f2: Halfspace3D) -> bool: 
+    # retorna si un punto implícito está en el plano de un triángulo
+    r, s, t = f1.get_points()
+    u, v, w = f2.get_points()
+    a, b, c = triangle.get_vertices()
+
+    rExp = pyattene.ExplicitPoint3D(r.x, r.y, r.z)
+    sExp = pyattene.ExplicitPoint3D(s.x, s.y, s.z)
+    tExp = pyattene.ExplicitPoint3D(t.x, t.y, t.z)
+    
+    uExp = pyattene.ExplicitPoint3D(u.x, u.y, u.z)
+    vExp = pyattene.ExplicitPoint3D(v.x, v.y, v.z)
+    wExp = pyattene.ExplicitPoint3D(w.x, w.y, w.z)
+
+    aExp = pyattene.ExplicitPoint3D(a.x, a.y, a.z)
+    bExp = pyattene.ExplicitPoint3D(b.x, b.y, b.z)
+    cExp = pyattene.ExplicitPoint3D(c.x, c.y, c.z)
+
+    pImp = pyattene.ImplicitPoint3D_TPI(aExp, bExp, cExp,
+                                        rExp, sExp, tExp,
+                                        uExp, vExp, wExp)
+    return pyattene.pointInTriangle(pImp, aExp, bExp, cExp)
