@@ -1,7 +1,6 @@
 from geometry.abstract_structs.simplex import AbstractSimplex
 from .point3d import Point3D
 from .triangle3d import Triangle3D
-from .. import pyattene
 import numpy as np
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -29,6 +28,7 @@ class Tetrahedron3D(AbstractSimplex):
     return (self.v1, self.v2, self.v3, self.v4)
 
   def _get_triangles(self):
+    from .. import pyattene
     self._triangles = []
     v0, v1, v2, v3 = self.get_vertices() 
     combinations = [
