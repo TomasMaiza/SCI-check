@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 @dataclass(frozen=True)
 class Triangle3D(AbstractSimplex):
-  # clase para representar el triángulo en 2D
+  # clase para representar el triángulo en 3D
 
   v1: Point3D # vértices
   v2: Point3D

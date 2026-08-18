@@ -20,19 +20,18 @@ class SCIChecker():
     self._subregionsAlgorithm = Subregions(geometry)
     self._coverageChecker = CoverageChecker(geometry, predicates)
 
-  def _create_triangles(self, triangles: list[np.ndarray]):
-    self._triangles = [] # lista de triángulos en los que se dividió el politopo
+  def _create_triangles(self, simplices: list[np.ndarray]):
+    self._simplices = [] # lista de triángulos en los que se dividió el politopo
     # convertimos a Simplex
-    for t in triangles:
-      # t tiene la forma [[x1, y1], [x2, y2], [x3, y3]]
+    for t in simplices:
       puntos = tuple(self._geometry.create_point(tuple(v)) for v in t)
-      simplex = self._geometry.create_simplex(puntos) # habría que chequear que es triángulo...
-      self._triangles.append(simplex)
+      simplex = self._geometry.create_simplex(puntos)
+      self._simplices.append(simplex)
 
   def triangulate_polytope(self): # asignar índices a vértices y guardar todo en variables?
     triangulator = PolytopeTriangulator(DelaunayTriangulation())
-    triangles = triangulator.triangulate(self._polytope)
-    self._create_triangles(triangles)
+    simplices = triangulator.triangulate(self._polytope)
+    self._create_triangles(simplices)
     self._set_indices()
 
   def _set_indices(self):

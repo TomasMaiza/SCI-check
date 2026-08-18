@@ -7,8 +7,8 @@ class Geometry3d(AbstractGeometry):
   def create_point(self, coord: tuple[float, ...]) -> Point3D: # crea un punto
     return Point3D(x = coord[0], y = coord[1])
 
-  def create_simplex(self, vertices: tuple[Point3D, ...]) -> Triangle3D:
-    return Triangle3D(v1 = vertices[0], v2 = vertices[1], v3 = vertices[2])
+  def create_simplex(self, vertices: tuple[Point3D, ...]) -> Tetrahedron3D:
+    return Tetrahedron3D(v1 = vertices[0], v2 = vertices[1], v3 = vertices[2], v4 = vertices[3])
 
   def create_halfspace(self, points: tuple[Point3D, Point3D]) -> Halfspace3D: 
     # crea un semiespacio
