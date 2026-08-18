@@ -11,12 +11,12 @@ class Predicates2d(AbstractPredicates):
     a, b = f.get_points()
     ori = orientation(a.x, a.y, b.x, b.y, v.x, v.y)
 
-    if ori == -1:
-      ret = OrientResult.OUT
+    if ori == 1:
+      ret = OrientResult.IN
     elif ori == 0:
       ret = OrientResult.ON
     else:
-      ret = OrientResult.IN
+      ret = OrientResult.OUT
     return ret
 
   def orient_LPI(self, r: Point2D, s: Point2D, f1: Halfspace2D, f2: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
@@ -38,12 +38,12 @@ class Predicates2d(AbstractPredicates):
 
     ori = pyattene.orient2d_IEE(pImp, aExp, bExp)
 
-    if ori == -1:
-      ret = OrientResult.OUT
+    if ori == 1:
+      ret = OrientResult.IN
     elif ori == 0:
       ret = OrientResult.ON
     else:
-      ret = OrientResult.IN
+      ret = OrientResult.OUT
     return ret
 
   def orient_TPI(self) -> OrientResult: # retorna IN, OUT, ON

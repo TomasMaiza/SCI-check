@@ -5,50 +5,53 @@ from shewchuk import orientation
 from .. import pyattene
 
 class Predicates3d(AbstractPredicates):
-  # clase para implementar los predicados en 2d
+  # clase para implementar los predicados en 3d
 
   def orient(self, v: Point3D, f: Halfspace3D) -> OrientResult: # retorna IN, OUT, ON
-    '''
-    a, b = f.get_points()
-    ori = orientation(a.x, a.y, b.x, b.y, v.x, v.y)
+    a, b, c = f.get_points()
+    vExp = pyattene.ExplicitPoint3D(v.x, v.y, v.z)
+    aExp = pyattene.ExplicitPoint3D(a.x, a.y, a.z)
+    bExp = pyattene.ExplicitPoint3D(b.x, b.y, b.z)
+    cExp = pyattene.ExplicitPoint3D(c.x, c.y, c.z)
 
-    if ori == -1:
-      ret = OrientResult.OUT
+    ori = pyattene.orient3d(vExp, aExp, bExp, cExp)
+
+    if ori == -1: # REVISAR ORIENTACIÓN DEL HALFSPACE 3D
+      ret = OrientResult.IN
     elif ori == 0:
       ret = OrientResult.ON
     else:
-      ret = OrientResult.IN
+      ret = OrientResult.OUT
     return ret
-    '''
     
-  def orient_LPI(self, r: Point2D, s: Point2D, f1: Halfspace2D, f2: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
-    '''
-    t, u = f1.get_points()
-    a, b = f2.get_points()
+  def orient_LPI(self, r: Point3D, s: Point3D, f1: Halfspace3D, f2: Halfspace3D) -> OrientResult: # retorna IN, OUT, ON
+    t, u, v = f1.get_points()
+    a, b, c = f2.get_points()
     # queremos calcular la orientación de f1 \cap rs respecto a f2
     
-    rExp = pyattene.ExplicitPoint2D(r.x, r.y)
-    sExp = pyattene.ExplicitPoint2D(s.x, s.y)
+    rExp = pyattene.ExplicitPoint3D(r.x, r.y, r.z)
+    sExp = pyattene.ExplicitPoint3D(s.x, s.y, s.z)
 
-    tExp = pyattene.ExplicitPoint2D(t.x, t.y)
-    uExp = pyattene.ExplicitPoint2D(u.x, u.y)
+    tExp = pyattene.ExplicitPoint3D(t.x, t.y, t.z)
+    uExp = pyattene.ExplicitPoint3D(u.x, u.y, u.z)
+    vExp = pyattene.ExplicitPoint3D(v.x, v.y, v.z)
 
-    aExp = pyattene.ExplicitPoint2D(a.x, a.y)
-    bExp = pyattene.ExplicitPoint2D(b.x, b.y)
+    aExp = pyattene.ExplicitPoint3D(a.x, a.y, a.z)
+    bExp = pyattene.ExplicitPoint3D(b.x, b.y, b.z)
+    cExp = pyattene.ExplicitPoint3D(c.x, c.y, c.z)
 
     # Punto implícito: intersección de rs con tu
-    pImp = pyattene.ImplicitPoint2D_SSI(rExp, sExp, tExp, uExp)
+    pImp = pyattene.ImplicitPoint3D_LPI(rExp, sExp, tExp, uExp, vExp)
 
-    ori = pyattene.orient2d_IEE(pImp, aExp, bExp)
+    ori = pyattene.orient3d(pImp, aExp, bExp, cExp)
 
     if ori == -1:
-      ret = OrientResult.OUT
+      ret = OrientResult.IN
     elif ori == 0:
       ret = OrientResult.ON
     else:
-      ret = OrientResult.IN
+      ret = OrientResult.OUT
     return ret
-    '''
 
   def orient_TPI(self) -> OrientResult: # retorna IN, OUT, ON
     pass
