@@ -43,4 +43,11 @@ PYBIND11_MODULE(pyattene, m) {
     m.def("orient2d_IEE", &orient2d_IEE, "Predicado I-E-E 2D");
     m.def("orient3d", &genericPoint::orient3D, "Predicado Orient3D dinámico",
           py::arg("a"), py::arg("b"), py::arg("c"), py::arg("d"));
+
+    // función pointInTriangle
+    // Usamos static_cast para especificar explícitamente cuál de las 3 sobrecargas queremos
+    m.def("pointInTriangle", 
+          static_cast<bool (*)(const genericPoint&, const genericPoint&, const genericPoint&, const genericPoint&)>(&genericPoint::pointInTriangle), 
+          "Verifica si un punto P coplanar esta dentro del triangulo ABC",
+          py::arg("P"), py::arg("A"), py::arg("B"), py::arg("C"));
 }
