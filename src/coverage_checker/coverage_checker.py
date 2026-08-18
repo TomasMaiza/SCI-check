@@ -54,7 +54,7 @@ class _CoverageCheckerIntern:
         break
     return ret
 
-  def edge_edge_out(self, 
+  def edge_plane_out(self, 
                     v1: AbstractPoint, 
                     v2: AbstractPoint, 
                     f: AbstractHalfspace, 
@@ -88,7 +88,7 @@ class _CoverageCheckerIntern:
         break
     return ret
 
-  def edge_edge_tri_out(self, 
+  def plane_plane_tri_out(self, 
                         triangle: AbstractSimplex, 
                         f1: AbstractHalfspace, 
                         f2: AbstractHalfspace, 
@@ -130,7 +130,7 @@ class _CoverageCheckerIntern:
     for i, p in polytopes:
       for f in p:
         for e in edges:
-          if not edgesIndex[e] and self.edge_edge_out(e[0], e[1], f, polytopeSet, i) == OUT:
+          if not edgesIndex[e] and self.edge_plane_out(e[0], e[1], f, polytopeSet, i) == OUT:
             return OUT
     for e in edges + invEdges:
       edgesIndex[e] = True
@@ -144,7 +144,7 @@ class _CoverageCheckerIntern:
       for j, pj in polytopes[i:]:
         for fi in pi:
           for fj in pj:
-            if self.edge_edge_tri_out(triangle, fi, fj, polytopeSet, i, j) == OUT:
+            if self.plane_plane_tri_out(triangle, fi, fj, polytopeSet, i, j) == OUT:
               return OUT
     return IN
 
