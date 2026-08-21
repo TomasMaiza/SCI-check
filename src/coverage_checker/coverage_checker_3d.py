@@ -5,6 +5,7 @@ from common import *
 from .strategy import CoverageCheckStrategy
 from .coverage_checker import CoverageChecker
 import logging
+import itertools
 
 class CoverageChecker3D(CoverageChecker):
   def __init__(self, 
@@ -14,8 +15,12 @@ class CoverageChecker3D(CoverageChecker):
 
   def check_c4(self,
                tetrahedron: Tetrahedron3D,
-               polytopeMap: PolytopeMap) -> OrientResult:
-    pass
+               polytopeSet: PolytopeMap) -> OrientResult:
+    faces = [(face, i) for i, p in enumerate(polytopeSet) for face in p]
+    for (fi, i), (fj, j), (fk, k) in itertools.combinations(faces, 3): # no repetimos ternas
+      if self.plane_plane_plane_tet_out(tetrahedron, fi, fj, fk, polytopeSet, i, j, k) == OUT:
+        return OUT
+    return IN
 
   # chequea triángulos
   def envelope_check_triangles(self, 
