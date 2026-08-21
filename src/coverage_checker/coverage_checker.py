@@ -71,6 +71,7 @@ class _CoverageCheckerIntern:
         break
     return ret
   
+  '''
   def implicit_point_in_triangle(self, 
                                  triangle: AbstractSimplex, 
                                  f1: AbstractHalfspace, 
@@ -86,7 +87,7 @@ class _CoverageCheckerIntern:
       if ori != IN:
         ret = False
         break
-    return ret
+    return ret'''
 
   def plane_plane_tri_out(self, 
                         triangle: AbstractSimplex, 
@@ -95,7 +96,7 @@ class _CoverageCheckerIntern:
                         polytopeMap: PolytopeMap, 
                         currentpIndex1: int, 
                         currentpIndex2: int) -> OrientResult:
-    if not self.implicit_point_in_triangle(triangle, f1, f2):
+    if not self._predicates.implicit_point_in_triangle(triangle, f1, f2):
       return IN
 
     r, s = f1.get_points()

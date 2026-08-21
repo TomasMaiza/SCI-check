@@ -29,6 +29,6 @@ class AbstractPredicates(ABC):
   def implicit_point_in_triangle(self, 
                                  triangle: AbstractSimplex, 
                                  f1: AbstractHalfspace, 
-                                 f2: AbstractHalfspace) -> OrientResult: 
+                                 f2: AbstractHalfspace) -> bool: 
     # retorna si un punto implícito está en el plano de un triángulo
     pass
