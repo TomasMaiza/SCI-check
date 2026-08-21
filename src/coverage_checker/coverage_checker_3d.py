@@ -96,7 +96,7 @@ class CoverageChecker3D(CoverageChecker):
     ret = IN
     if not self.envelope_check_triangles(tetrahedron, polytopeSet, verticesIndex, edgesIndex):
       ret = OUT
-    if self._checker.check_c4(tetrahedron, polytopeSet, edgesIndex) == OUT:
+    if self.check_c4(tetrahedron, polytopeSet, edgesIndex) == OUT:
       log.info("Falla C4")
       ret = OUT
     else:

@@ -9,7 +9,7 @@ def create_mock_3d_box(geom, xmin, xmax, ymin, ymax, zmin, zmax) -> list:
     Los puntos están ordenados en sentido ANTIHORARIO vistos desde afuera,
     garantizando que el vector normal apunte hacia el exterior del volumen.
     """
-    def p(x, y, z): return geom.create_point(x, y, z)
+    def p(x, y, z): return geom.create_point((x, y, z))
     
     # 1. BOTTOM (Plano Z = zmin). Normal apunta hacia -Z.
     # Mirando desde abajo, antihorario es Y+, luego X+
@@ -53,7 +53,7 @@ def run_pure_geometry_3d_test():
 
     # Variables de estado que necesita envelope_check
     v_idx = {v1: False, v2: False, v3: False, v4: False}
-    e_idx = {e: False for e in tetrahedron.get_all_edges()[0]} # o como devuelva tus aristas
+    e_idx = {e: False for e in tetrahedron.get_edges()[0]} # o como devuelva tus aristas
 
     print("===========================================")
     
