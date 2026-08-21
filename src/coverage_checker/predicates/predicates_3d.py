@@ -53,11 +53,15 @@ class Predicates3d(AbstractPredicates):
       ret = OrientResult.OUT
     return ret
 
-  def orient_TPI(self, triangle: Triangle3D, f1: Halfspace3D, f2: Halfspace3D, f3: Halfspace3D) -> OrientResult: # retorna IN, OUT, ON
+  def orient_TPI_halfspaces(self, 
+                            f: Halfspace3D, 
+                            f1: Halfspace3D, 
+                            f2: Halfspace3D, 
+                            ref: Halfspace3D) -> OrientResult: # retorna IN, OUT, ON
     t, u, v = f1.get_points()
     a, b, c = f2.get_points()
-    r, s, q = f3.get_points()
-    v1, v2, v3 = triangle.get_vertices()
+    r, s, q = ref.get_points()
+    v1, v2, v3 = f.get_points()
 
     tExp = pyattene.ExplicitPoint3D(t.x, t.y, t.z)
     uExp = pyattene.ExplicitPoint3D(u.x, u.y, u.z)
@@ -89,6 +93,15 @@ class Predicates3d(AbstractPredicates):
     else:
       ret = OrientResult.OUT
     return ret
+
+  def orient_TPI(self, 
+                 triangle: Triangle3D, 
+                 f1: Halfspace3D, 
+                 f2: Halfspace3D, 
+                 ref: Halfspace3D) -> OrientResult:
+    vertices = triangle.get_vertices()
+    f = Halfspace3D(points = vertices)
+    return self.orient_TPI_halfspaces(f, f1, f2, ref)
 
   def implicit_point_in_triangle(self, 
                                  triangle: Triangle3D, 

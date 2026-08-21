@@ -13,6 +13,37 @@ class CoverageChecker3D(CoverageChecker):
                predicates: AbstractPredicates) -> None:
     self._checker = CoverageChecker(geometry, predicates)
 
+  def implicit_point_in_tetrahedron_TPI(self,
+                                        tetrahedron: Tetrahedron3D, 
+                                        f1: AbstractHalfspace, 
+                                        f2: AbstractHalfspace, 
+                                        f3: AbstractHalfspace):
+    ret = True
+    triangles = tetrahedron.get_faces()
+    for t in triangles:
+      vertices = t.get_vertices()
+      f = Halfspace3D(points = vertices)
+      ori = self._predicates.orient_TPI_halfspaces(f1, f2, f3, f)
+      if ori == OUT:
+        ret = False
+        break
+    return ret
+
+  def implicit_point_in_polytope_TPI(self, 
+                                     f1: AbstractHalfspace,
+                                     f2: AbstractHalfspace, 
+                                     f3: AbstractHalfspace, 
+                                     p: list[AbstractHalfspace]) -> bool:
+    ret = True
+    if len(p) == 0:
+      ret = False
+    for fp in p:
+      ori = self._predicates.orient_TPI_halfspaces(f1, f2, f3, fp)
+      if ori == OUT:
+        ret = False
+        break
+    return ret
+
   def plane_plane_plane_tet_out(self,
                                 tetrahedron: Tetrahedron3D, 
                                 f1: AbstractHalfspace, 
@@ -22,12 +53,12 @@ class CoverageChecker3D(CoverageChecker):
                                 currentpIndex1: int,
                                 currentpIndex2: int, 
                                 currentpIndex3: int) -> OrientResult:
-    if not self._predicates.implicit_point_in_polytope(tetrahedron, f1, f2, f3):
+    if not self.implicit_point_in_tetrahedron_TPI(tetrahedron, f1, f2, f3):
       return IN
 
     ret = OUT
     for i, p in enumerate(polytopeMap):
-      if i not in {currentpIndex1, currentpIndex2, currentpIndex3} and self.implicit_point_in_polytope_FPI(tetrahedron, f1, f2, f3, p):
+      if i not in {currentpIndex1, currentpIndex2, currentpIndex3} and self.implicit_point_in_polytope_TPI(f1, f2, f3, p):
         ret = IN
         break
 
