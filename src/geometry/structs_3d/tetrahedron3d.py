@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.common.types import Edge
 
-@dataclass(frozen=True)
 class Tetrahedron3D(AbstractSimplex):
   # clase para representar el tetraedro en 3D
 
