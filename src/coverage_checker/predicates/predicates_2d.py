@@ -54,23 +54,17 @@ class Predicates2d(AbstractPredicates):
     pass
 
   def implicit_point_in_triangle(self, 
-                                   triangle: Triangle2D, 
-                                   f1: Halfspace2D, 
-                                   f2: Halfspace2D) -> bool: 
-    # retorna si un punto implícito está en el plano de un triángulo
+                                 triangle: Triangle2D, 
+                                 f1: Halfspace2D, 
+                                 f2: Halfspace2D) -> bool: 
+    # determina si un punto (intersección de dos semiespacios) pertenece a un triángulo
+    edges = triangle.get_faces()
     r, s = f1.get_points()
-    t, u = f2.get_points()
-    a, b, c = triangle.get_vertices()
-
-    rExp = pyattene.ExplicitPoint2D(r.x, r.y)
-    sExp = pyattene.ExplicitPoint2D(s.x, s.y)
-    
-    tExp = pyattene.ExplicitPoint2D(t.x, t.y)
-    uExp = pyattene.ExplicitPoint2D(u.x, u.y)
-
-    aExp = pyattene.ExplicitPoint2D(a.x, a.y)
-    bExp = pyattene.ExplicitPoint2D(b.x, b.y)
-    cExp = pyattene.ExplicitPoint2D(c.x, c.y)
-
-    pImp = pyattene.ImplicitPoint2D_SSI(rExp, sExp, tExp, uExp)
-    return pyattene.pointInTriangle(pImp, aExp, bExp, cExp)
+    ret = True
+    for e in edges:
+      # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
+      ori = self.orient_LPI(r, s, f2, e)
+      if ori != IN:
+        ret = False
+        break
+    return ret

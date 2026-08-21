@@ -81,7 +81,7 @@ class _CoverageCheckerIntern:
     r, s = f1.get_points()
     ret = True
     for v1, v2 in edges:
-      # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
+      # queremos calcular la orientación de f1 \\cap f2 respecto a v1v2
       e = self._geometry.create_halfspace((v1, v2))
       ori = self._predicates.orient_LPI(r, s, f2, e)
       if ori != IN:
