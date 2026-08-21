@@ -3,6 +3,7 @@ from geometry import *
 from common import *
 from .strategy import CoverageCheckStrategy
 import logging
+import itertools
 
 
 # Patrón Proxy
@@ -136,14 +137,13 @@ class _CoverageCheckerIntern:
   def check_c3(self, 
                triangle: AbstractSimplex, 
                polytopeSet: PolytopeMap) -> OrientResult:
-    polytopes = list(enumerate(polytopeSet))
-    for i, pi in polytopes:
-      for j, pj in polytopes[i:]:
-        for fi in pi:
-          for fj in pj:
-            if self.plane_plane_tri_out(triangle, fi, fj, polytopeSet, i, j) == OUT:
-              return OUT
-    return IN
+    faces = [(face, i) for i, p in enumerate(polytopeSet) for face in p]
+    ret = IN
+    for (f1, i), (f2, j) in itertools.combinations(faces, 2):
+      if self.plane_plane_tri_out(triangle, f1, f2, polytopeSet, i, j) == OUT:
+        ret = OUT
+        break  
+    return ret
 
 class CoverageChecker(CoverageCheckStrategy):
   def __init__(self, 

@@ -14,7 +14,7 @@ class Predicates3d(AbstractPredicates):
     bExp = pyattene.ExplicitPoint3D(b.x, b.y, b.z)
     cExp = pyattene.ExplicitPoint3D(c.x, c.y, c.z)
 
-    ori = pyattene.orient3d(vExp, aExp, bExp, cExp)
+    ori = pyattene.orient3d(aExp, bExp, cExp, vExp)
 
     if ori == -1: # REVISAR ORIENTACIÓN DEL HALFSPACE 3D
       ret = OrientResult.IN
@@ -112,6 +112,23 @@ class Predicates3d(AbstractPredicates):
     u, v, w = f2.get_points()
     a, b, c = triangle.get_vertices()
 
+    # --- ESCUDO PROTECTOR: Filtro de paralelismo ---
+    def normal(p1, p2, p3):
+        nx = (p2.y - p1.y) * (p3.z - p1.z) - (p2.z - p1.z) * (p3.y - p1.y)
+        ny = (p2.z - p1.z) * (p3.x - p1.x) - (p2.x - p1.x) * (p3.z - p1.z)
+        nz = (p2.x - p1.x) * (p3.y - p1.y) - (p2.y - p1.y) * (p3.x - p1.x)
+        return nx, ny, nz
+
+    n1 = normal(a, b, c) 
+    n2 = normal(r, s, t) 
+    n3 = normal(u, v, w) 
+
+    det = n1[0]*(n2[1]*n3[2] - n2[2]*n3[1]) - n1[1]*(n2[0]*n3[2] - n2[2]*n3[0]) + n1[2]*(n2[0]*n3[1] - n2[1]*n3[0])
+    
+    if abs(det) < 1e-6:
+        return False # Son paralelos, abortamos.
+    # -----------------------------------------------
+
     rExp = pyattene.ExplicitPoint3D(r.x, r.y, r.z)
     sExp = pyattene.ExplicitPoint3D(s.x, s.y, s.z)
     tExp = pyattene.ExplicitPoint3D(t.x, t.y, t.z)
@@ -127,4 +144,16 @@ class Predicates3d(AbstractPredicates):
     pImp = pyattene.ImplicitPoint3D_TPI(aExp, bExp, cExp, # está bien esto?
                                         rExp, sExp, tExp,
                                         uExp, vExp, wExp)
-    return pyattene.pointInTriangle(pImp, aExp, bExp, cExp)
+    #return pyattene.pointInTriangle(pImp, aExp, bExp, cExp)
+
+    is_inside = pyattene.pointInTriangle(pImp, aExp, bExp, cExp)
+    
+    if is_inside:
+        print("\n--- FALSO POSITIVO DETECTADO ---")
+        print(f"Triángulo: {a}, {b}, {c}")
+        # Imprimimos 1 punto de cada plano para ver qué caras está evaluando
+        print(f"Cara 1 (f1): {r}")
+        print(f"Cara 2 (f2): {u}")
+        print("--------------------------------")
+        
+    return is_inside

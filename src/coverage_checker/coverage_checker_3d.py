@@ -85,7 +85,8 @@ class CoverageChecker3D(CoverageChecker):
     ret = True
     for t in triangles:
       coverage = self._checker.envelope_check(t, polytopeSet, verticesIndex, edgesIndex)
-      if not coverage:
+      if coverage == OUT:
+        ret = False
         break
     return ret
 
