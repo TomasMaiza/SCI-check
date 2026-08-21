@@ -7,7 +7,7 @@ import logging
 
 # Patrón Proxy
 class _CoverageCheckerIntern:
-  def __init__(self, 
+  def __init__(self,
                geometry: AbstractGeometry, 
                predicates: AbstractPredicates) -> None:
     self._geometry = geometry
@@ -39,11 +39,27 @@ class _CoverageCheckerIntern:
     ori2 = self._predicates.orient(v2, f)
     return ori1 == ori2 or ori1 == ON or ori2 == ON
 
-  def implicit_point_in_polytope(self, 
-                                 v1: AbstractPoint, 
-                                 v2: AbstractPoint, 
-                                 f: AbstractHalfspace, 
+  def implicit_point_in_polytope_TPI(self, 
+                                 triangle: AbstractSimplex,
+                                 f1: AbstractHalfspace,
+                                 f2: AbstractHalfspace, 
                                  p: list[AbstractHalfspace]) -> bool:
+    ret = True
+    if len(p) == 0:
+      ret = False
+    for fp in p:
+      #ori = self._predicates.orient_TPI(v1, v2, f, fp)
+      ori = self._predicates.orient_TPI(triangle, f1, f2, fp)
+      if ori == OUT:
+        ret = False
+        break
+    return ret
+
+  def implicit_point_in_polytope_LPI(self, 
+                                     v1: AbstractPoint, 
+                                     v2: AbstractPoint, 
+                                     f: AbstractHalfspace, 
+                                     p: list[AbstractHalfspace]) -> bool:
     ret = True
     if len(p) == 0:
       ret = False
@@ -66,7 +82,7 @@ class _CoverageCheckerIntern:
 
     ret = OUT
     for i, p in enumerate(polytopeMap):
-      if i != currentpIndex and self.implicit_point_in_polytope(v1, v2, f, p):
+      if i != currentpIndex and self.implicit_point_in_polytope_LPI(v1, v2, f, p):
         ret = IN
         break
     return ret
@@ -81,10 +97,9 @@ class _CoverageCheckerIntern:
     if not self._predicates.implicit_point_in_triangle(triangle, f1, f2):
       return IN
 
-    r, s = f1.get_points()
     ret = OUT
     for i, p in enumerate(polytopeMap):
-      if i != currentpIndex1 and i != currentpIndex2 and self.implicit_point_in_polytope(r, s, f2, p):
+      if i not in {currentpIndex1, currentpIndex2} and self.implicit_point_in_polytope_TPI(triangle, f1, f2, p):
         ret = IN
         break
 

@@ -51,7 +51,8 @@ class Predicates2d(AbstractPredicates):
                  f1: Halfspace2D, 
                  f2: Halfspace2D, 
                  f3: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
-    pass
+    r, s = f1.get_points()
+    return self.orient_LPI(r, s, f2, f3)
 
   def implicit_point_in_triangle(self, 
                                  triangle: Triangle2D, 
