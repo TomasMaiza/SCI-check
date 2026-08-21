@@ -1,5 +1,6 @@
 from geometry.abstract_structs.simplex import AbstractSimplex
 from .point3d import Point3D
+from .halfspace3d import Halfspace3D
 import numpy as np
 from dataclasses import dataclass
 from typing import TYPE_CHECKING

@@ -1,5 +1,6 @@
 from geometry.abstract_structs.simplex import AbstractSimplex
 from .point2d import Point2D
+from .halfspace2d import Halfspace2D
 import numpy as np
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
@@ -30,3 +31,9 @@ class Triangle2D(AbstractSimplex):
   def get_all_edges(self) -> tuple[tuple['Edge', 'Edge', 'Edge'], tuple['Edge', 'Edge', 'Edge']]:
     # retorna las aristas en ambos sentidos
     return self.get_edges(), self.get_inverse_edges()
+
+  def get_faces(self) -> tuple[Halfspace2D, Halfspace2D, Halfspace2D]:
+    f1 = Halfspace2D(points = (self.v1, self.v2))
+    f2 = Halfspace2D(points = (self.v2, self.v3))
+    f3 = Halfspace2D(points = (self.v3, self.v1))
+    return f1, f2, f3
