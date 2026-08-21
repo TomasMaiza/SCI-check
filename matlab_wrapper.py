@@ -22,8 +22,10 @@ class MatlabWrapperSCI:
     # inicializa la geometría y los predicados
     geomClass = GeometryFactory[dimension]
     predClass = PredicatesFactory[dimension]
+    covCheckerClass = CoverageCheckerFactory[dimension]
     self._geom = geomClass()
     self._preds = predClass()
+    self._covChecker = covCheckerClass
   
   def create_polytope(self, polytopeVerticesRaw: list[list[float]]):
     # se inicializa el politopo
@@ -122,7 +124,7 @@ class MatlabWrapperSCI:
     self.create_geometry_and_predicates(dimension)
     self.create_polytope(polytopeVerticesRaw)
     self.create_sas(systemRaw)
-    checker = SCIChecker(self._geom, self._preds, self._polytope, self._sas)
+    checker = SCIChecker(self._geom, self._preds, self._covChecker, self._polytope, self._sas)
     isSCI, subregions = checker.sci_check(dwellTime, K)
     self.plot_filled_scenario(f"K = {K}", self._polytope, isSCI, subregions)
     serializedSubregions = self._serialize_polytope_map(subregions)

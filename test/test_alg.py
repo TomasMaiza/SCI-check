@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from scipy.spatial import ConvexHull
 from sci import SCIChecker
+from coverage_checker import *
 from geometry import GeometryFactory, Polytope, PolytopeImp
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
@@ -104,6 +105,7 @@ def run_matlab_validation():
     print("Ejecutando Experimento K=3 (h ≈ 0.067)...")
     checker_k3 = SCIChecker(geometry=geometry_2d, 
                                     predicates=predicates_2d, 
+                                    coverageChecker=CoverageChecker,
                                     polytope=base_polytope, 
                                     sas=sas)
     
@@ -116,6 +118,7 @@ def run_matlab_validation():
     print("\nEjecutando Experimento K=12 (h ≈ 0.017)...")
     checker_k12 = SCIChecker(geometry=geometry_2d, 
                                         predicates=predicates_2d, 
+                                        coverageChecker=CoverageChecker,
                                         polytope=base_polytope, 
                                         sas=sas)
     
@@ -128,6 +131,7 @@ def run_matlab_validation():
     print("\nEjecutando Experimento K=11 (h ≈ )...")
     checker_k350 = SCIChecker(geometry=geometry_2d, 
                                         predicates=predicates_2d, 
+                                        coverageChecker=CoverageChecker,
                                         polytope=base_polytope, 
                                         sas=sas)
         

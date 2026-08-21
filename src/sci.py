@@ -11,6 +11,7 @@ class SCIChecker():
   def __init__(self, 
                geometry: AbstractGeometry, 
                predicates: AbstractPredicates, 
+               coverageChecker: CoverageCheckStrategy,
                polytope: Polytope, 
                sas: SwitchedAffineSystem):
     self._geometry = geometry
@@ -18,7 +19,7 @@ class SCIChecker():
     self._polytope = polytope
     self._sas = sas
     self._subregionsAlgorithm = Subregions(geometry)
-    self._coverageChecker = CoverageChecker(geometry, predicates)
+    self._coverageChecker = coverageChecker(geometry, predicates)
 
   def _create_simplices(self, simplices: list[np.ndarray]):
     self._simplices = [] # lista de triángulos en los que se dividió el politopo
