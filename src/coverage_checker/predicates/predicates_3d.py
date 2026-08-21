@@ -111,7 +111,7 @@ class Predicates3d(AbstractPredicates):
     bExp = pyattene.ExplicitPoint3D(b.x, b.y, b.z)
     cExp = pyattene.ExplicitPoint3D(c.x, c.y, c.z)
 
-    pImp = pyattene.ImplicitPoint3D_TPI(aExp, bExp, cExp,
+    pImp = pyattene.ImplicitPoint3D_TPI(aExp, bExp, cExp, # está bien esto?
                                         rExp, sExp, tExp,
                                         uExp, vExp, wExp)
     return pyattene.pointInTriangle(pImp, aExp, bExp, cExp)
