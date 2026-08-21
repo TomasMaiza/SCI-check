@@ -12,6 +12,8 @@ class CoverageChecker3D(CoverageChecker):
                geometry: AbstractGeometry, 
                predicates: AbstractPredicates) -> None:
     self._checker = CoverageChecker(geometry, predicates)
+    self._geometry = geometry
+    self._predicates = predicates
 
   def implicit_point_in_tetrahedron_TPI(self,
                                         tetrahedron: Tetrahedron3D, 
@@ -96,7 +98,7 @@ class CoverageChecker3D(CoverageChecker):
     ret = IN
     if not self.envelope_check_triangles(tetrahedron, polytopeSet, verticesIndex, edgesIndex):
       ret = OUT
-    if self.check_c4(tetrahedron, polytopeSet, edgesIndex) == OUT:
+    elif self.check_c4(tetrahedron, polytopeSet) == OUT:
       log.info("Falla C4")
       ret = OUT
     else:
