@@ -59,3 +59,14 @@ class Tetrahedron3D(AbstractSimplex):
 
   def get_faces(self) -> tuple[Triangle3D, Triangle3D, Triangle3D, Triangle3D]:
     return tuple(self._triangles)
+
+  def get_edges(self) -> tuple['Edge', ...]: # retorna sus aristas
+    pass
+
+  def get_inverse_edges(self) -> tuple['Edge', ...]:
+    # retorna las aristas con el sentido invertido
+    pass
+
+  def get_all_edges(self) -> tuple[tuple['Edge', ...], tuple['Edge', ...]]:
+    # retorna las aristas en ambos sentidos
+    pass
