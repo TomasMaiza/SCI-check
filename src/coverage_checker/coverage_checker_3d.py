@@ -13,6 +13,26 @@ class CoverageChecker3D(CoverageChecker):
                predicates: AbstractPredicates) -> None:
     self._checker = CoverageChecker(geometry, predicates)
 
+  def plane_plane_plane_tet_out(self,
+                                tetrahedron: Tetrahedron3D, 
+                                f1: AbstractHalfspace, 
+                                f2: AbstractHalfspace, 
+                                f3: AbstractHalfspace, 
+                                polytopeMap: PolytopeMap, 
+                                currentpIndex1: int,
+                                currentpIndex2: int, 
+                                currentpIndex3: int) -> OrientResult:
+    if not self._predicates.implicit_point_in_polytope(tetrahedron, f1, f2, f3):
+      return IN
+
+    ret = OUT
+    for i, p in enumerate(polytopeMap):
+      if i not in {currentpIndex1, currentpIndex2, currentpIndex3} and self.implicit_point_in_polytope_FPI(tetrahedron, f1, f2, f3, p):
+        ret = IN
+        break
+
+    return ret
+
   def check_c4(self,
                tetrahedron: Tetrahedron3D,
                polytopeSet: PolytopeMap) -> OrientResult:
