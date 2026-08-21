@@ -70,24 +70,6 @@ class _CoverageCheckerIntern:
         ret = IN
         break
     return ret
-  
-  '''
-  def implicit_point_in_triangle(self, 
-                                 triangle: AbstractSimplex, 
-                                 f1: AbstractHalfspace, 
-                                 f2: AbstractHalfspace) -> bool:
-    # determina si un punto (intersección de dos semiespacios) pertenece a un triángulo
-    edges = triangle.get_edges()
-    r, s = f1.get_points()
-    ret = True
-    for v1, v2 in edges:
-      # queremos calcular la orientación de f1 \\cap f2 respecto a v1v2
-      e = self._geometry.create_halfspace((v1, v2))
-      ori = self._predicates.orient_LPI(r, s, f2, e)
-      if ori != IN:
-        ret = False
-        break
-    return ret'''
 
   def plane_plane_tri_out(self, 
                         triangle: AbstractSimplex, 
