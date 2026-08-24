@@ -25,4 +25,43 @@ class Geometry3d(AbstractGeometry):
     return 3
 
   def create_halfspaces_list(self, subregionPolytope: 'Polytope') -> list[Halfspace3D]:
-    pass
+    # REVISAR
+    matrixA, vectorB = subregionPolytope.get_hrep()
+    dimension = 3
+    halfspacesList = []
+      
+    for i in range(len(vectorB)):
+      normalVector = matrixA[i]
+      offset = vectorB[i]
+
+      maxIndex = np.argmax(np.abs(normalVector))
+      if abs(normalVector[maxIndex]) < 1e-12:
+        continue
+              
+      basePointCoords = np.zeros(dimension)
+      basePointCoords[maxIndex] = offset / normalVector[maxIndex]
+      pointsCoordsList = [basePointCoords]
+          
+      for j in range(dimension):
+        if j != maxIndex:
+          currentPointCoords = np.copy(basePointCoords)
+          currentPointCoords[j] += 1.0
+          currentPointCoords[maxIndex] -= normalVector[j] / normalVector[maxIndex]
+          pointsCoordsList.append(currentPointCoords)
+                  
+      # 3. Escudo protector de orientación para 3D (Regla de la mano derecha)
+      vector1 = pointsCoordsList[1] - pointsCoordsList[0]
+      vector2 = pointsCoordsList[2] - pointsCoordsList[0]
+      computedCross = np.cross(vector1, vector2)
+          
+      if np.dot(computedCross, normalVector) < 0:
+        # Invertimos dos puntos para corregir el sentido de la normal
+        pointsCoordsList[1], pointsCoordsList[2] = pointsCoordsList[2], pointsCoordsList[1]
+              
+          # 4. Creamos los puntos abstractos mediante la fábrica y armamos el semiespacio
+      abstractPoints = tuple(self.create_point(tuple(coords)) for coords in pointsCoordsList)
+      halfspace = self.create_halfspace(abstractPoints)
+      halfspacesList.append(halfspace)
+          
+    return halfspacesList
+    
