@@ -32,7 +32,7 @@ class Halfspace2D(AbstractHalfspace):
     p2 = basePoint + perpVector
     self.p2 = Point2D(p2[0], p2[1])
 
-  def get_normal(self) -> Point2D:
+  def get_normal(self) -> tuple[Fraction, Fraction]:
     # calcula la normal del semiespacio
     x1, y1 = Fraction(self.p1.x), Fraction(self.p1.y)
     x2, y2 = Fraction(self.p2.x), Fraction(self.p2.y)
@@ -40,4 +40,4 @@ class Halfspace2D(AbstractHalfspace):
     dx = x2 - x1
     dy = y2 - y1
 
-    return Point2D(dx, dy)
+    return dx, dy

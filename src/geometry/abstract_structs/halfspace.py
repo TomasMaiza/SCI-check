@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 from typing import Optional
 from geometry.abstract_structs.point import AbstractPoint
+from fractions import Fraction
 
 class AbstractHalfspace(ABC):
   # representación de un semiespacio en un espacio n-dimensional
@@ -14,5 +15,5 @@ class AbstractHalfspace(ABC):
     pass
 
   @abstractmethod
-  def get_normal(self) -> AbstractPoint: # permite obtener el vector normal del semiespacio
+  def get_normal(self) -> tuple[Fraction]: # permite obtener el vector normal del semiespacio
     pass
