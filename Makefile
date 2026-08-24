@@ -12,8 +12,11 @@ compile:
 run: compile
 	@PYTHONPATH=./src python3 test/test_alg.py
 
-run3d: compile
+run3d2: compile
 	@PYTHONPATH=./src python3 test/test_3d.py
+
+run3d: compile
+	@PYTHONPATH=./src python3 test/test_3d_completo.py
 
 subregions: compile
 	@PYTHONPATH=.:./src pytest test/test_subregions.py -v
