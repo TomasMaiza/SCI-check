@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from .abstract_structs import *
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+  from .polytope import Polytope
 
 class AbstractGeometry(ABC):
   # clase abstracta para generar estructuras geométricas de dimensión n
@@ -22,4 +26,9 @@ class AbstractGeometry(ABC):
 
   @abstractmethod
   def get_dimension(self) -> int: # retorna la dimensión
+    pass
+
+  @abstractmethod
+  def create_halfspaces_list(self, subregionPolytope: 'Polytope') -> list[AbstractHalfspace]:
+    # crea una lista de semiespacios que definen un politopo
     pass

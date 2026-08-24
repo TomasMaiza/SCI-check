@@ -1,6 +1,10 @@
 import numpy as np
 from .geometry import AbstractGeometry
 from .structs_3d import *
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+  from .polytope import Polytope
 
 class Geometry3d(AbstractGeometry):
   # geometría 3d
@@ -19,3 +23,6 @@ class Geometry3d(AbstractGeometry):
 
   def get_dimension(self) -> int: # retorna la dimensión
     return 3
+
+  def create_halfspaces_list(self, subregionPolytope: 'Polytope') -> list[Halfspace3D]:
+    pass

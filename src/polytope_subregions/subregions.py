@@ -13,28 +13,6 @@ class Subregions(SubregionsStrategy):
   def __init__(self, geometry: AbstractGeometry):
     self._approxMethod = Taylor
     self._geometry = geometry
-
-  def get_polytope_vertices_CCW(self, subregionPolytope: Polytope) -> list[list[float]]:
-    # Extrae y ordena los vértices del politopo en sentido antihorario (CCW).
-    vertices = subregionPolytope.get_vertices() # obtengo los vértices del politopo
-    if vertices is None or len(vertices) < 3:
-        return vertices.tolist() if vertices is not None else []
-    hull = ConvexHull(vertices) # ordenamos los vértices en sentido antihorario con ConvexHull
-    sortedVertices = vertices[hull.vertices]
-    return sortedVertices.tolist()
-    
-  def _create_halfspaces_list(self, subregionPolytope: Polytope) -> list[AbstractHalfspace]:
-    sortedVertices = self.get_polytope_vertices_CCW(subregionPolytope)    
-    numVertices = len(sortedVertices)
-    halfspaces = []
-    for i in range(numVertices): # iteramos para armar los bordes del politopo (v1, v2)
-      v1 = sortedVertices[i]
-      v2 = sortedVertices[(i + 1) % numVertices]
-      p1 = self._geometry.create_point(tuple(v1))
-      p2 = self._geometry.create_point(tuple(v2))
-      hs = self._geometry.create_halfspace((p1, p2))
-      halfspaces.append(hs)
-    return halfspaces
   
   def get_subregion(self, 
                     subsystem: AffineMode, 
@@ -66,7 +44,7 @@ class Subregions(SubregionsStrategy):
     matrixb = matrixc - matrixb
     subregionPolytope = type(polytope)(A = matrixA, b = matrixb)
     subregionPolytope.reduce()
-    return self._create_halfspaces_list(subregionPolytope)
+    return self._geometry.create_halfspaces_list(subregionPolytope)
 
   def get_subregions(self, 
                      sas: SwitchedAffineSystem, 

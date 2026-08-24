@@ -1,6 +1,11 @@
 import numpy as np
 from .geometry import AbstractGeometry
 from .structs_2d import *
+from scipy.spatial import ConvexHull
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+  from .polytope import Polytope
 
 class Geometry2d(AbstractGeometry):
   # geometría 2d
@@ -19,3 +24,25 @@ class Geometry2d(AbstractGeometry):
 
   def get_dimension(self) -> int: # retorna la dimensión
     return 2
+
+  def _get_polytope_vertices_CCW(self, subregionPolytope: 'Polytope') -> list[list[float]]:
+    # Extrae y ordena los vértices del politopo en sentido antihorario (CCW).
+    vertices = subregionPolytope.get_vertices() # obtengo los vértices del politopo
+    if vertices is None or len(vertices) < 3:
+        return vertices.tolist() if vertices is not None else []
+    hull = ConvexHull(vertices) # ordenamos los vértices en sentido antihorario con ConvexHull
+    sortedVertices = vertices[hull.vertices]
+    return sortedVertices.tolist()
+
+  def create_halfspaces_list(self, subregionPolytope: 'Polytope') -> list[Halfspace2D]:
+    sortedVertices = self._get_polytope_vertices_CCW(subregionPolytope)    
+    numVertices = len(sortedVertices)
+    halfspaces = []
+    for i in range(numVertices): # iteramos para armar los bordes del politopo (v1, v2)
+      v1 = sortedVertices[i]
+      v2 = sortedVertices[(i + 1) % numVertices]
+      p1 = self.create_point(tuple(v1))
+      p2 = self.create_point(tuple(v2))
+      hs = self.create_halfspace((p1, p2))
+      halfspaces.append(hs)
+    return halfspaces
