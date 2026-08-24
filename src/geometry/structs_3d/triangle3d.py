@@ -31,3 +31,6 @@ class Triangle3D(AbstractSimplex):
   def get_all_edges(self) -> tuple[tuple['Edge', 'Edge', 'Edge'], tuple['Edge', 'Edge', 'Edge']]:
     # retorna las aristas en ambos sentidos
     return self.get_edges(), self.get_inverse_edges()
+
+  def to_halfspace(self) -> Halfspace3D:
+    return Halfspace3D(points = (self.v1, self.v2, self.v3))
