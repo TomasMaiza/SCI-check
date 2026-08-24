@@ -25,16 +25,38 @@ class Subregions(SubregionsStrategy):
     
 
   def _create_halfspaces_list(self, subregionPolytope: Polytope) -> list[AbstractHalfspace]:
-    sortedVertices = self.get_polytope_vertices_CCW(subregionPolytope)    
-    numVertices = len(sortedVertices)
+    A, b = subregionPolytope.get_hrep()
+    dim = self._geometry.get_dimension()
     halfspaces = []
-    for i in range(numVertices): # iteramos para armar los bordes del politopo (v1, v2)
-      v1 = sortedVertices[i]
-      v2 = sortedVertices[(i + 1) % numVertices]
-      p1 = self._geometry.create_point(tuple(v1))
-      p2 = self._geometry.create_point(tuple(v2))
-      hs = self._geometry.create_halfspace((p1, p2))
+      
+    for i in range(len(b)):
+      n = A[i] # vector normal de la cara
+      d = b[i] # offset de la cara
+          
+      idx = np.argmax(np.abs(n))
+      if abs(n[idx]) < 1e-12:
+        continue
+              
+      p0 = np.zeros(dim) # punto base en el plano
+      p0[idx] = d / n[idx]
+      points = [p0]
+          
+      for j in range(dim):
+        if j != idx:
+          pj = np.copy(p0)
+          pj[j] += 1.0
+          pj[idx] -= n[j] / n[idx]
+          points.append(pj)
+                  
+      V = np.column_stack([p - points[0] for p in points[1:]])
+      M = np.column_stack((V, n))
+      if np.linalg.det(M) < 0:
+        points[0], points[1] = points[1], points[0]
+          
+      abstractPoints = tuple(self._geometry.create_point(tuple(coords)) for coords in points)
+      hs = self._geometry.create_halfspace(abstractPoints)
       halfspaces.append(hs)
+          
     return halfspaces
 
   def get_subregion(self, 

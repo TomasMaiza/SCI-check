@@ -45,7 +45,7 @@ class SCIChecker():
       for v in vertices:
         self._verticesIndex[v] = False # ningún vértice fue chequeado aún
 
-      edges = t.get_edges()
+      edges = t.get_all_edges()
       for e in edges:
         self._edgesIndex[e] = False
       
