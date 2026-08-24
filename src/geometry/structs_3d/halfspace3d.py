@@ -2,6 +2,7 @@ from geometry.abstract_structs.halfspace import AbstractHalfspace
 from .point3d import Point3D
 import numpy as np
 from typing import Optional
+from fractions import Fraction
 
 class Halfspace3D(AbstractHalfspace):
   # representación de un semiespacio en 2D
@@ -43,3 +44,13 @@ class Halfspace3D(AbstractHalfspace):
       
     p3_coords = basePoint + perpVector2
     self.p3 = Point3D(p3_coords[0], p3_coords[1], p3_coords[2])
+
+  def get_normal(self) -> Point3D: # permite obtener el vector normal del semiespacio
+    x1, y1, z1 = Fraction(self.p1.x), Fraction(self.p1.y), Fraction(self.p1.z)
+    x2, y2, z2 = Fraction(self.p2.x), Fraction(self.p2.y), Fraction(self.p2.z)
+    x3, y3, z3 = Fraction(self.p3.x), Fraction(self.p3.y), Fraction(self.p3.z)
+            
+    nx = (y2 - y1) * (z3 - z1) - (z2 - z1) * (y3 - y1)
+    ny = (z2 - z1) * (x3 - x1) - (x2 - x1) * (z3 - z1)
+    nz = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)
+    return Point3D(nx, ny, nz)
