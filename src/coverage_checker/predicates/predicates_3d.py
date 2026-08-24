@@ -110,7 +110,7 @@ class Predicates3d(AbstractPredicates):
     n1 = f1.get_normal()
     n2 = f2.get_normal()
     n3 = f3.get_normal()
-    det = n1.x*(n2.y*n3.z - n2.z*n3.y) - n1.y*(n2.x*n3.z - n2.z*n3.x) + n1.z*(n2.x*n3.y - n2.y*n3.x)
+    det = n1[0]*(n2[1]*n3[2] - n2[2]*n3[1]) - n1[1]*(n2[0]*n3[2] - n2[2]*n3[0]) + n1[2]*(n2[0]*n3[1] - n2[1]*n3[0])
     return det == 0
 
   def implicit_point_in_triangle(self, 
@@ -118,12 +118,9 @@ class Predicates3d(AbstractPredicates):
                                  f1: Halfspace3D, 
                                  f2: Halfspace3D) -> bool: 
     # retorna si un punto implícito está en el plano de un triángulo
-    
     f3 = triangle.to_halfspace()
-    # --- ESCUDO PROTECTOR: Filtro de paralelismo ---
     if self._parallel_halfspaces(f1, f2, f3):
         return False
-    # -----------------------------------------------
 
     r, s, t = f1.get_points()
     u, v, w = f2.get_points()
