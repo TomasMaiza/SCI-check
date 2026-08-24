@@ -16,3 +16,6 @@ class Geometry2d(AbstractGeometry):
 
   def create_halfspace_from_vector(self, normalVector: np.ndarray, b: float) -> Halfspace2D: # crea un semiespacio
     return Halfspace2D(normalVector = normalVector, b = b)
+
+  def get_dimension(self) -> int: # retorna la dimensión
+    return 2

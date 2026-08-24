@@ -19,3 +19,7 @@ class AbstractGeometry(ABC):
   @abstractmethod
   def create_halfspace_from_vector(self, normalVector: np.ndarray, b: float) -> AbstractHalfspace: # crea un semiespacio
     pass
+
+  @abstractmethod
+  def get_dimension(self) -> int: # retorna la dimensión
+    pass
