@@ -2,6 +2,7 @@ from geometry.abstract_structs.halfspace import AbstractHalfspace
 from .point2d import Point2D
 import numpy as np
 from typing import Optional
+from fractions import Fraction
 
 class Halfspace2D(AbstractHalfspace):
   # representación de un semiespacio en 2D
@@ -30,3 +31,13 @@ class Halfspace2D(AbstractHalfspace):
     self.p1 = Point2D(basePoint[0], basePoint[1])    
     p2 = basePoint + perpVector
     self.p2 = Point2D(p2[0], p2[1])
+
+  def get_normal(self) -> Point2D:
+    # calcula la normal del semiespacio
+    x1, y1 = Fraction(self.p1.x), Fraction(self.p1.y)
+    x2, y2 = Fraction(self.p2.x), Fraction(self.p2.y)
+          
+    dx = x2 - x1
+    dy = y2 - y1
+
+    return Point2D(dx, dy)

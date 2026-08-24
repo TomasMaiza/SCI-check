@@ -12,3 +12,7 @@ class AbstractHalfspace(ABC):
   @abstractmethod
   def create_from_normal_vector(self, normalVector: np.ndarray, b: float): # permite crear el semiespacio a partir del vector normal
     pass
+
+  @abstractmethod
+  def get_normal(self) -> AbstractPoint: # permite obtener el vector normal del semiespacio
+    pass
