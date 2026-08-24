@@ -141,16 +141,5 @@ class Predicates3d(AbstractPredicates):
     pImp = pyattene.ImplicitPoint3D_TPI(aExp, bExp, cExp,
                                         rExp, sExp, tExp,
                                         uExp, vExp, wExp)
-    #return pyattene.pointInTriangle(pImp, aExp, bExp, cExp)
-
-    is_inside = pyattene.pointInTriangle(pImp, aExp, bExp, cExp)
     
-    if is_inside:
-        print("\n--- FALSO POSITIVO DETECTADO ---")
-        print(f"Triángulo: {a}, {b}, {c}")
-        # Imprimimos 1 punto de cada plano para ver qué caras está evaluando
-        print(f"Cara 1 (f1): {r}")
-        print(f"Cara 2 (f2): {u}")
-        print("--------------------------------")
-        
-    return is_inside
+    return pyattene.pointInTriangle(pImp, aExp, bExp, cExp)
