@@ -14,7 +14,7 @@ class AbstractPredicates(ABC):
                  v1: AbstractPoint, 
                  v2: AbstractPoint, 
                  f1: AbstractHalfspace, 
-                 f2: AbstractHalfspace) -> OrientResult: # retorna IN, OUT, ON
+                 ref: AbstractHalfspace) -> OrientResult: # retorna IN, OUT, ON
     pass
 
   @abstractmethod
@@ -22,7 +22,7 @@ class AbstractPredicates(ABC):
                  triangle: AbstractSimplex, 
                  f1: AbstractHalfspace, 
                  f2: AbstractHalfspace, 
-                 f3: AbstractHalfspace) -> OrientResult: # retorna IN, OUT, ON
+                 ref: AbstractHalfspace) -> OrientResult: # retorna IN, OUT, ON
     pass
 
   @abstractmethod

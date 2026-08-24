@@ -24,10 +24,10 @@ class Predicates3d(AbstractPredicates):
       ret = OrientResult.OUT
     return ret
     
-  def orient_LPI(self, r: Point3D, s: Point3D, f1: Halfspace3D, f2: Halfspace3D) -> OrientResult: # retorna IN, OUT, ON
+  def orient_LPI(self, r: Point3D, s: Point3D, f1: Halfspace3D, ref: Halfspace3D) -> OrientResult: # retorna IN, OUT, ON
     t, u, v = f1.get_points()
-    a, b, c = f2.get_points()
-    # queremos calcular la orientación de f1 \cap rs respecto a f2
+    a, b, c = ref.get_points()
+    # queremos calcular la orientación de f1 \cap rs respecto a ref
     
     rExp = pyattene.ExplicitPoint3D(r.x, r.y, r.z)
     sExp = pyattene.ExplicitPoint3D(s.x, s.y, s.z)

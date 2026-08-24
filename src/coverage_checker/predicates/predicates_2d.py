@@ -19,10 +19,10 @@ class Predicates2d(AbstractPredicates):
       ret = OrientResult.OUT
     return ret
 
-  def orient_LPI(self, r: Point2D, s: Point2D, f1: Halfspace2D, f2: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
+  def orient_LPI(self, r: Point2D, s: Point2D, f1: Halfspace2D, ref: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
     t, u = f1.get_points()
-    a, b = f2.get_points()
-    # queremos calcular la orientación de f1 \cap rs respecto a f2
+    a, b = ref.get_points()
+    # queremos calcular la orientación de f1 \cap rs respecto a ref
     
     rExp = pyattene.ExplicitPoint2D(r.x, r.y)
     sExp = pyattene.ExplicitPoint2D(s.x, s.y)
@@ -50,9 +50,9 @@ class Predicates2d(AbstractPredicates):
                  triangle: Triangle2D, 
                  f1: Halfspace2D, 
                  f2: Halfspace2D, 
-                 f3: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
+                 ref: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
     r, s = f1.get_points()
-    return self.orient_LPI(r, s, f2, f3)
+    return self.orient_LPI(r, s, f2, ref)
 
   def implicit_point_in_triangle(self, 
                                  triangle: Triangle2D, 
