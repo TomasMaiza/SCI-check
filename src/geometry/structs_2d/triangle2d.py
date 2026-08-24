@@ -28,9 +28,9 @@ class Triangle2D(AbstractSimplex):
     # retorna las aristas con el sentido invertido
     return ((self.v2, self.v1), (self.v3, self.v2), (self.v1, self.v3))
 
-  def get_all_edges(self) -> tuple[tuple['Edge', 'Edge', 'Edge'], tuple['Edge', 'Edge', 'Edge']]:
+  def get_all_edges(self) -> tuple['Edge', 'Edge', 'Edge', 'Edge', 'Edge', 'Edge']:
     # retorna las aristas en ambos sentidos
-    return self.get_edges(), self.get_inverse_edges()
+    return self.get_edges() + self.get_inverse_edges()
 
   def get_faces(self) -> tuple[Halfspace2D, Halfspace2D, Halfspace2D]:
     f1 = Halfspace2D(points = (self.v1, self.v2))

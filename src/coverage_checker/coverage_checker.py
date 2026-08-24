@@ -122,8 +122,8 @@ class _CoverageCheckerIntern:
                triangle: AbstractSimplex, 
                polytopeSet: PolytopeMap, 
                edgesIndex: EdgesIndex) -> OrientResult:
-    allEdges = triangle.get_all_edges()
-    edges, invEdges = allEdges
+    edges = triangle.get_edges()
+    invEdges = triangle.get_inverse_edges()
     polytopes = enumerate(polytopeSet)
     for i, p in polytopes:
       for f in p:
