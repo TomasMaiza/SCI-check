@@ -113,6 +113,7 @@ class _CoverageCheckerIntern:
     ret = IN
     for v in vertices:
       if not verticesIndex[v] and self.point_out(v, polytopeSet) == OUT:
+        #log.info(f"Vértice OUT: {v}")
         ret = OUT
         break
       verticesIndex[v] = True # pisamos el valor si ya era True y sino lo marcamos por primera vez
