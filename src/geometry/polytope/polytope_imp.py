@@ -70,5 +70,5 @@ class PolytopeImp(Polytope):
 
   def reduce(self):
     # elimina las inecuaciones redundantes
-    pc.reduce(self.polytope)
+    self.polytope = pc.reduce(self.polytope)
 
