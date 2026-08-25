@@ -96,4 +96,4 @@ def plot_filled_scenario(title: str, original_poly: Polytope, coverage_result: b
 
 if __name__ == "__main__":
   setup_logger()
-  ejecutar_test(T = 0.1, K = 12)
+  ejecutar_test(T = 0.1, K = 1)
