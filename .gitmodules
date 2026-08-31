@@ -1,3 +1,10 @@
 [submodule "external/Indirect_Predicates"]
 	path = external/Indirect_Predicates
 	url = https://github.com/MarcoAttene/Indirect_Predicates.git
+
+[submodule "external/pycvxset"]
+	path = external/pycvxset
+	url = https://github.com/merlresearch/pycvxset.git
+[submodule "src/external/pycvxset"]
+	path = src/external/pycvxset
+	url = https://github.com/merlresearch/pycvxset.git
