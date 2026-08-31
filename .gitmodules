@@ -1,4 +1,4 @@
-[submodule "external/Indirect_Predicates"]
+[submodule "src/external/Indirect_Predicates"]
 	path = src/external/Indirect_Predicates
 	url = https://github.com/MarcoAttene/Indirect_Predicates.git
 
