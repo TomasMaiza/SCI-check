@@ -50,7 +50,7 @@ class _CoverageCheckerIntern:
       ret = False
     for fp in p:
       ori = self._predicates.orient_TPI(triangle, f1, f2, fp)
-      if ori == OUT:
+      if ori != IN:
         ret = False
         break
     return ret
