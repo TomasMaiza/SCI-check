@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from common import OrientResult
 from geometry.abstract_structs import *
+from geometry import Polytope
 
 class AbstractPredicates(ABC):
   # clase para implementar los predicados en dimensión n
@@ -26,8 +27,8 @@ class AbstractPredicates(ABC):
     pass
 
   @abstractmethod
-  def implicit_point_in_triangle(self, 
-                                 triangle: AbstractSimplex, 
+  def implicit_point_in_polytope(self, 
+                                 polytope: Polytope, 
                                  f1: AbstractHalfspace, 
                                  f2: AbstractHalfspace) -> bool: 
     # retorna si un punto implícito está en el plano de un triángulo
