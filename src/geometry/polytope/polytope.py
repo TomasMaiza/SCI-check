@@ -23,6 +23,11 @@ class Polytope(ABC):
     pass
 
   @abstractmethod
+  def get_edges(self) -> list[tuple[float, float]]:
+    # retorna las aristas del politopo
+    pass
+
+  @abstractmethod
   def intersect(self, p: 'Polytope') -> 'Polytope':
     # permite intersecar el politopo con otro
     pass

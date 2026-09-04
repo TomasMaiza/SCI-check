@@ -30,6 +30,21 @@ class PolytopeImp(Polytope):
     # permite obtener las matrices A y b que definen al politopo
     return self.polytope.A, self.polytope.b
 
+  def get_edges(self) -> list[tuple[float, float]]:
+    # 1. Extraemos los vértices (si solo tenías H-rep, la librería los calcula acá)
+    vertices = pc.extreme(self.polytope)
+    if vertices is None or len(vertices) < 3:
+        return [] # No forma una región cerrada
+    hull = ConvexHull(vertices)
+    edges = []
+    # En 2D, los 'simplices' son matemáticamente los segmentos (aristas)
+    # hull.simplices es una lista de pares de índices [i, j]
+    for simplex in hull.simplices:
+        p1 = vertices[simplex[0]]
+        p2 = vertices[simplex[1]]
+        edges.append((p1, p2))   
+    return edges
+
   def _map_polytopes_from_pc(self, pcList: list[pc.Polytope]) -> list['PolytopeImp']:
     # toma una lista de pc.Polytope y retorna una de PolytopeImp
     polyList = []
