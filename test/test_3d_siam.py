@@ -47,12 +47,12 @@ def sistema():
 '''
 def sistema():
     # 1. Parámetros con unidades correctas
-    R_E = 100
+    R_E = 100e-3
     R = 25
     E = 24
-    C1 = 50
-    C2 = 25
-    L = 10
+    C1 = 50e-6
+    C2 = 25e-6
+    L = 10e-3
     
     # Matrices A originales (dinámica)[cite: 3]
     A1 = np.array([[-1/(R_E * C1), 0, 0], 
@@ -206,4 +206,4 @@ def plot_3d_scenario(title: str, original_poly, coverage_result: bool, subregion
 
 if __name__ == "__main__":
   setup_logger()
-  ejecutar_test(T = 20 * 1e-6, K = 1)
+  ejecutar_test(T = 20 * 1e-6, K = 200)
