@@ -1,5 +1,6 @@
 from common import OrientResult, IN, ON, OUT
 from geometry.structs_2d import *
+from geometry import Polytope, Geometry2d
 from .predicates import AbstractPredicates
 from shewchuk import orientation
 from .. import pyattene
@@ -19,7 +20,11 @@ class Predicates2d(AbstractPredicates):
       ret = OrientResult.OUT
     return ret
 
-  def orient_LPI(self, r: Point2D, s: Point2D, f1: Halfspace2D, ref: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
+  def orient_LPI(self, 
+                 r: Point2D, 
+                 s: Point2D, 
+                 f1: Halfspace2D, 
+                 ref: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
     t, u = f1.get_points()
     a, b = ref.get_points()
     # queremos calcular la orientación de f1 \cap rs respecto a ref
@@ -47,24 +52,26 @@ class Predicates2d(AbstractPredicates):
     return ret
 
   def orient_TPI(self, 
-                 triangle: Triangle2D, 
+                 polytope: Polytope, 
                  f1: Halfspace2D, 
                  f2: Halfspace2D, 
                  ref: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
     r, s = f1.get_points()
     return self.orient_LPI(r, s, f2, ref)
 
-  def implicit_point_in_triangle(self, 
-                                 triangle: Triangle2D, 
+  def implicit_point_in_polytope(self, 
+                                 polytope: Polytope, 
                                  f1: Halfspace2D, 
                                  f2: Halfspace2D) -> bool: 
-    # determina si un punto (intersección de dos semiespacios) pertenece a un triángulo
-    edges = triangle.get_faces()
+    # determina si un punto (intersección de dos semiespacios) pertenece a un politopo
+    #edges = polytope.get_edges()
     r, s = f1.get_points()
+    geom = Geometry2d()
+    hs = geom.create_halfspaces_list(polytope)
     ret = True
-    for e in edges:
+    for f in hs:
       # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
-      ori = self.orient_LPI(r, s, f2, e)
+      ori = self.orient_LPI(r, s, f2, f)
       if ori != IN:
         ret = False
         break

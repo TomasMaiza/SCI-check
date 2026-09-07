@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
   from .polytope import Polytope
+  from src.common.types import Edge
 
 class Geometry2d(AbstractGeometry):
   # geometría 2d
@@ -46,3 +47,12 @@ class Geometry2d(AbstractGeometry):
       hs = self.create_halfspace((p1, p2))
       halfspaces.append(hs)
     return halfspaces
+
+  def get_polytope_edges(self, polytope: 'Polytope') -> list['Edge']:
+    # devuelve una lista de las aristas de un politopo como una lista de (Point2D, Point2D)
+    edges = polytope.get_edges()
+    geomEdges = []
+    for e in edges:
+      v1, v2 = Point2D(x = e[0][0], y = e[0][1]), Point2D(x = e[1][0], y = e[1][1])
+      geomEdges.append((v1, v2))
+    return geomEdges

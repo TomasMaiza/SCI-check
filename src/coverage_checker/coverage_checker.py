@@ -41,7 +41,7 @@ class _CoverageCheckerIntern:
     return ori1 == ori2 or ori1 == ON or ori2 == ON
 
   def implicit_point_in_polytope_TPI(self, 
-                                 triangle: AbstractSimplex,
+                                 polytope: Polytope,
                                  f1: AbstractHalfspace,
                                  f2: AbstractHalfspace, 
                                  p: list[AbstractHalfspace]) -> bool:
@@ -49,8 +49,8 @@ class _CoverageCheckerIntern:
     if len(p) == 0:
       ret = False
     for fp in p:
-      ori = self._predicates.orient_TPI(triangle, f1, f2, fp)
-      if ori == OUT:
+      ori = self._predicates.orient_TPI(polytope, f1, f2, fp)
+      if ori != IN:
         ret = False
         break
     return ret
@@ -87,61 +87,56 @@ class _CoverageCheckerIntern:
         break
     return ret
 
-  def plane_plane_tri_out(self, 
-                        triangle: AbstractSimplex, 
+  def plane_plane_poly_out(self, 
+                        polytope: Polytope, 
                         f1: AbstractHalfspace, 
                         f2: AbstractHalfspace, 
                         polytopeMap: PolytopeMap, 
                         currentpIndex1: int, 
                         currentpIndex2: int) -> OrientResult:
-    if not self._predicates.implicit_point_in_triangle(triangle, f1, f2):
+    if not self._predicates.implicit_point_in_polytope(polytope, f1, f2):
       return IN
 
     ret = OUT
     for i, p in enumerate(polytopeMap):
-      if i not in {currentpIndex1, currentpIndex2} and self.implicit_point_in_polytope_TPI(triangle, f1, f2, p):
+      if i not in {currentpIndex1, currentpIndex2} and self.implicit_point_in_polytope_TPI(polytope, f1, f2, p):
         ret = IN
         break
 
     return ret
 
   def check_c1(self, 
-               triangle: AbstractSimplex, 
-               polytopeSet: PolytopeMap, 
-               verticesIndex: VerticesIndex) -> OrientResult:
-    vertices = triangle.get_vertices()
+               polytope: Polytope, 
+               polytopeSet: PolytopeMap) -> OrientResult:
+    vertices = polytope.get_vertices()
     ret = IN
     for v in vertices:
-      if not verticesIndex[v] and self.point_out(v, polytopeSet) == OUT:
+      v = self._geometry.create_point(tuple(v))
+      if self.point_out(v, polytopeSet) == OUT:
         #log.info(f"Vértice OUT: {v}")
         ret = OUT
         break
-      verticesIndex[v] = True # pisamos el valor si ya era True y sino lo marcamos por primera vez
     return ret
 
   def check_c2(self, 
-               triangle: AbstractSimplex, 
-               polytopeSet: PolytopeMap, 
-               edgesIndex: EdgesIndex) -> OrientResult:
-    edges = triangle.get_edges()
-    invEdges = triangle.get_inverse_edges()
+               polytope: Polytope, 
+               polytopeSet: PolytopeMap) -> OrientResult:
+    edges = self._geometry.get_polytope_edges(polytope)
     polytopes = enumerate(polytopeSet)
     for i, p in polytopes:
       for f in p:
         for e in edges:
-          if not edgesIndex[e] and self.edge_plane_out(e[0], e[1], f, polytopeSet, i) == OUT:
+          if self.edge_plane_out(e[0], e[1], f, polytopeSet, i) == OUT:
             return OUT
-    for e in edges + invEdges:
-      edgesIndex[e] = True
     return IN
   
   def check_c3(self, 
-               triangle: AbstractSimplex, 
+               polytope: Polytope, 
                polytopeSet: PolytopeMap) -> OrientResult:
     faces = [(face, i) for i, p in enumerate(polytopeSet) for face in p]
     ret = IN
     for (f1, i), (f2, j) in itertools.combinations(faces, 2):
-      if self.plane_plane_tri_out(triangle, f1, f2, polytopeSet, i, j) == OUT:
+      if self.plane_plane_poly_out(polytope, f1, f2, polytopeSet, i, j) == OUT:
         ret = OUT
         break  
     return ret
@@ -154,18 +149,16 @@ class CoverageChecker(CoverageCheckStrategy):
 
   # chequea UN triángulo
   def envelope_check(self, 
-                     triangle: AbstractSimplex, 
-                     polytopeSet: PolytopeMap, 
-                     verticesIndex: VerticesIndex, 
-                     edgesIndex: EdgesIndex) -> OrientResult: 
+                     polytope: Polytope, 
+                     polytopeSet: PolytopeMap) -> OrientResult: 
     ret = IN
-    if self._checker.check_c1(triangle, polytopeSet, verticesIndex) == OUT:
+    if self._checker.check_c1(polytope, polytopeSet) == OUT:
       log.info("Falla C1")
       ret = OUT
-    elif self._checker.check_c2(triangle, polytopeSet, edgesIndex) == OUT:
+    elif self._checker.check_c2(polytope, polytopeSet) == OUT:
       log.info("Falla C2")
       ret = OUT
-    elif self._checker.check_c3(triangle, polytopeSet) == OUT:
+    elif self._checker.check_c3(polytope, polytopeSet) == OUT:
       log.info("Falla C3")
       ret = OUT
     else:

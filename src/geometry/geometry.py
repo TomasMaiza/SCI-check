@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
   from .polytope import Polytope
+  from src.common.types import Edge
 
 class AbstractGeometry(ABC):
   # clase abstracta para generar estructuras geométricas de dimensión n
@@ -29,6 +30,11 @@ class AbstractGeometry(ABC):
     pass
 
   @abstractmethod
-  def create_halfspaces_list(self, subregionPolytope: 'Polytope') -> list[AbstractHalfspace]:
+  def create_halfspaces_list(self, polytope: 'Polytope') -> list[AbstractHalfspace]:
     # crea una lista de semiespacios que definen un politopo
+    pass
+
+  @abstractmethod
+  def get_polytope_edges(self, polytope: 'Polytope') -> list['Edge']:
+    # devuelve una lista de las aristas de un politopo
     pass

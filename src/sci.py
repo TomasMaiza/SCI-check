@@ -97,6 +97,7 @@ class SCIChecker():
 
   def check_coverage(self) -> bool: # itera sobre los triángulos
     ret = True
+    '''
     for t in self._simplices:
       # filteredMap = self._get_filtered_map(t)
       filteredMap = self._subregions
@@ -104,11 +105,15 @@ class SCIChecker():
       if check == OUT:
         ret = False
         break
+    '''
+    check = self._coverageChecker.envelope_check(self._polytope, self._subregions)
+    if check == OUT:
+      ret = False
     return ret
 
   def sci_check(self, dwellTime: float, K: int) -> tuple[bool, PolytopeMap]: # hace todo el proceso
     self.get_subregions(dwellTime, K)
-    self.triangulate_polytope()
+    # self.triangulate_polytope()
     # self.create_aabb_tree() # estrategia de aceleración 1
     cov = self.check_coverage()
     subregions = self._subregions
