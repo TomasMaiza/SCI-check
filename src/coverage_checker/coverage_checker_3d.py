@@ -22,11 +22,11 @@ class CoverageChecker3D(CoverageChecker):
                                         f2: AbstractHalfspace, 
                                         f3: AbstractHalfspace):
     ret = True
-    triangles = polytope.get_faces()
-    for t in triangles:
-      vertices = t.get_vertices()
-      f = Halfspace3D(points = vertices)
-      ori = self._predicates.orient_TPI_halfspaces(f1, f2, f3, f)
+    faces = polytope.get_faces()
+    for p in faces:
+      vertices = p.get_vertices()
+      f = Halfspace3D(points = vertices) # VER ORIENT TPI PARA POLITOPOS
+      ori = self._predicates.orient_TPI(f1, f2, f3, f)
       if ori == OUT:
         ret = False
         break
