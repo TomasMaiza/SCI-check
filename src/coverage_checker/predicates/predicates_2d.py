@@ -48,7 +48,7 @@ class Predicates2d(AbstractPredicates):
     return ret
 
   def orient_TPI(self, 
-                 triangle: Triangle2D, 
+                 polytope: Polytope, 
                  f1: Halfspace2D, 
                  f2: Halfspace2D, 
                  ref: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
@@ -67,7 +67,7 @@ class Predicates2d(AbstractPredicates):
       # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
       p1, p2 = Point2D(e[0][0], e[0][1]), Point2D(e[1][0], e[1][1])
       face = Halfspace2D(points = (p1, p2))
-      ori = self.orient_LPI(r, s, f2, e)
+      ori = self.orient_LPI(r, s, f2, face)
       if ori != IN:
         ret = False
         break
