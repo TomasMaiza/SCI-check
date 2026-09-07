@@ -1,6 +1,6 @@
 from common import OrientResult, IN, ON, OUT
 from geometry.structs_2d import *
-from geometry import Polytope
+from geometry import Polytope, Geometry2d
 from .predicates import AbstractPredicates
 from shewchuk import orientation
 from .. import pyattene
@@ -59,15 +59,15 @@ class Predicates2d(AbstractPredicates):
                                  polytope: Polytope, 
                                  f1: Halfspace2D, 
                                  f2: Halfspace2D) -> bool: 
-    # determina si un punto (intersección de dos semiespacios) pertenece a un triángulo
-    edges = polytope.get_edges()
+    # determina si un punto (intersección de dos semiespacios) pertenece a un politopo
+    #edges = polytope.get_edges()
     r, s = f1.get_points()
+    geom = Geometry2d()
+    hs = geom.create_halfspaces_list(polytope)
     ret = True
-    for e in edges:
+    for f in hs:
       # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
-      p1, p2 = Point2D(e[0][0], e[0][1]), Point2D(e[1][0], e[1][1])
-      face = Halfspace2D(points = (p1, p2))
-      ori = self.orient_LPI(r, s, f2, face)
+      ori = self.orient_LPI(r, s, f2, f)
       if ori != IN:
         ret = False
         break
