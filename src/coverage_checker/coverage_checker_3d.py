@@ -98,7 +98,7 @@ class CoverageChecker3D(CoverageChecker):
                      verticesIndex: VerticesIndex, 
                      edgesIndex: EdgesIndex) -> OrientResult: 
     ret = IN
-    if not self.envelope_check_triangles(polytope, polytopeSet, verticesIndex, edgesIndex):
+    if not self.envelope_check_faces(polytope, polytopeSet, verticesIndex, edgesIndex):
       ret = OUT
     elif self.check_c4(polytope, polytopeSet) == OUT:
       log.info("Falla C4")
