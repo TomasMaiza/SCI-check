@@ -23,7 +23,7 @@ class Polytope(ABC):
     pass
 
   @abstractmethod
-  def get_edges(self) -> list[tuple[float, float]]:
+  def get_edges(self) -> list[tuple[tuple[float, float], tuple[float, float]]]:
     # retorna las aristas del politopo
     pass
 
