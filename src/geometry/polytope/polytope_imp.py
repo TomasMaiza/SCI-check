@@ -45,6 +45,40 @@ class PolytopeImp(Polytope):
         edges.append((tuple(p1), tuple(p2)))   
     return edges
 
+  def get_faces(self) -> list['PolytopeImp']:
+    # devuelve las caras del politopo como objetos Polytope
+    vertices = pc.extreme(self.polytope)
+    if vertices is None or len(vertices) == 0:
+      return []
+        
+    A = self.polytope.A
+    b = self.polytope.b
+    faces = []
+
+    for i in range(len(b)): # iteramos sobre las inecuaciones 
+      faceVertices = []
+      for v in vertices: # buscamos qué vértices caen exactamente sobre este hiperplano (Ax = b)
+        if np.isclose(np.dot(A[i], v), b[i], atol=0): # SI NO ANDA cambiar tolerancia atol=1e-7
+          faceVertices.append(v)
+      if len(faceVertices) >= 3:
+        # TRUCO DE LA LIBRERÍA: Simulamos la igualdad matemática (A_i*x = b_i) 
+        # agregando a la H-rep la inecuación opuesta: -A_i*x <= -b_i
+        A_face = np.vstack([A, -A[i]])
+        b_face = np.append(b, -b[i])
+            
+        # Instanciamos el politopo crudo de la librería
+        face_poly_raw = pc.Polytope(A_face, b_face)
+            
+        # ¡CRÍTICO! Le inyectamos los vértices a mano para evitar que SciPy intente
+        # triangular una figura chata y explote por volumen cero.
+        face_poly_raw.V = np.array(faceVertices)
+            
+        # Lo envolvemos en nuestra propia clase Strategy y lo guardamos
+        facePolytope = self.__class__.__new__(self.__class__)
+        facePolytope.polytope = face_poly_raw
+        faces.append(facePolytope)
+    return faces
+
   def _map_polytopes_from_pc(self, pcList: list[pc.Polytope]) -> list['PolytopeImp']:
     # toma una lista de pc.Polytope y retorna una de PolytopeImp
     polyList = []

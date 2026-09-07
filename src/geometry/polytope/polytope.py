@@ -28,6 +28,11 @@ class Polytope(ABC):
     pass
 
   @abstractmethod
+  def get_faces(self) -> list['Polytope']:
+    # devuelve las caras del politopo como objetos Polytope
+    pass
+
+  @abstractmethod
   def intersect(self, p: 'Polytope') -> 'Polytope':
     # permite intersecar el politopo con otro
     pass
