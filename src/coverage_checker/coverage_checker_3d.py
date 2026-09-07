@@ -7,6 +7,7 @@ from .coverage_checker import CoverageChecker
 import logging
 import itertools
 
+# Patrón Decorator
 class CoverageChecker3D(CoverageChecker):
   def __init__(self, 
                geometry: AbstractGeometry, 
