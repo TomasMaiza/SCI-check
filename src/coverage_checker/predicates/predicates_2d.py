@@ -20,7 +20,11 @@ class Predicates2d(AbstractPredicates):
       ret = OrientResult.OUT
     return ret
 
-  def orient_LPI(self, r: Point2D, s: Point2D, f1: Halfspace2D, ref: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
+  def orient_LPI(self, 
+                 r: Point2D, 
+                 s: Point2D, 
+                 f1: Halfspace2D, 
+                 ref: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
     t, u = f1.get_points()
     a, b = ref.get_points()
     # queremos calcular la orientación de f1 \cap rs respecto a ref
