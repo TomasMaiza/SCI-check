@@ -121,14 +121,12 @@ class _CoverageCheckerIntern:
   def check_c2(self, 
                polytope: Polytope, 
                polytopeSet: PolytopeMap) -> OrientResult:
-    edges = polytope.get_edges()
+    edges = self._geometry.get_polytope_edges(polytope)
     polytopes = enumerate(polytopeSet)
     for i, p in polytopes:
       for f in p:
         for e in edges:
-          v1 = self._geometry.create_point(e[0]) # esto que lo haga get_edges
-          v2 = self._geometry.create_point(e[1])
-          if self.edge_plane_out(v1, v2, f, polytopeSet, i) == OUT:
+          if self.edge_plane_out(e[0], e[1], f, polytopeSet, i) == OUT:
             return OUT
     return IN
   
