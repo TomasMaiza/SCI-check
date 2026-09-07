@@ -16,13 +16,13 @@ class CoverageChecker3D(CoverageChecker):
     self._geometry = geometry
     self._predicates = predicates
 
-  def implicit_point_in_tetrahedron_TPI(self,
-                                        tetrahedron: Tetrahedron3D, 
+  def implicit_point_in_polytope_TPI(self,
+                                        polytope: Polytope, 
                                         f1: AbstractHalfspace, 
                                         f2: AbstractHalfspace, 
                                         f3: AbstractHalfspace):
     ret = True
-    triangles = tetrahedron.get_faces()
+    triangles = polytope.get_faces()
     for t in triangles:
       vertices = t.get_vertices()
       f = Halfspace3D(points = vertices)
@@ -48,7 +48,7 @@ class CoverageChecker3D(CoverageChecker):
     return ret
 
   def plane_plane_plane_tet_out(self,
-                                tetrahedron: Tetrahedron3D, 
+                                polytope: Polytope, 
                                 f1: AbstractHalfspace, 
                                 f2: AbstractHalfspace, 
                                 f3: AbstractHalfspace, 
@@ -56,7 +56,7 @@ class CoverageChecker3D(CoverageChecker):
                                 currentpIndex1: int,
                                 currentpIndex2: int, 
                                 currentpIndex3: int) -> OrientResult:
-    if not self.implicit_point_in_tetrahedron_TPI(tetrahedron, f1, f2, f3):
+    if not self.implicit_point_in_polytope_TPI(polytope, f1, f2, f3):
       return IN
 
     ret = OUT
@@ -68,39 +68,39 @@ class CoverageChecker3D(CoverageChecker):
     return ret
 
   def check_c4(self,
-               tetrahedron: Tetrahedron3D,
+               polytope: Polytope,
                polytopeSet: PolytopeMap) -> OrientResult:
     faces = [(face, i) for i, p in enumerate(polytopeSet) for face in p]
     for (fi, i), (fj, j), (fk, k) in itertools.combinations(faces, 3): # no repetimos ternas
-      if self.plane_plane_plane_tet_out(tetrahedron, fi, fj, fk, polytopeSet, i, j, k) == OUT:
+      if self.plane_plane_plane_tet_out(polytope, fi, fj, fk, polytopeSet, i, j, k) == OUT:
         return OUT
     return IN
 
-  # chequea triángulos
-  def envelope_check_triangles(self, 
-                              tetrahedron: Tetrahedron3D, 
-                              polytopeSet: PolytopeMap, 
-                              verticesIndex: VerticesIndex, 
-                              edgesIndex: EdgesIndex) -> bool:
-    triangles = tetrahedron.get_faces()
+  # chequea C1, C2 Y C3 para las caras del politopo
+  def envelope_check_faces(self, 
+                           polytope: Polytope, 
+                           polytopeSet: PolytopeMap, 
+                           verticesIndex: VerticesIndex, 
+                           edgesIndex: EdgesIndex) -> bool:
+    faces = polytope.get_faces()
     ret = True
-    for t in triangles:
-      coverage = self._checker.envelope_check(t, polytopeSet, verticesIndex, edgesIndex)
+    for f in faces:
+      coverage = self._checker.envelope_check(f, polytopeSet, verticesIndex, edgesIndex)
       if coverage == OUT:
         ret = False
         break
     return ret
 
-  # chequea UN tetredro
+  # chequea un politopo 3d
   def envelope_check(self, 
-                     tetrahedron: Tetrahedron3D, 
+                     polytope: Polytope, 
                      polytopeSet: PolytopeMap, 
                      verticesIndex: VerticesIndex, 
                      edgesIndex: EdgesIndex) -> OrientResult: 
     ret = IN
-    if not self.envelope_check_triangles(tetrahedron, polytopeSet, verticesIndex, edgesIndex):
+    if not self.envelope_check_triangles(polytope, polytopeSet, verticesIndex, edgesIndex):
       ret = OUT
-    elif self.check_c4(tetrahedron, polytopeSet) == OUT:
+    elif self.check_c4(polytope, polytopeSet) == OUT:
       log.info("Falla C4")
       ret = OUT
     else:
