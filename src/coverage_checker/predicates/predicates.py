@@ -20,7 +20,7 @@ class AbstractPredicates(ABC):
 
   @abstractmethod
   def orient_TPI(self, 
-                 triangle: AbstractSimplex, 
+                 polytope: Polytope, 
                  f1: AbstractHalfspace, 
                  f2: AbstractHalfspace, 
                  ref: AbstractHalfspace) -> OrientResult: # retorna IN, OUT, ON
