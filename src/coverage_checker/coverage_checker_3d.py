@@ -16,7 +16,7 @@ class CoverageChecker3D(CoverageChecker):
     self._geometry = geometry
     self._predicates = predicates
 
-  def implicit_point_in_polytope_TPI(self,
+  def implicit_point_in_tet_TPI(self, # revisar estas cosas. Probabemente la del tetraedro se va?
                                         polytope: Polytope, 
                                         f1: AbstractHalfspace, 
                                         f2: AbstractHalfspace, 
@@ -32,7 +32,7 @@ class CoverageChecker3D(CoverageChecker):
         break
     return ret
 
-  def implicit_point_in_polytope_TPI(self, 
+  def implicit_point_in_polytope_TPI(self, # la muevo a predicates3d?
                                      f1: AbstractHalfspace,
                                      f2: AbstractHalfspace, 
                                      f3: AbstractHalfspace, 
@@ -56,7 +56,7 @@ class CoverageChecker3D(CoverageChecker):
                                 currentpIndex1: int,
                                 currentpIndex2: int, 
                                 currentpIndex3: int) -> OrientResult:
-    if not self.implicit_point_in_polytope_TPI(polytope, f1, f2, f3):
+    if not self.implicit_point_in_tet_TPI(polytope, f1, f2, f3):
       return IN
 
     ret = OUT
