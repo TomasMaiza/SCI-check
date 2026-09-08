@@ -152,9 +152,7 @@ class Predicates3d(AbstractPredicates):
     # que un punto interno refPoint
     oriImpPoint = self.orient_TPI_halfspaces(f, f1, f2, refHalfspace)
     oriRefPoint = self.orient(refPoint, refHalfspace)
-    if oriImpPoint * oriImpPoint < 0:
-      return False
-    return True
+    return oriImpPoint == oriRefPoint # qué pasa con los ON?
 
   def implicit_point_in_polytope_face(self, 
                                       polytope: Polytope, 
@@ -187,8 +185,6 @@ class Predicates3d(AbstractPredicates):
       v2 = Point3D(float(e[1][0]), float(e[1][1]), float(e[1][2]))
       q = Point3D(v1.x + nx, v1.y + ny, v1.z + nz)
       ref = Halfspace3D(points = (v1, v2, q))
-      '''if self.orient_TPI_halfspaces(f, f1, f2, ref) == OUT:
-        return False'''
       if not self._point_on_same_side(f, f1, f2, ref, centroid):
         return False
     return True
