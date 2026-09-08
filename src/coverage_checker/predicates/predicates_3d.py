@@ -166,43 +166,8 @@ class Predicates3d(AbstractPredicates):
     for e in edges:
       v1 = Point3D(float(e[0][0]), float(e[0][1]), float(e[0][2]))
       v2 = Point3D(float(e[1][0]), float(e[1][1]), float(e[1][2]))
-      q = pyattene.ExplicitPoint3D(v1.x + nx, v1.y + ny, v1.z + nz)
+      q = Point3D(v1.x + nx, v1.y + ny, v1.z + nz)
       ref = Halfspace3D(points = (v1, v2, q))
       if self.orient_TPI_halfspaces(f, f1, f2, ref) == OUT:
         return False
     return True
-    '''
-    if len(vertices) < 3:
-      return False
-
-    a = Point3D(x=float(vertices[0][0]), y=float(vertices[0][1]), z=float(vertices[0][2]))
-    b = Point3D(x=float(vertices[1][0]), y=float(vertices[1][1]), z=float(vertices[1][2]))
-    c = Point3D(x=float(vertices[2][0]), y=float(vertices[2][1]), z=float(vertices[2][2]))
-
-    f3 = Halfspace3D(points = (a, b, c))
-    if self._parallel_halfspaces(f1, f2, f3):
-        return False
-
-    r, s, t = f1.get_points()
-    u, v, w = f2.get_points()
-    
-    rExp = pyattene.ExplicitPoint3D(r.x, r.y, r.z)
-    sExp = pyattene.ExplicitPoint3D(s.x, s.y, s.z)
-    tExp = pyattene.ExplicitPoint3D(t.x, t.y, t.z)
-    
-    uExp = pyattene.ExplicitPoint3D(u.x, u.y, u.z)
-    vExp = pyattene.ExplicitPoint3D(v.x, v.y, v.z)
-    wExp = pyattene.ExplicitPoint3D(w.x, w.y, w.z)
-
-    aExp = pyattene.ExplicitPoint3D(a.x, a.y, a.z)
-    bExp = pyattene.ExplicitPoint3D(b.x, b.y, b.z)
-    cExp = pyattene.ExplicitPoint3D(c.x, c.y, c.z)
-
-    pImp = pyattene.ImplicitPoint3D_TPI(aExp, bExp, cExp,
-                                        rExp, sExp, tExp,
-                                        uExp, vExp, wExp)
-    
-
-            
-    return True
-    '''
