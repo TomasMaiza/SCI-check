@@ -142,6 +142,20 @@ class Predicates3d(AbstractPredicates):
     
     return nx, ny, nz
 
+  def _point_on_same_side(self, 
+                          f: Halfspace3D, 
+                          f1: Halfspace3D, 
+                          f2: Halfspace3D, 
+                          refHalfspace: Halfspace3D, 
+                          refPoint: Point3D) -> bool:
+    # calcula si el punto implícito de intersección de tres planos tiene la misma orientación
+    # que un punto interno refPoint
+    oriImpPoint = self.orient_TPI_halfspaces(f, f1, f2, refHalfspace)
+    oriRefPoint = self.orient(refPoint, refHalfspace)
+    if oriImpPoint * oriImpPoint < 0:
+      return False
+    return True
+
   def implicit_point_in_polytope_face(self, 
                                       polytope: Polytope, 
                                       f1: Halfspace3D, 
@@ -159,8 +173,13 @@ class Predicates3d(AbstractPredicates):
     if self._parallel_halfspaces(f1, f2, f):
       return False
 
-    # por cada arista del politopo me fijo la orientación de pImp
-    # si todas las orientaciones dan igual, está dentro
+    cx = (a.x + b.x + c.x) / 3.0
+    cy = (a.y + b.y + c.y) / 3.0
+    cz = (a.z + b.z + c.z) / 3.0
+    centroid = Point3D(cx, cy, cz)
+    # centroide del triángulo abc
+    # es un punto interno del politopo para tomar de referencia
+
     nx, ny, nz = self._calculate_normal(a, b, c)
     edges = polytope.get_edges()
     for e in edges:
@@ -168,6 +187,8 @@ class Predicates3d(AbstractPredicates):
       v2 = Point3D(float(e[1][0]), float(e[1][1]), float(e[1][2]))
       q = Point3D(v1.x + nx, v1.y + ny, v1.z + nz)
       ref = Halfspace3D(points = (v1, v2, q))
-      if self.orient_TPI_halfspaces(f, f1, f2, ref) == OUT:
+      '''if self.orient_TPI_halfspaces(f, f1, f2, ref) == OUT:
+        return False'''
+      if not self._point_on_same_side(f, f1, f2, ref, centroid):
         return False
     return True
