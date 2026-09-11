@@ -86,13 +86,11 @@ class CoverageChecker3D(CoverageChecker):
   # chequea C1, C2 Y C3 para las caras del politopo
   def envelope_check_faces(self, 
                            polytope: Polytope, 
-                           polytopeSet: PolytopeMap, 
-                           verticesIndex: VerticesIndex, 
-                           edgesIndex: EdgesIndex) -> bool:
+                           polytopeSet: PolytopeMap) -> bool:
     faces = polytope.get_faces()
     ret = True
     for f in faces:
-      coverage = self._checker.envelope_check(f, polytopeSet, verticesIndex, edgesIndex)
+      coverage = self._checker.envelope_check(f, polytopeSet)
       if coverage == OUT:
         ret = False
         break
@@ -101,11 +99,9 @@ class CoverageChecker3D(CoverageChecker):
   # chequea un politopo 3d
   def envelope_check(self, 
                      polytope: Polytope, 
-                     polytopeSet: PolytopeMap, 
-                     verticesIndex: VerticesIndex, 
-                     edgesIndex: EdgesIndex) -> OrientResult: 
+                     polytopeSet: PolytopeMap) -> OrientResult: 
     ret = IN
-    if not self.envelope_check_faces(polytope, polytopeSet, verticesIndex, edgesIndex):
+    if not self.envelope_check_faces(polytope, polytopeSet):
       ret = OUT
     elif self.check_c4(polytope, polytopeSet) == OUT:
       log.info("Falla C4")
