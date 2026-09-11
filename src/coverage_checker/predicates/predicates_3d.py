@@ -162,11 +162,11 @@ class Predicates3d(AbstractPredicates):
     cz = (a.z + b.z + c.z) / 3.0
     return Point3D(cx, cy, cz)
 
-  def implicit_point_in_polytope_face(self, 
+  def implicit_point_in_polytope(self, 
                                       polytope: Polytope, 
                                       f1: Halfspace3D, 
                                       f2: Halfspace3D) -> bool: 
-    # retorna si un punto implícito está en el plano de la cara de un politopo
+    # retorna si un punto implícito está en el plano de la CARA de un politopo
     vertices = polytope.get_vertices()
     if len(vertices) < 3:
       return False
