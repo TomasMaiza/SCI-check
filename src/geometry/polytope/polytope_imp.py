@@ -10,6 +10,7 @@ import itertools
 class PolytopeImp(Polytope):
   # implementación de politopos usando la librería polytope
   polytope: pc.Polytope
+  _vertices: np.ndarray
 
   def __init__(self, 
                vertices: Optional['tuple[AbstractPoint, ...]'] = None, 
@@ -25,7 +26,17 @@ class PolytopeImp(Polytope):
     
   def get_vertices(self) -> np.ndarray:
     # permite obtener los vértices del politopo
-    return pc.extreme(self.polytope)
+    # 1. Si los vértices fueron inyectados a mano (ej: por get_faces), los devolvemos al instante.
+    if hasattr(self, '_vertices') and self._vertices is not None:
+        return self._vertices
+        
+    # 2. Si no, dejamos que la librería haga su trabajo
+    vertices = pc.extreme(self.polytope)
+    
+    # 3. Guardamos el resultado para no volver a calcularlo en el futuro (Opcional pero recomendado)
+    self._vertices = vertices
+    
+    return vertices
   
   def get_hrep(self) -> tuple[np.ndarray, np.ndarray]:
     # permite obtener las matrices A y b que definen al politopo
@@ -83,6 +94,7 @@ class PolytopeImp(Polytope):
         # Lo envolvemos en nuestra propia clase Strategy y lo guardamos
         facePolytope = self.__class__.__new__(self.__class__)
         facePolytope.polytope = face_poly_raw
+        facePolytope._vertices = np.array(faceVertices)
         faces.append(facePolytope)
     return faces
 
