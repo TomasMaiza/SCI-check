@@ -5,10 +5,12 @@ from .polytope import Polytope
 import polytope as pc
 from scipy.spatial import ConvexHull
 from geometry import AbstractPoint, AbstractHalfspace
+import itertools
 
 class PolytopeImp(Polytope):
   # implementación de politopos usando la librería polytope
   polytope: pc.Polytope
+  _vertices: np.ndarray
 
   def __init__(self, 
                vertices: Optional['tuple[AbstractPoint, ...]'] = None, 
@@ -24,26 +26,42 @@ class PolytopeImp(Polytope):
     
   def get_vertices(self) -> np.ndarray:
     # permite obtener los vértices del politopo
-    return pc.extreme(self.polytope)
+    # 1. Si los vértices fueron inyectados a mano (ej: por get_faces), los devolvemos al instante.
+    if hasattr(self, '_vertices') and self._vertices is not None:
+        return self._vertices
+        
+    # 2. Si no, dejamos que la librería haga su trabajo
+    vertices = pc.extreme(self.polytope)
+    
+    # 3. Guardamos el resultado para no volver a calcularlo en el futuro (Opcional pero recomendado)
+    self._vertices = vertices
+    
+    return vertices
   
   def get_hrep(self) -> tuple[np.ndarray, np.ndarray]:
     # permite obtener las matrices A y b que definen al politopo
     return self.polytope.A, self.polytope.b
 
-  def get_edges(self) -> list[tuple[tuple[float, float], tuple[float, float]]]:
-    # 1. Extraemos los vértices (si solo tenías H-rep, la librería los calcula acá)
+  def get_edges(self) -> list[tuple[tuple[float, ...], tuple[float, ...]]]:
     vertices = pc.extreme(self.polytope)
-    if vertices is None or len(vertices) < 3:
-        return [] # No forma una región cerrada
+    # En 1D un segmento tiene 2 vértices, así que < 2 es más genérico
+    if vertices is None or len(vertices) < 2:
+      return [] 
+        
     hull = ConvexHull(vertices)
-    edges = []
-    # En 2D, los 'simplices' son matemáticamente los segmentos (aristas)
-    # hull.simplices es una lista de pares de índices [i, j]
+    unique_edges = set()
+    
     for simplex in hull.simplices:
-        p1 = vertices[simplex[0]]
-        p2 = vertices[simplex[1]]
-        edges.append((tuple(p1), tuple(p2)))   
-    return edges
+      # itertools.combinations saca todos los pares posibles del simplex
+      # En 2D saca 1 par. En 3D saca 3 pares (los 3 lados del triángulo).
+      for i, j in itertools.combinations(simplex, 2):
+        # Ordenamos los índices para que (v1, v2) y (v2, v1) colapsen en el set
+        idx_min, idx_max = min(i, j), max(i, j)
+        p1 = tuple(vertices[idx_min])
+        p2 = tuple(vertices[idx_max])
+        unique_edges.add((p1, p2))   
+            
+    return list(unique_edges)
 
   def get_faces(self) -> list['PolytopeImp']:
     # devuelve las caras del politopo como objetos Polytope
@@ -76,6 +94,7 @@ class PolytopeImp(Polytope):
         # Lo envolvemos en nuestra propia clase Strategy y lo guardamos
         facePolytope = self.__class__.__new__(self.__class__)
         facePolytope.polytope = face_poly_raw
+        facePolytope._vertices = np.array(faceVertices)
         faces.append(facePolytope)
     return faces
 

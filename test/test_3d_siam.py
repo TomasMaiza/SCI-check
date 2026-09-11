@@ -206,4 +206,4 @@ def plot_3d_scenario(title: str, original_poly, coverage_result: bool, subregion
 
 if __name__ == "__main__":
   setup_logger()
-  ejecutar_test(T = 20 * 1e-6, K = 200)
+  ejecutar_test(T = 20 * 1e-6, K = 50)
