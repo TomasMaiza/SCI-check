@@ -154,6 +154,14 @@ class Predicates3d(AbstractPredicates):
     oriRefPoint = self.orient(refPoint, refHalfspace)
     return oriImpPoint == oriRefPoint # qué pasa con los ON?
 
+  def _get_centroid(self, a: Point3D, b: Point3D, c: Point3D) -> Point3D:
+    # retorna un punto interno del politopo
+    # a futuro ver si hacer una función get_intern_point o algo así para reutilizar
+    cx = (a.x + b.x + c.x) / 3.0
+    cy = (a.y + b.y + c.y) / 3.0
+    cz = (a.z + b.z + c.z) / 3.0
+    return Point3D(cx, cy, cz)
+
   def implicit_point_in_polytope_face(self, 
                                       polytope: Polytope, 
                                       f1: Halfspace3D, 
@@ -171,10 +179,7 @@ class Predicates3d(AbstractPredicates):
     if self._parallel_halfspaces(f1, f2, f):
       return False
 
-    cx = (a.x + b.x + c.x) / 3.0
-    cy = (a.y + b.y + c.y) / 3.0
-    cz = (a.z + b.z + c.z) / 3.0
-    centroid = Point3D(cx, cy, cz)
+    centroid = self._get_centroid(a, b, c)
     # centroide del triángulo abc
     # es un punto interno del politopo para tomar de referencia
 
@@ -188,3 +193,26 @@ class Predicates3d(AbstractPredicates):
       if not self._point_on_same_side(f, f1, f2, ref, centroid):
         return False
     return True
+
+  def implicit_point_in_polytope_3d(self, 
+                                     polytope: Polytope, 
+                                     f1: Halfspace3D, 
+                                     f2: Halfspace3D,
+                                     f3: Halfspace3D) -> bool:
+    # intersección de punto implícito producto de 3 semiespacios con un politopo 3d
+    ret = True
+    faces = polytope.get_faces()
+    for p in faces:
+      vertices = p.get_vertices() # FUNCIÓN get_plane EN POLYTOPE? EN HALFSPACE?
+      if len(vertices) < 3:
+        return False # o true?
+      a = Point3D(x=float(vertices[0][0]), y=float(vertices[0][1]), z=float(vertices[0][2]))
+      b = Point3D(x=float(vertices[1][0]), y=float(vertices[1][1]), z=float(vertices[1][2]))
+      c = Point3D(x=float(vertices[2][0]), y=float(vertices[2][1]), z=float(vertices[2][2]))
+      ref = Halfspace3D(points = (a, b, c))
+      centroid = self._get_centroid(a, b, c)
+      ori = self._point_on_same_side(f1, f2, f3, ref, centroid)
+      if ori == OUT:
+        ret = False
+        break
+    return ret

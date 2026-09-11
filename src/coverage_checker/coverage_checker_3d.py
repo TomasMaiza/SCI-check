@@ -16,6 +16,7 @@ class CoverageChecker3D(CoverageChecker):
     self._geometry = geometry
     self._predicates = predicates
 
+  '''
   def implicit_point_in_tet_TPI(self, # revisar estas cosas. Probabemente la del tetraedro se va?
                                         polytope: Polytope, 
                                         f1: AbstractHalfspace, 
@@ -25,12 +26,16 @@ class CoverageChecker3D(CoverageChecker):
     faces = polytope.get_faces()
     for p in faces:
       vertices = p.get_vertices()
-      f = Halfspace3D(points = vertices) # VER ORIENT TPI PARA POLITOPOS
+      a = Point3D(x=float(vertices[0][0]), y=float(vertices[0][1]), z=float(vertices[0][2]))
+      b = Point3D(x=float(vertices[1][0]), y=float(vertices[1][1]), z=float(vertices[1][2]))
+      c = Point3D(x=float(vertices[2][0]), y=float(vertices[2][1]), z=float(vertices[2][2]))
+      f = Halfspace3D(points = (a, b, c)) # VER ORIENT TPI PARA POLITOPOS
       ori = self._predicates.orient_TPI(f1, f2, f3, f)
       if ori == OUT:
         ret = False
         break
     return ret
+  '''
 
   def implicit_point_in_polytope_TPI(self, # la muevo a predicates3d?
                                      f1: AbstractHalfspace,
@@ -56,6 +61,7 @@ class CoverageChecker3D(CoverageChecker):
                                 currentpIndex1: int,
                                 currentpIndex2: int, 
                                 currentpIndex3: int) -> OrientResult:
+    # punto implícito: intersección de 3 planos
     if not self.implicit_point_in_tet_TPI(polytope, f1, f2, f3):
       return IN
 

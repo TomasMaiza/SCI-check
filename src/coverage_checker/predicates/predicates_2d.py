@@ -76,3 +76,5 @@ class Predicates2d(AbstractPredicates):
         ret = False
         break
     return ret
+
+    # VER ACÁ LO DE LOS CENTROIDES SI LAS ARISTAS NO ESTÁN ORDENADAS / PARA NO ORDENARLAS
