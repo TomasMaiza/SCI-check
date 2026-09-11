@@ -12,9 +12,9 @@ class CoverageChecker3D(CoverageChecker):
   def __init__(self, 
                geometry: AbstractGeometry, 
                predicates: AbstractPredicates) -> None:
-    self._checker = CoverageChecker(geometry, Predicates3d)
+    self._checker = CoverageChecker(geometry, Predicates3d())
     self._geometry = geometry
-    self._predicates = Predicates3d
+    self._predicates = Predicates3d()
 
   '''
   def implicit_point_in_tet_TPI(self, # revisar estas cosas. Probabemente la del tetraedro se va?
