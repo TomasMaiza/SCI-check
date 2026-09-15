@@ -15,7 +15,12 @@ PYBIND11_MODULE(pyattene, m) {
         .def("Y", &explicitPoint2D::Y);
 
     py::class_<implicitPoint2D_SSI, genericPoint>(m, "ImplicitPoint2D_SSI") // Implicit 2D point class
-        .def(py::init<const genericPoint&, const genericPoint&, const genericPoint&, const genericPoint&>());
+        .def(py::init<const genericPoint&, const genericPoint&, const genericPoint&, const genericPoint&>(),
+            py::keep_alive<1, 2>(), // Ata el 1er argumento al objeto creado
+            py::keep_alive<1, 3>(), // Ata el 2do argumento al objeto creado
+            py::keep_alive<1, 4>(), // Ata el 3er argumento al objeto creado
+            py::keep_alive<1, 5>()  // Ata el 4to argumento al objeto creado
+            );
 
     // structs 3d
     py::class_<explicitPoint3D, genericPoint>(m, "ExplicitPoint3D") 
