@@ -3,19 +3,16 @@ from geometry.structs_3d import *
 from geometry import Polytope, Geometry3d
 from .predicates import AbstractPredicates
 from fractions import Fraction
-from bindings import *
+from bindings import AtteneAdapter3D
 
 class Predicates3d(AbstractPredicates):
   # clase para implementar los predicados en 3d
 
-  def orient(self, v: Point3D, f: Halfspace3D) -> OrientResult: # retorna IN, OUT, ON
-    a, b, c = f.get_points()
-    vExp = pyattene.ExplicitPoint3D(v.x, v.y, v.z)
-    aExp = pyattene.ExplicitPoint3D(a.x, a.y, a.z)
-    bExp = pyattene.ExplicitPoint3D(b.x, b.y, b.z)
-    cExp = pyattene.ExplicitPoint3D(c.x, c.y, c.z)
+  def __init__(self):
+    self._adapter = AtteneAdapter3D()
 
-    ori = pyattene.orient3d(aExp, bExp, cExp, vExp)
+  def orient(self, v: Point3D, f: Halfspace3D) -> OrientResult: # retorna IN, OUT, ON
+    ori = self._adapter.orient3dE(v, f)
 
     if ori == -1: # REVISAR ORIENTACIÓN DEL HALFSPACE 3D
       ret = OrientResult.IN
@@ -30,25 +27,9 @@ class Predicates3d(AbstractPredicates):
                  s: Point3D, 
                  f1: Halfspace3D, 
                  ref: Halfspace3D) -> OrientResult: # retorna IN, OUT, ON
-    t, u, v = f1.get_points()
-    a, b, c = ref.get_points()
     # queremos calcular la orientación de f1 \cap rs respecto a ref
-    
-    rExp = pyattene.ExplicitPoint3D(r.x, r.y, r.z)
-    sExp = pyattene.ExplicitPoint3D(s.x, s.y, s.z)
-
-    tExp = pyattene.ExplicitPoint3D(t.x, t.y, t.z)
-    uExp = pyattene.ExplicitPoint3D(u.x, u.y, u.z)
-    vExp = pyattene.ExplicitPoint3D(v.x, v.y, v.z)
-
-    aExp = pyattene.ExplicitPoint3D(a.x, a.y, a.z)
-    bExp = pyattene.ExplicitPoint3D(b.x, b.y, b.z)
-    cExp = pyattene.ExplicitPoint3D(c.x, c.y, c.z)
-
-    # Punto implícito: intersección de rs con tu
-    pImp = pyattene.ImplicitPoint3D_LPI(rExp, sExp, tExp, uExp, vExp)
-
-    ori = pyattene.orient3d(pImp, aExp, bExp, cExp)
+    pImp = self._adapter.create_implicit_point_lpi(r, s, f1) # Punto implícito: intersección de rs con f1
+    ori = self._adapter.orient3dI(pImp, ref)
 
     if ori == -1:
       ret = OrientResult.IN
@@ -63,33 +44,9 @@ class Predicates3d(AbstractPredicates):
                             f1: Halfspace3D, 
                             f2: Halfspace3D, 
                             ref: Halfspace3D) -> OrientResult: # retorna IN, OUT, ON
-    t, u, v = f1.get_points()
-    a, b, c = f2.get_points()
-    r, s, q = ref.get_points()
-    v1, v2, v3 = f.get_points()
-
-    tExp = pyattene.ExplicitPoint3D(t.x, t.y, t.z)
-    uExp = pyattene.ExplicitPoint3D(u.x, u.y, u.z)
-    vExp = pyattene.ExplicitPoint3D(v.x, v.y, v.z)
-
-    aExp = pyattene.ExplicitPoint3D(a.x, a.y, a.z)
-    bExp = pyattene.ExplicitPoint3D(b.x, b.y, b.z)
-    cExp = pyattene.ExplicitPoint3D(c.x, c.y, c.z)
-
-    rExp = pyattene.ExplicitPoint3D(r.x, r.y, r.z)
-    sExp = pyattene.ExplicitPoint3D(s.x, s.y, s.z)
-    qExp = pyattene.ExplicitPoint3D(q.x, q.y, q.z)
-
-    v1Exp = pyattene.ExplicitPoint3D(v1.x, v1.y, v1.z)
-    v2Exp = pyattene.ExplicitPoint3D(v2.x, v2.y, v2.z)
-    v3Exp = pyattene.ExplicitPoint3D(v3.x, v3.y, v3.z)
-
-    # Punto implícito: intersección del plano f con f1 y f2
-    pImp = pyattene.ImplicitPoint3D_TPI(v1Exp, v2Exp, v3Exp,
-                                        tExp, uExp, vExp,
-                                        aExp, bExp, cExp)
-
-    ori = pyattene.orient3d(pImp, rExp, sExp, qExp)
+    # calcula la orientación del punto intersección de f, f1 y f2 respecto a ref
+    pImp = self._adapter.create_implicit_point_tpi(f, f1, f2) # Punto implícito: intersección del plano f con f1 y f2
+    ori = self._adapter.orient3dI(pImp, ref)
 
     if ori == -1:
       ret = OrientResult.IN
