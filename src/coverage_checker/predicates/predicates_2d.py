@@ -30,7 +30,6 @@ class Predicates2d(AbstractPredicates):
                  f1: Halfspace2D, 
                  ref: Halfspace2D) -> OrientResult:
     # queremos calcular la orientación de f1 \cap rs respecto a ref
-    self._adapter()
     pImp = self._adapter.create_implicit_point_ssi(r, s, f1) # Punto implícito: intersección de rs con f1
     ori = self._adapter.orient2d_IEE(pImp, ref)
 

@@ -3,7 +3,7 @@ from geometry.structs_3d import *
 from geometry import Polytope, Geometry3d
 from .predicates import AbstractPredicates
 from fractions import Fraction
-from .. import pyattene
+from bindings import *
 
 class Predicates3d(AbstractPredicates):
   # clase para implementar los predicados en 3d
