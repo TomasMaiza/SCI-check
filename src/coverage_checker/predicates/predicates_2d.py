@@ -4,7 +4,6 @@ from geometry import Polytope, Geometry2d
 from .predicates import AbstractPredicates
 from shewchuk import orientation
 from bindings import AtteneAdapter2D
-#from bindings import pyattene
 
 class Predicates2d(AbstractPredicates):
   # clase para implementar los predicados en 2d
