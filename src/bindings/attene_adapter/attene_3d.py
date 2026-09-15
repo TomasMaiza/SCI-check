@@ -41,7 +41,7 @@ class AtteneAdapter3D(AtteneAdapter):
 
   def orient3dE(self, 
                 p: Point3D,
-                f: Halfspace3D):
+                f: Halfspace3D) -> int:
     # calcula la orientación del punto explícito p respecto al plano f
     pExp = pyattene.ExplicitPoint3D(p.x, p.y, p.z)
     aExp, bExp, cExp = self.create_explicit_points_from_halfspace(f)
@@ -49,7 +49,7 @@ class AtteneAdapter3D(AtteneAdapter):
 
   def orient3dI(self, 
                 pImp,
-                f: Halfspace3D):
+                f: Halfspace3D) -> int:
     # calcula la orientación del punto implícito p respecto al plano f
     aExp, bExp, cExp = self.create_explicit_points_from_halfspace(f)
     return pyattene.orient3d(aExp, bExp, cExp, pImp)
