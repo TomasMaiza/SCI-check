@@ -84,7 +84,7 @@ class Predicates3d(AbstractPredicates):
     v2Exp = pyattene.ExplicitPoint3D(v2.x, v2.y, v2.z)
     v3Exp = pyattene.ExplicitPoint3D(v3.x, v3.y, v3.z)
 
-    # Punto implícito: intersección del triángulo con f1 y f2
+    # Punto implícito: intersección del plano f con f1 y f2
     pImp = pyattene.ImplicitPoint3D_TPI(v1Exp, v2Exp, v3Exp,
                                         tExp, uExp, vExp,
                                         aExp, bExp, cExp)
