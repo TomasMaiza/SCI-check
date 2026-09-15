@@ -2,7 +2,6 @@ from common import OrientResult, IN, ON, OUT
 from geometry.structs_2d import *
 from geometry import Polytope, Geometry2d
 from .predicates import AbstractPredicates
-from shewchuk import orientation
 from bindings import AtteneAdapter2D
 
 class Predicates2d(AbstractPredicates):
@@ -12,8 +11,8 @@ class Predicates2d(AbstractPredicates):
     self._adapter = AtteneAdapter2D()
 
   def orient(self, v: Point2D, f: Halfspace2D) -> OrientResult: # retorna IN, OUT, ON
-    a, b = f.get_points()
-    ori = orientation(a.x, a.y, b.x, b.y, v.x, v.y)
+    # calcula la orientación de v respecto a f
+    ori = self._adapter.orient2d_EEE(v, f)
 
     if ori == 1:
       ret = OrientResult.IN
