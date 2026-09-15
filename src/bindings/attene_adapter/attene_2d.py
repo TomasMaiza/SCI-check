@@ -30,3 +30,9 @@ class AtteneAdapter2D(AtteneAdapter):
     # calcula la orientación de pImp respecto a la recta ref
     aExp, bExp = self.create_explicit_points_from_halfspace(ref) 
     return pyattene.orient2d_IEE(pImp, aExp, bExp)
+
+  def orient2d_EEE(self, p: Point2D, ref: Halfspace2D) -> int:
+    # calcula la orientación del punto explícito p respecto a la recta ref
+    pExp = pyattene.ExplicitPoint2D(p.x, p.y)
+    aExp, bExp = self.create_explicit_points_from_halfspace(ref)
+    return pyattene.orient2d_EEE(pExp, aExp, bExp)
