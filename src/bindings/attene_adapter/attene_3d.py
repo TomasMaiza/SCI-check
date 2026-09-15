@@ -1,6 +1,6 @@
 from geometry.structs_3d import *
 from .attene import AtteneAdapter
-from .. import pyattene
+from bindings import pyattene
 
 class AtteneAdapter3D(AtteneAdapter):
   # clase de adaptador 2d para la librería de implicit predicates
