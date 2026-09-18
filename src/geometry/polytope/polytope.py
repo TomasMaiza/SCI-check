@@ -15,7 +15,9 @@ class Polytope(ABC):
   _b: np.ndarray
   # _supporting_hyperplane: Hyperplane | None
 
-  def __init__(self, 
+  def __init__(self,
+               intDim: int,
+               ambDim: int,
                vertices: Optional['tuple[AbstractPoint, ...]'] = None, 
                A: Optional['np.ndarray'] = None, 
                b: Optional['np.ndarray'] = None):
@@ -37,7 +39,7 @@ class Polytope(ABC):
     pass
 
   @abstractmethod
-  def get_faces(self) -> list['Polytope']:
+  def get_boundaries(self) -> list['Polytope']:
     # devuelve las caras del politopo como objetos Polytope
     pass
 
