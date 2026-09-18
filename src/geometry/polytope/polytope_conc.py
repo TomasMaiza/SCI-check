@@ -5,6 +5,7 @@ from geometry import AbstractPoint, AbstractHalfspace, Hyperplane
 from common import Edge
 from .polytope import Polytope
 import polytope as pc
+from .polytope_conc_2d import ConcretePolytope2D
 
 class ConcretePolytope(Polytope):
   # Implementación de politopos
@@ -45,6 +46,7 @@ class ConcretePolytope(Polytope):
   def _set_h_rep_from_vertices(self):
     # calcula A y b si se inicializó con vértices
     poly = pc.qhull(self._vertices)
+    poly = pc.reduce(poly)
     self._A, self._b = poly.A, poly.b
 
   def get_vertices(self) -> np.ndarray:
@@ -90,12 +92,21 @@ class ConcretePolytope(Polytope):
       if len(in_plane_indices) >= self._intDim:
         face_vertices = self._vertices[in_plane_indices]
 
+        # diccionario del composite para instanciar según dimensión (si es hoja o no)
+        if self._intDim == 3:
+          boundary = ConcretePolytope2D(
+            intDim = 2,
+            ambDim = self._ambDim,
+            vertices = face_vertices
+          )
+
         # Instanciamos la cara reduciendo la dimensión intrínseca
-        boundary = Polytope(
-          intDim=self._intDim - 1,
-          ambDim=self._ambDim,
-          vertices=face_vertices
-        )
+        else:
+          boundary = ConcretePolytope(
+            intDim=self._intDim - 1,
+            ambDim=self._ambDim,
+            vertices=face_vertices
+          )
           
       # (Opcional a futuro): face._supp_hyperplane = Hyperplane(normal, offset)
           
