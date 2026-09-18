@@ -1,10 +1,19 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from typing import Optional
-from geometry import AbstractPoint, AbstractHalfspace
+from geometry import AbstractPoint, AbstractHalfspace, Hyperplane
+from common import Edge
 
 class Polytope(ABC):
   # Clase abstracta para representar politopos
+
+  _intDim: int # dimensión intrínseca del politopo
+  _ambDim: int # dimensión ambiental
+  _boundaries: list['Polytope']
+  _vertices: np.ndarray
+  _A: np.ndarray 
+  _b: np.ndarray
+  # _supporting_hyperplane: Hyperplane | None
 
   def __init__(self, 
                vertices: Optional['tuple[AbstractPoint, ...]'] = None, 
@@ -19,7 +28,7 @@ class Polytope(ABC):
 
   @abstractmethod
   def get_hrep(self) -> tuple[np.ndarray, np.ndarray]:
-    # permite obtener las matrices A y b que definen al politopo
+    # permite obtener las matrices A y b que definen al politopo (Ax <= b)
     pass
 
   @abstractmethod
@@ -33,35 +42,13 @@ class Polytope(ABC):
     pass
 
   @abstractmethod
-  def intersect(self, p: 'Polytope') -> 'Polytope':
-    # permite intersecar el politopo con otro
+  def get_halfspaces(self) -> list[AbstractHalfspace]:
+    # devuelve la lista de los semiespacios que definen al politopo
     pass
 
   @abstractmethod
-  def union(self, p: 'Polytope') -> list['Polytope']:
-    # permite calcular la unión del politopo con otro
-    # retorna una lista por si la región resultante no es convexa
-    pass
-
-  @abstractmethod
-  def difference(self, p: 'Polytope') -> list['Polytope']:
-    # permite calcular la diferencia entre dos politopos
-    pass
-
-  @abstractmethod
-  def is_empty(self) -> bool:
-    # retorna si el politopo es vacío
-    pass
-
-  @abstractmethod
-  def contains(self, x: AbstractPoint):
-    # retorna si un punto pertenece al politopo
-    # usar predicados para hacerlo exacto?
-    pass
-
-  @abstractmethod
-  def subset(self, p: 'Polytope') -> bool:
-    # retorna si el politopo es subconjunto de p
+  def get_supporting_hyperplane(self) -> Hyperplane:
+    # retorna el hiperplano que contiene al politopo si intDim < ambDim
     pass
 
   @abstractmethod
