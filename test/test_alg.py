@@ -4,7 +4,7 @@ import matplotlib.patches as patches
 from scipy.spatial import ConvexHull
 from sci import SCIChecker
 from coverage_checker import *
-from geometry import GeometryFactory, Polytope, PolytopeImp
+from geometry import GeometryFactory, Polytope, ConcretePolytope2D
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
 from common import PolytopeMap, setup_logger
@@ -75,7 +75,7 @@ def run_matlab_validation():
                        [ 0.0,  1.0], 
                        [ 0.0, -1.0]])
     b_poly = np.array([[1.0], [1.0], [1.0], [1.0]]) 
-    base_polytope = PolytopeImp(A = A_poly, b = b_poly)
+    base_polytope = ConcretePolytope2D(2, 2, A = A_poly, b = b_poly)
 
     # --- 2. Definición del Sistema Afín Conmutado ---
     rho = 10.15
