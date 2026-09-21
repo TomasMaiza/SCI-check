@@ -9,6 +9,7 @@ from polytope_subregions import SubregionsStrategy, Subregions
 
 class SCIChecker():
   def __init__(self, 
+               dimension: int,
                geometry: AbstractGeometry, 
                predicates: AbstractPredicates, 
                coverageChecker: CoverageCheckStrategy,
@@ -18,7 +19,7 @@ class SCIChecker():
     self._predicates = predicates
     self._polytope = polytope
     self._sas = sas
-    self._subregionsAlgorithm = Subregions(geometry)
+    self._subregionsAlgorithm = Subregions(geometry, dimension)
     self._coverageChecker = coverageChecker(geometry, predicates)
 
   def _create_simplices(self, simplices: list[np.ndarray]):
