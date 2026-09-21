@@ -4,7 +4,7 @@ from scipy.spatial import ConvexHull
 from .subregionsStrategy import SubregionsStrategy
 from affine_system import *
 from common import PolytopeMap
-from geometry import AbstractHalfspace, AbstractGeometry, Polytope
+from geometry import Halfspace, AbstractGeometry, Polytope
 from .approximations import Euler, Taylor
 from affine_system import SwitchedAffineSystem, AffineMode
 from .matrices import partition_matrices
@@ -16,7 +16,7 @@ class Subregions(SubregionsStrategy):
   
   def get_subregion(self, 
                     subsystem: AffineMode, 
-                    polytope: Polytope) -> list[AbstractHalfspace]:
+                    polytope: Polytope) -> list[Halfspace]:
     # obtiene la subregión para un modo particular
     approx = self._approxMethod(subsystem, polytope, scaling=1, order=4)
     r = 0 # r_0
