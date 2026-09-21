@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from typing import Optional
-from geometry import AbstractPoint, AbstractHalfspace, Hyperplane
+from geometry import AbstractPoint, Halfspace, Hyperplane
 from common import Edge
 from .polytope import Polytope
 import polytope as pc
@@ -17,7 +17,7 @@ class ConcretePolytope2D(Polytope):
   _A: np.ndarray 
   _b: np.ndarray
   _supporting_hyperplane: Hyperplane
-  _halfspaces: list[AbstractHalfspace]
+  _halfspaces: list[Halfspace]
 
   def __init__(self, 
                intDim: int,
@@ -81,7 +81,7 @@ class ConcretePolytope2D(Polytope):
   def get_boundaries(self):
     return
 
-  def get_halfspaces(self) -> list[AbstractHalfspace]:
+  def get_halfspaces(self) -> list[Halfspace]:
     # devuelve la lista de los semiespacios que definen al politopo
     if self._halfspaces is None:
       A, b = self._A, self._b
@@ -89,7 +89,7 @@ class ConcretePolytope2D(Polytope):
       for i in range(len(b)):
         A_face = A[i]
         b_face = b[i]
-        hs = AbstractHalfspace(A_face, b_face)
+        hs = Halfspace(normalVector=A_face, b=b_face)
         self._halfspaces.append(hs)
     return self._halfspaces
 

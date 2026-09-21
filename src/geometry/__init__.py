@@ -8,7 +8,7 @@ GeometryFactory = {2: Geometry2d, 3: Geometry3d} # agregar acá las distintas di
 
 __all__ = ["AbstractGeometry", 
            "GeometryFactory", 
-           "AbstractHalfspace", 
+           "Halfspace", 
            "AbstractPoint", 
            "AbstractSimplex",
            "Hyperplane",
