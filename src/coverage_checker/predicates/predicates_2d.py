@@ -53,7 +53,8 @@ class Predicates2d(AbstractPredicates):
                                  f2: Halfspace) -> bool: 
     # determina si un punto (intersección de dos semiespacios) pertenece a un politopo
     #edges = polytope.get_edges()
-    r, s = f1.get_points()
+    points = f1.get_points()
+    r, s = Point2D(points[0]), Point2D(points[1])
     hs = polytope.get_halfspaces()
     ret = True
     for f in hs:
