@@ -54,8 +54,7 @@ class Predicates2d(AbstractPredicates):
     # determina si un punto (intersección de dos semiespacios) pertenece a un politopo
     #edges = polytope.get_edges()
     r, s = f1.get_points()
-    geom = Geometry2d()
-    hs = geom.create_halfspaces_list(polytope)
+    hs = polytope.get_halfspaces()
     ret = True
     for f in hs:
       # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
