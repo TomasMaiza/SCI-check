@@ -17,9 +17,10 @@ class Halfspace():
                points: Optional['list[Point]'] = None, 
                normalVector: Optional[np.ndarray] = None, 
                b: Optional[float] = None):
-    if normalVector is None and b is None and points is not None:
+    self._points = None
+    if points is not None:
       self._points = points
-    elif points is None and normalVector is not None and b is not None:
+    elif normalVector is not None and b is not None:
       self.create_from_normal_vector(normalVector, b)
     else:
       raise ValueError("Inicialización inválida: Proveer puntos o (normalVector, b).")
