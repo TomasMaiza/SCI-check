@@ -5,7 +5,7 @@ type PolytopeMap = list[list[Halfspace]]
 
 type SerializedPolytopeMap = list[list[list[float]]] # lista de subespacios para matlab
 
-type Point = tuple[float] # un punto es una tupla de flotantes
+type Point = tuple[float, ...] # un punto es una tupla de flotantes
 
 type Edge = tuple[Point, Point] # una arista es una tupla de puntos
 

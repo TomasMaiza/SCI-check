@@ -9,6 +9,7 @@ ON = OrientResult.ON
 __all__ = ["OrientResult", 
            "PolytopeMap", 
            "SerializedPolytopeMap",
+           "Point",
            "Edge", 
            "VerticesIndex", 
            "EdgesIndex", 
