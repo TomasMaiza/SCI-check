@@ -40,12 +40,13 @@ class ConcretePolytope(Polytope):
   def _set_vertices_from_hrep(self):
     # calcula los vértices si se inicializó con h-rep
     poly = pc.Polytope(self._A, self._b)
+    poly = pc.reduce(poly)
+    self._A, self._b = poly.A, poly.b 
     self._vertices = pc.extreme(poly)
 
   def _set_h_rep_from_vertices(self):
     # calcula A y b si se inicializó con vértices
     poly = pc.qhull(self._vertices)
-    poly = pc.reduce(poly)
     self._A, self._b = poly.A, poly.b
 
   def get_vertices(self) -> np.ndarray:
