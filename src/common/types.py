@@ -1,4 +1,4 @@
-from geometry.abstract_structs import AbstractPoint, Halfspace
+from geometry.abstract_structs import Halfspace
 
 type PolytopeMap = list[list[Halfspace]]
 # diccionario que relaciona cada subregion con un conjunto de los semiespacios que la definen
@@ -9,7 +9,7 @@ type Point = tuple[float, ...] # un punto es una tupla de flotantes
 
 type Edge = tuple[Point, Point] # una arista es una tupla de puntos
 
-type VerticesIndex = dict[AbstractPoint, bool]
+type VerticesIndex = dict[Point, bool]
 # tabla que indexa los vértices para no repetir chequeos en la condición C1. El valor indica si
 # ya fue verificado.
 
