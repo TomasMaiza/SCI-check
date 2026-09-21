@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from typing import Optional
-from geometry import AbstractPoint, AbstractHalfspace, Hyperplane
+from geometry import AbstractPoint, Halfspace, Hyperplane
 from common import Edge
 
 class Polytope(ABC):
@@ -44,7 +44,7 @@ class Polytope(ABC):
     pass
 
   @abstractmethod
-  def get_halfspaces(self) -> list[AbstractHalfspace]:
+  def get_halfspaces(self) -> list[Halfspace]:
     # devuelve la lista de los semiespacios que definen al politopo
     pass
 

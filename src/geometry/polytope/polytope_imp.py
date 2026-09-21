@@ -4,7 +4,7 @@ from typing import Optional
 from .polytope import Polytope
 import polytope as pc
 from scipy.spatial import ConvexHull
-from geometry import AbstractPoint, AbstractHalfspace
+from geometry import AbstractPoint, Halfspace
 import itertools
 
 class PolytopeImp(Polytope):

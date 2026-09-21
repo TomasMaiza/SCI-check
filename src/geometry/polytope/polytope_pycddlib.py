@@ -3,7 +3,7 @@ import numpy as np
 from typing import Optional
 from .polytope import Polytope
 from scipy.spatial import ConvexHull
-from geometry import AbstractPoint, AbstractHalfspace
+from geometry import AbstractPoint, Halfspace
 import cdd
 import cdd.gmp
 from fractions import Fraction
