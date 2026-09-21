@@ -14,7 +14,7 @@ class AtteneAdapter(ABC):
     pass
 
   @abstractmethod
-  def create_explicit_points_from_halfspace(self, hs: AbstractHalfspace): 
+  def create_explicit_points_from_halfspace(self, hs: Halfspace): 
     # retorna los puntos explícitos que definen un semiespacio
     pass
   
