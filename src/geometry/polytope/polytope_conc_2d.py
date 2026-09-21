@@ -86,25 +86,43 @@ class ConcretePolytope2D(Polytope):
   def get_halfspaces(self) -> list[Halfspace]:
     if self._halfspaces is None:
       self._halfspaces = []
-      TOL = 1e-8 # Tolerancia para absorber los errores de punto flotante de Qhull
+      TOL = 1e-8 
       
       for i in range(len(self._b)):
         normal = self._A[i]
         offset = self._b[i]
         
-        # 1. Buscamos qué vértices pertenecen a esta inecuación (Ax - b = 0)
+        # 1. Buscamos qué vértices pertenecen a esta inecuación
         distances = np.dot(self._vertices, normal) - offset
         in_plane_indices = np.where(np.isclose(distances, 0.0, atol=TOL))[0]
         
-        # 2. Extraemos los vértices (asumiendo que _vertices es tu ndarray o lista)
-        face_points = [
+        # 2. Extraemos los vértices en tuplas puras
+        extracted_points = [
             (float(self._vertices[idx][0]), float(self._vertices[idx][1])) 
             for idx in in_plane_indices
         ]
         
-        # 3. Instanciamos el semiespacio inyectando AMBOS datos
+        # 3. Orientación geométrica y limpieza de colineales
+        if len(extracted_points) >= 2:
+            r = extracted_points[0]
+            s = extracted_points[-1] # Garantiza agarrar los dos extremos
+            
+            dx = s[0] - r[0]
+            dy = s[1] - r[1]
+            nx, ny = normal[0], normal[1]
+            
+            # Producto cruzado 2D: verifica si el interior quedó a la derecha
+            if nx * dy - ny * dx < 0:
+                face_points = [s, r] # Invertimos para corregir la línea dirigida
+            else:
+                face_points = [r, s]
+        else:
+            face_points = extracted_points
+        
+        # 4. Instanciamos inyectando TODOS los datos
         hs = Halfspace(points=face_points, normalVector=normal, b=offset)
         self._halfspaces.append(hs) 
+        
     return self._halfspaces
 
   def get_supporting_hyperplane(self) -> Hyperplane:
