@@ -6,6 +6,7 @@ from .polytope import Polytope
 import polytope as pc
 from scipy.spatial import ConvexHull
 import itertools
+from common import Point
 
 class ConcretePolytope2D(Polytope):
   # Implementación de politopos 2D (hoja del Composite)
@@ -83,15 +84,27 @@ class ConcretePolytope2D(Polytope):
     return
 
   def get_halfspaces(self) -> list[Halfspace]:
-    # devuelve la lista de los semiespacios que definen al politopo
     if self._halfspaces is None:
-      A, b = self._A, self._b
       self._halfspaces = []
-      for i in range(len(b)):
-        A_face = A[i]
-        b_face = b[i]
-        hs = Halfspace(normalVector=A_face, b=b_face)
-        self._halfspaces.append(hs)
+      TOL = 1e-8 # Tolerancia para absorber los errores de punto flotante de Qhull
+      
+      for i in range(len(self._b)):
+        normal = self._A[i]
+        offset = self._b[i]
+        
+        # 1. Buscamos qué vértices pertenecen a esta inecuación (Ax - b = 0)
+        distances = np.dot(self._vertices, normal) - offset
+        in_plane_indices = np.where(np.isclose(distances, 0.0, atol=TOL))[0]
+        
+        # 2. Extraemos los vértices (asumiendo que _vertices es tu ndarray o lista)
+        face_points = [
+            (float(self._vertices[idx][0]), float(self._vertices[idx][1])) 
+            for idx in in_plane_indices
+        ]
+        
+        # 3. Instanciamos el semiespacio inyectando AMBOS datos
+        hs = Halfspace(points=face_points, normalVector=normal, b=offset)
+        self._halfspaces.append(hs) 
     return self._halfspaces
 
   def get_supporting_hyperplane(self) -> Hyperplane:
