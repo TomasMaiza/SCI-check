@@ -137,7 +137,7 @@ class _CoverageCheckerIntern:
     ret = IN
     for (f1, i), (f2, j) in itertools.combinations(faces, 2):
       if self.plane_plane_poly_out(polytope, f1, f2, polytopeSet, i, j) == OUT:
-        log.info(f"PUNTO OUT. Caras {i} y {j}")
+        # log.info(f"PUNTO OUT. Caras {i} y {j}")
         ret = OUT
         break 
     return ret
