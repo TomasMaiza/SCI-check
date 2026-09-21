@@ -16,32 +16,11 @@ class CoverageChecker3D(CoverageChecker):
     self._geometry = geometry
     self._predicates = Predicates3d()
 
-  '''
-  def implicit_point_in_tet_TPI(self, # revisar estas cosas. Probabemente la del tetraedro se va?
-                                        polytope: Polytope, 
-                                        f1: AbstractHalfspace, 
-                                        f2: AbstractHalfspace, 
-                                        f3: AbstractHalfspace):
-    ret = True
-    faces = polytope.get_faces()
-    for p in faces:
-      vertices = p.get_vertices()
-      a = Point3D(x=float(vertices[0][0]), y=float(vertices[0][1]), z=float(vertices[0][2]))
-      b = Point3D(x=float(vertices[1][0]), y=float(vertices[1][1]), z=float(vertices[1][2]))
-      c = Point3D(x=float(vertices[2][0]), y=float(vertices[2][1]), z=float(vertices[2][2]))
-      f = Halfspace3D(points = (a, b, c)) # VER ORIENT TPI PARA POLITOPOS
-      ori = self._predicates.orient_TPI(f1, f2, f3, f)
-      if ori == OUT:
-        ret = False
-        break
-    return ret
-  '''
-
   def implicit_point_in_polytope_TPI(self, # la muevo a predicates3d?
-                                     f1: AbstractHalfspace,
-                                     f2: AbstractHalfspace, 
-                                     f3: AbstractHalfspace, 
-                                     p: list[AbstractHalfspace]) -> bool:
+                                     f1: Halfspace,
+                                     f2: Halfspace, 
+                                     f3: Halfspace, 
+                                     p: list[Halfspace]) -> bool:
     ret = True
     if len(p) == 0:
       ret = False
@@ -54,9 +33,9 @@ class CoverageChecker3D(CoverageChecker):
 
   def plane_plane_plane_poly_out(self,
                                 polytope: Polytope, 
-                                f1: AbstractHalfspace, 
-                                f2: AbstractHalfspace, 
-                                f3: AbstractHalfspace, 
+                                f1: Halfspace, 
+                                f2: Halfspace, 
+                                f3: Halfspace, 
                                 polytopeMap: PolytopeMap, 
                                 currentpIndex1: int,
                                 currentpIndex2: int, 

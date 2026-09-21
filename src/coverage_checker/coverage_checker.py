@@ -35,16 +35,16 @@ class _CoverageCheckerIntern:
   def points_on_same_side(self, 
                           v1: AbstractPoint, 
                           v2: AbstractPoint, 
-                          f: AbstractHalfspace) -> bool:
+                          f: Halfspace) -> bool:
     ori1 = self._predicates.orient(v1, f)
     ori2 = self._predicates.orient(v2, f)
     return ori1 == ori2 or ori1 == ON or ori2 == ON
 
   def implicit_point_in_polytope_TPI(self, 
                                  polytope: Polytope,
-                                 f1: AbstractHalfspace,
-                                 f2: AbstractHalfspace, 
-                                 p: list[AbstractHalfspace]) -> bool:
+                                 f1: Halfspace,
+                                 f2: Halfspace, 
+                                 p: list[Halfspace]) -> bool:
     ret = True
     if len(p) == 0:
       ret = False
@@ -58,8 +58,8 @@ class _CoverageCheckerIntern:
   def implicit_point_in_polytope_LPI(self, 
                                      v1: AbstractPoint, 
                                      v2: AbstractPoint, 
-                                     f: AbstractHalfspace, 
-                                     p: list[AbstractHalfspace]) -> bool:
+                                     f: Halfspace, 
+                                     p: list[Halfspace]) -> bool:
     ret = True
     if len(p) == 0:
       ret = False
@@ -73,7 +73,7 @@ class _CoverageCheckerIntern:
   def edge_plane_out(self, 
                     v1: AbstractPoint, 
                     v2: AbstractPoint, 
-                    f: AbstractHalfspace, 
+                    f: Halfspace, 
                     polytopeMap: PolytopeMap, 
                     currentpIndex: int) -> OrientResult:
     # primero verificamos la posición de los puntos respecto a f
@@ -89,8 +89,8 @@ class _CoverageCheckerIntern:
 
   def plane_plane_poly_out(self, 
                         polytope: Polytope, 
-                        f1: AbstractHalfspace, 
-                        f2: AbstractHalfspace, 
+                        f1: Halfspace, 
+                        f2: Halfspace, 
                         polytopeMap: PolytopeMap, 
                         currentpIndex1: int, 
                         currentpIndex2: int) -> OrientResult:
