@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import numpy as np
 from typing import Optional
 from geometry import AbstractPoint, Halfspace, Hyperplane
-from common import Edge
 from .polytope import Polytope
 import polytope as pc
 from .polytope_conc_2d import ConcretePolytope2D
