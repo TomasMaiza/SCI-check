@@ -17,12 +17,10 @@ class Halfspace():
                points: Optional['list[Point]'] = None, 
                normalVector: Optional[np.ndarray] = None, 
                b: Optional[float] = None):
-    self._points = None
-    if points is not None:
-      self._points = points
-    elif normalVector is not None and b is not None:
-      self.create_from_normal_vector(normalVector, b)
-    else:
+    self._points = points
+    self._normal = normalVector
+    self._b = b
+    if points is None and normalVector is None and b is None:
       raise ValueError("Inicialización inválida: Proveer puntos o (normalVector, b).")
 
   def get_points(self) -> list['Point']: # retorna los puntos que definen el semiespacio
@@ -30,8 +28,7 @@ class Halfspace():
 
   def create_from_normal_vector(self, normalVector: np.ndarray, b: float): 
     # permite crear el semiespacio a partir del vector normal
-    self._normal = normalVector
-    self._b = b
+    pass
 
   def get_normal(self) -> np.ndarray: # permite obtener el vector normal del semiespacio
     if self._normal is not None:
