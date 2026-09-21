@@ -8,14 +8,17 @@ from geometry import GeometryFactory, Polytope, ConcretePolytope2D
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
 from common import PolytopeMap, setup_logger
+import polytope as pc
 
 
 def plot_filled_scenario(title: str, original_poly: Polytope, checker: 'SCIChecker', coverage_result: bool, subregions_map: PolytopeMap):
     """Grafica el politopo y las subregiones con relleno traslúcido."""
     fig, ax = plt.subplots(figsize=(10, 8))
+
+    poly = pc.qhull(vertices = original_poly.get_vertices())
     
     # 1. Dibujamos la caja original S como referencia (fondo gris)
-    original_poly.polytope.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
+    poly.polytope.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
     
     # Colores base para imitar la paleta de MATLAB
     colors = ['#1f77b4', '#ff7f0e', '#d62728', '#9467bd', '#2ca02c'] 
