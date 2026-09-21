@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import numpy as np
 from typing import Optional
 from geometry import AbstractPoint, Halfspace, Hyperplane
-from common import Edge
 
 class Polytope(ABC):
   # Clase abstracta para representar politopos
