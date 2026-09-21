@@ -30,8 +30,9 @@ def plot_filled_scenario(title: str, original_poly: Polytope, checker: 'SCICheck
             
         points = []
         for hs in halfspaces_list:
-            points.append([hs.p1.x, hs.p1.y])
-            points.append([hs.p2.x, hs.p2.y])
+            p = hs.get_points()
+            points.append(list(p[0]))
+            points.append(list(p[1]))
             
         points_array = np.array(points)
         
