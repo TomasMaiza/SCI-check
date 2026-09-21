@@ -1,5 +1,5 @@
 import numpy as np
-from .geometry import AbstractGeometry
+from .geometry import AbstractGeometry, Halfspace
 from .structs_2d import *
 from scipy.spatial import ConvexHull
 from typing import TYPE_CHECKING
@@ -16,11 +16,11 @@ class Geometry2d(AbstractGeometry):
   def create_simplex(self, vertices: tuple[Point2D, ...]) -> Triangle2D:
     return Triangle2D(v1 = vertices[0], v2 = vertices[1], v3 = vertices[2])
 
-  def create_halfspace(self, points: tuple[Point2D, Point2D]) -> Halfspace2D: 
+  def create_halfspace(self, points: tuple[Point2D, Point2D]) -> Halfspace: 
     # crea un semiespacio
     return Halfspace2D(points = points)
 
-  def create_halfspace_from_vector(self, normalVector: np.ndarray, b: float) -> Halfspace2D: # crea un semiespacio
+  def create_halfspace_from_vector(self, normalVector: np.ndarray, b: float) -> Halfspace: # crea un semiespacio
     return Halfspace2D(normalVector = normalVector, b = b)
 
   def get_dimension(self) -> int: # retorna la dimensión
@@ -35,16 +35,17 @@ class Geometry2d(AbstractGeometry):
     sortedVertices = vertices[hull.vertices]
     return sortedVertices.tolist()
 
-  def create_halfspaces_list(self, subregionPolytope: 'Polytope') -> list[Halfspace2D]:
+  def create_halfspaces_list(self, subregionPolytope: 'Polytope') -> list[Halfspace]:
     sortedVertices = self._get_polytope_vertices_CCW(subregionPolytope)    
     numVertices = len(sortedVertices)
     halfspaces = []
     for i in range(numVertices): # iteramos para armar los bordes del politopo (v1, v2)
       v1 = sortedVertices[i]
       v2 = sortedVertices[(i + 1) % numVertices]
-      p1 = self.create_point(tuple(v1))
-      p2 = self.create_point(tuple(v2))
-      hs = self.create_halfspace((p1, p2))
+      p1 = tuple(v1)
+      p2 = tuple(v2)
+      #hs = self.create_halfspace((p1, p2))
+      hs = Halfspace(points = [p1, p2])
       halfspaces.append(hs)
     return halfspaces
 

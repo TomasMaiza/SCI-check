@@ -2,16 +2,17 @@ import numpy as np
 from typing import Optional
 from geometry.abstract_structs.point import AbstractPoint
 from fractions import Fraction
+from common import Point
 
 class Halfspace():
   # representación de un semiespacio en un espacio n-dimensional
 
-  _points: list[tuple[float, float]]
+  _points: list[Point]
   _normal: np.ndarray
   _b: float
 
   def __init__(self, 
-               points: Optional['list[tuple[float, float]]'] = None, 
+               points: Optional['list[Point]'] = None, 
                normalVector: Optional[np.ndarray] = None, 
                b: Optional[float] = None):
     if normalVector is None and b is None and points is not None:
@@ -21,7 +22,7 @@ class Halfspace():
     else:
       raise ValueError("Inicialización inválida: Proveer puntos o (normalVector, b).")
 
-  def get_points(self) -> list[tuple[float, float]]: # retorna los puntos que definen el semiespacio
+  def get_points(self) -> list[Point]: # retorna los puntos que definen el semiespacio
     return self._points
 
   def create_from_normal_vector(self, normalVector: np.ndarray, b: float): 
