@@ -18,7 +18,7 @@ def plot_filled_scenario(title: str, original_poly: Polytope, checker: 'SCICheck
     poly = pc.qhull(vertices = original_poly.get_vertices())
     
     # 1. Dibujamos la caja original S como referencia (fondo gris)
-    poly.polytope.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
+    poly.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
     
     # Colores base para imitar la paleta de MATLAB
     colors = ['#1f77b4', '#ff7f0e', '#d62728', '#9467bd', '#2ca02c'] 
