@@ -46,7 +46,8 @@ class Predicates2d(AbstractPredicates):
                  f1: Halfspace, 
                  f2: Halfspace, 
                  ref: Halfspace) -> OrientResult: # retorna IN, OUT, ON
-    r, s = f1.get_points()
+    points = f1.get_points()
+    r, s = Point2D(points[0][0], points[0][1]), Point2D(points[1][0], points[1][1])
     return self.orient_LPI(r, s, f2, ref)
 
   def implicit_point_in_polytope(self, 
