@@ -103,7 +103,7 @@ def run_matlab_validation():
     # Experimento 1: K = 3 (Debería dejar huecos)
     # =================================================================
     print("Ejecutando Experimento K=3 (h ≈ 0.067)...")
-    checker_k3 = SCIChecker(geometry=geometry_2d, 
+    checker_k3 = SCIChecker(dimension=2, geometry=geometry_2d, 
                                     predicates=predicates_2d, 
                                     coverageChecker=CoverageChecker,
                                     polytope=base_polytope, 
@@ -116,7 +116,7 @@ def run_matlab_validation():
     # Experimento 2: K = 12 (NO debería cubrir)
     # =================================================================
     print("\nEjecutando Experimento K=12 (h ≈ 0.017)...")
-    checker_k12 = SCIChecker(geometry=geometry_2d, 
+    checker_k12 = SCIChecker(dimension=2, geometry=geometry_2d, 
                                         predicates=predicates_2d, 
                                         coverageChecker=CoverageChecker,
                                         polytope=base_polytope, 
@@ -129,7 +129,7 @@ def run_matlab_validation():
     # Experimento 3: K = 350 (Debería cubrir?)
     # =================================================================
     print("\nEjecutando Experimento K=11 (h ≈ )...")
-    checker_k350 = SCIChecker(geometry=geometry_2d, 
+    checker_k350 = SCIChecker(dimension=2, geometry=geometry_2d, 
                                         predicates=predicates_2d, 
                                         coverageChecker=CoverageChecker,
                                         polytope=base_polytope, 
