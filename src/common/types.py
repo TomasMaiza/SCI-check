@@ -5,7 +5,9 @@ type PolytopeMap = list[list[Halfspace]]
 
 type SerializedPolytopeMap = list[list[list[float]]] # lista de subespacios para matlab
 
-type Edge = tuple[AbstractPoint, AbstractPoint] # una arista es una tupla de puntos
+type Point = tuple[float] # un punto es una tupla de flotantes
+
+type Edge = tuple[Point, Point] # una arista es una tupla de puntos
 
 type VerticesIndex = dict[AbstractPoint, bool]
 # tabla que indexa los vértices para no repetir chequeos en la condición C1. El valor indica si
