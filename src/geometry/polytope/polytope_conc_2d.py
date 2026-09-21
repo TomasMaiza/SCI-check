@@ -26,6 +26,7 @@ class ConcretePolytope2D(Polytope):
                b: Optional['np.ndarray'] = None):
     self._intDim = 2
     self._ambDim = ambDim
+    self._halfspaces = None
     if A is not None and b is not None and vertices is None:
       self._A = A
       self._b = b
