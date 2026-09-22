@@ -1,10 +1,13 @@
 from abc import ABC, abstractmethod
 import numpy as np
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from geometry import AbstractPoint, Halfspace, Hyperplane
 from .polytope import Polytope
 import polytope as pc
 from .polytope_conc_2d import ConcretePolytope2D
+
+if TYPE_CHECKING:
+  from src.common.types import Point
 
 class ConcretePolytope(Polytope):
   # Implementación de politopos
@@ -21,28 +24,36 @@ class ConcretePolytope(Polytope):
   def __init__(self, 
                intDim: int,
                ambDim: int,
-               vertices: Optional['tuple[AbstractPoint, ...]'] = None, 
+               vertices: Optional['list[Point]'] = None,
+               verticesnp: Optional['np.ndarray'] = None,
                A: Optional['np.ndarray'] = None, 
                b: Optional['np.ndarray'] = None):
+
+    if (A is None or b is None) and vertices is None and verticesnp is None:
+      raise ValueError("Inicialización inválida: Proveer vértices o (A, b)")
+
     self._intDim = intDim
     self._ambDim = ambDim
     self._halfspaces = None
-    if A is not None and b is not None and vertices is None:
-      self._A = A
-      self._b = b
-      self._set_vertices_from_hrep()
-    elif A is None and b is None and vertices is not None and len(vertices) > 2:
-      pointsArray = np.array([list(v.get_point()) for v in vertices])
-      self._vertices = pointsArray  
-      self._set_h_rep_from_vertices()
+    self._A = A
+    self._b = b
+
+    if verticesnp is not None:
+      self._vertices = verticesnp
+    elif vertices is not None:
+      self._vertices = np.array(vertices) 
     else:
-      raise ValueError("Inicialización inválida: Proveer vértices o (A, b)")
+      self._vertices = None
+
+    if self._vertices is None:
+      self._set_vertices_from_hrep()
+    elif self._A is None or self._b is None:
+      self._set_h_rep_from_vertices()
+    self.reduce()
 
   def _set_vertices_from_hrep(self):
     # calcula los vértices si se inicializó con h-rep
     poly = pc.Polytope(self._A, self._b)
-    poly = pc.reduce(poly)
-    self._A, self._b = poly.A, poly.b 
     self._vertices = pc.extreme(poly)
 
   def _set_h_rep_from_vertices(self):
@@ -106,7 +117,7 @@ class ConcretePolytope(Polytope):
           boundary = ConcretePolytope(
             intDim=self._intDim - 1,
             ambDim=self._ambDim,
-            vertices=face_vertices
+            verticesnp=face_vertices
           )
           
       # (Opcional a futuro): face._supp_hyperplane = Hyperplane(normal, offset)
@@ -151,4 +162,6 @@ class ConcretePolytope(Polytope):
 
   def reduce(self):
     # elimina las inecuaciones redundantes
-    pass
+    poly = pc.Polytope(self._A, self._b)
+    poly = pc.reduce(poly)
+    self._A, self._b = poly.A, poly.b
