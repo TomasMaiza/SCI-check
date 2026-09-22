@@ -127,7 +127,7 @@ class Predicates3d(AbstractPredicates):
 
     centroid = polytope.get_centroid() # es un punto interno del politopo para tomar de referencia
     normal = f.get_normal() 
-    edges = polytope.get_edges()
+    edges = polytope.get_edges() # en nd, esto cambia a get_boundaries()
     for e in edges:
       ref_points = [tuple(float(c) for c in v) for v in e]
       v_base = np.array(e[0])
