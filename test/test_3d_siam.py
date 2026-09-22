@@ -17,14 +17,14 @@ def set_sci(polytope: PolytopeImp, sas: SwitchedAffineSystem):
 
 def politopo():
   geom = GeometryFactory[3]()
-  v = (geom.create_point(coord = (0.05, -0.5, 0.02)), 
-       geom.create_point(coord = (0.05, -0.5, -0.02)),
-       geom.create_point(coord = (0.05, 0.5, 0.02)),
-       geom.create_point(coord = (0.05, 0.5, -0.02)),
-       geom.create_point(coord = (-0.05, 0.5, -0.02)),
-       geom.create_point(coord = (-0.05, 0.5, 0.02)),
-       geom.create_point(coord = (-0.05, -0.5, -0.02)),
-       geom.create_point(coord = (-0.05, -0.5, 0.02)))
+  v = ((0.05, -0.5, 0.02), 
+       (0.05, -0.5, -0.02),
+       (0.05, 0.5, 0.02),
+       (0.05, 0.5, -0.02),
+       (-0.05, 0.5, -0.02),
+       (-0.05, 0.5, 0.02),
+       (-0.05, -0.5, -0.02),
+       (-0.05, -0.5, 0.02))
   polytope = ConcretePolytope(intDim=3, ambDim=3, vertices=v)
   return polytope
 
