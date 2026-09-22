@@ -26,6 +26,7 @@ class ConcretePolytope(Polytope):
                b: Optional['np.ndarray'] = None):
     self._intDim = intDim
     self._ambDim = ambDim
+    self._halfspaces = None
     if A is not None and b is not None and vertices is None:
       self._A = A
       self._b = b
@@ -115,15 +116,28 @@ class ConcretePolytope(Polytope):
     return self._boundaries
 
   def get_halfspaces(self) -> list[Halfspace]:
-    # devuelve la lista de los semiespacios que definen al politopo
     if self._halfspaces is None:
-      A, b = self._A, self._b
       self._halfspaces = []
-      for i in range(len(b)):
-        A_face = A[i]
-        b_face = b[i]
-        hs = Halfspace(normalVector=A_face, b=b_face)
+      TOL = 1e-8 
+      
+      for i in range(len(self._b)):
+        normal = self._A[i]
+        offset = self._b[i]
+        
+        # 1. Buscamos qué vértices pertenecen a este hiperplano N-dimensional
+        distances = np.dot(self._vertices, normal) - offset
+        in_plane_indices = np.where(np.isclose(distances, 0.0, atol=TOL))[0]
+        
+        # 2. Extracción genérica para N dimensiones (tupla de N floats)
+        face_points = [
+            tuple(float(coord) for coord in self._vertices[idx])
+            for idx in in_plane_indices
+        ]
+        
+        # 3. Instanciamos el semiespacio inyectando matrices Y puntos
+        hs = Halfspace(points=face_points, normalVector=normal, b=offset)
         self._halfspaces.append(hs)
+        
     return self._halfspaces
 
   def get_supporting_hyperplane(self) -> Hyperplane:
