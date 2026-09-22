@@ -22,12 +22,31 @@ class ConcretePolytope2D(Polytope):
   def __init__(self, 
                intDim: int,
                ambDim: int,
-               vertices: Optional['tuple[AbstractPoint, ...]'] = None, 
+               vertices: Optional['tuple[AbstractPoint, ...]'] = None,
+               verticesnp: Optional['np.ndarray'] = None,
                A: Optional['np.ndarray'] = None, 
                b: Optional['np.ndarray'] = None):
     self._intDim = 2
     self._ambDim = ambDim
     self._halfspaces = None
+    self._vertices = None
+    self._A = None
+    if A is not None and b is not None:
+      self._A = A
+      self._b = b
+    if vertices is not None:
+      pointsArray = np.array([list(v.get_point()) for v in vertices])
+      self._vertices = pointsArray
+    if verticesnp is not None:
+      self._vertices = verticesnp
+    if self._vertices is None:
+      self._set_vertices_from_hrep()
+    elif self._A is None:
+      self._set_h_rep_from_vertices()
+    if (A is None or b is None) and vertices is None and verticesnp is None:
+      raise ValueError("Inicialización inválida: Proveer vértices o (A, b)")
+
+    '''
     if A is not None and b is not None and vertices is None:
       self._A = A
       self._b = b
@@ -38,6 +57,7 @@ class ConcretePolytope2D(Polytope):
       self._set_h_rep_from_vertices()
     else:
       raise ValueError("Inicialización inválida: Proveer vértices o (A, b)")
+    '''
 
   def _set_vertices_from_hrep(self):
     # calcula los vértices si se inicializó con h-rep

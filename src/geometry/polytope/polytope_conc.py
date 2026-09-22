@@ -98,7 +98,7 @@ class ConcretePolytope(Polytope):
           boundary = ConcretePolytope2D(
             intDim = 2,
             ambDim = self._ambDim,
-            vertices = face_vertices
+            verticesnp = face_vertices
           )
 
         # Instanciamos la cara reduciendo la dimensión intrínseca
