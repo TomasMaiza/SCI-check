@@ -16,10 +16,10 @@ def set_sci(polytope: PolytopeImp, sas: SwitchedAffineSystem):
 
 def politopo():
   geom = GeometryFactory[2]()
-  v = (geom.create_point(coord = (np.sqrt(2), 0)), 
-       geom.create_point(coord = (-np.sqrt(2), 0)),
-       geom.create_point(coord = (0, np.sqrt(2))),
-       geom.create_point(coord = (0, -np.sqrt(2))))
+  v = ((np.sqrt(2), 0), 
+       (-np.sqrt(2), 0),
+       (0, np.sqrt(2)),
+       (0, -np.sqrt(2)))
   polytope = ConcretePolytope2D(intDim = 2, ambDim = 2, vertices = v)
   return polytope
 
