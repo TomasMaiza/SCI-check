@@ -43,11 +43,11 @@ class CoverageChecker3D(CoverageChecker):
     # punto implícito: intersección de 3 planos
     if not self._predicates.implicit_point_in_polytope_3d(polytope, f1, f2, f3):
       return IN
-    faces = polytope.get_faces()
+    # faces = polytope.get_boundaries()
     ret = OUT
-    for i, p in enumerate(faces):
+    for i, p in enumerate(polytopeMap):
       #if i not in {currentpIndex1, currentpIndex2, currentpIndex3} and self.implicit_point_in_polytope_TPI(f1, f2, f3, p):
-      if i not in {currentpIndex1, currentpIndex2, currentpIndex3} and self.implicit_point_in_polytope_3d(f1, f2, f3, p):
+      if i not in {currentpIndex1, currentpIndex2, currentpIndex3} and self.implicit_point_in_polytope_TPI(f1, f2, f3, p):
         ret = IN
         break
 
@@ -66,7 +66,7 @@ class CoverageChecker3D(CoverageChecker):
   def envelope_check_faces(self, 
                            polytope: Polytope, 
                            polytopeSet: PolytopeMap) -> bool:
-    faces = polytope.get_faces()
+    faces = polytope.get_boundaries()
     ret = True
     for f in faces:
       coverage = self._checker.envelope_check(f, polytopeSet)
