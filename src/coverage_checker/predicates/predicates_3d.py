@@ -1,6 +1,6 @@
-from common import OrientResult, IN, ON, OUT
+from common import OrientResult, IN, ON, OUT, Point
 from geometry.structs_3d import *
-from geometry import Polytope, Geometry3d
+from geometry import Polytope, Geometry3d, Halfspace
 from .predicates import AbstractPredicates
 from fractions import Fraction
 from bindings import AtteneAdapter3D
@@ -11,8 +11,8 @@ class Predicates3d(AbstractPredicates):
   def __init__(self):
     self._adapter = AtteneAdapter3D()
 
-  def orient(self, v: Point3D, f: Halfspace3D) -> OrientResult: # retorna IN, OUT, ON
-    ori = self._adapter.orient3dE(v, f)
+  def orient(self, v: Point3D, f: Halfspace) -> OrientResult: # retorna IN, OUT, ON
+    ori = self._adapter.orient3dE(v.get_point(), f)
 
     if ori == -1: # REVISAR ORIENTACIÓN DEL HALFSPACE 3D
       ret = OrientResult.IN
@@ -25,10 +25,10 @@ class Predicates3d(AbstractPredicates):
   def orient_LPI(self, 
                  r: Point3D, 
                  s: Point3D, 
-                 f1: Halfspace3D, 
-                 ref: Halfspace3D) -> OrientResult: # retorna IN, OUT, ON
+                 f1: Halfspace, 
+                 ref: Halfspace) -> OrientResult: # retorna IN, OUT, ON
     # queremos calcular la orientación de f1 \cap rs respecto a ref
-    pImp = self._adapter.create_implicit_point_lpi(r, s, f1) # Punto implícito: intersección de rs con f1
+    pImp = self._adapter.create_implicit_point_lpi(r.get_point(), s.get_point(), f1) # Punto implícito: intersección de rs con f1
     ori = self._adapter.orient3dI(pImp, ref)
 
     if ori == -1:
@@ -40,10 +40,10 @@ class Predicates3d(AbstractPredicates):
     return ret
 
   def orient_TPI_halfspaces(self, 
-                            f: Halfspace3D, 
-                            f1: Halfspace3D, 
-                            f2: Halfspace3D, 
-                            ref: Halfspace3D) -> OrientResult: # retorna IN, OUT, ON
+                            f: Halfspace, 
+                            f1: Halfspace, 
+                            f2: Halfspace, 
+                            ref: Halfspace) -> OrientResult: # retorna IN, OUT, ON
     # calcula la orientación del punto intersección de f, f1 y f2 respecto a ref
     pImp = self._adapter.create_implicit_point_tpi(f, f1, f2) # Punto implícito: intersección del plano f con f1 y f2
     ori = self._adapter.orient3dI(pImp, ref)
@@ -58,25 +58,25 @@ class Predicates3d(AbstractPredicates):
 
   def orient_TPI(self, 
                  polytope: Polytope, 
-                 f1: Halfspace3D, 
-                 f2: Halfspace3D, 
-                 ref: Halfspace3D) -> OrientResult:
+                 f1: Halfspace, 
+                 f2: Halfspace, 
+                 ref: Halfspace) -> OrientResult:
     # predicado para la cara de un politopo
     vertices = polytope.get_vertices()
     if len(vertices) < 3:
       return OUT
     
-    a = Point3D(x=float(vertices[0][0]), y=float(vertices[0][1]), z=float(vertices[0][2]))
-    b = Point3D(x=float(vertices[1][0]), y=float(vertices[1][1]), z=float(vertices[1][2]))
-    c = Point3D(x=float(vertices[2][0]), y=float(vertices[2][1]), z=float(vertices[2][2]))
+    a = (float(vertices[0][0]), float(vertices[0][1]), float(vertices[0][2]))
+    b = (float(vertices[1][0]), float(vertices[1][1]), float(vertices[1][2]))
+    c = (float(vertices[2][0]), float(vertices[2][1]), float(vertices[2][2]))
     
-    f = Halfspace3D(points = (a, b, c))
+    f = Halfspace(points = [a, b, c])
     return self.orient_TPI_halfspaces(f, f1, f2, ref)
 
   def _parallel_halfspaces(self,
-                           f1: Halfspace3D,
-                           f2: Halfspace3D,
-                           f3: Halfspace3D) -> bool:
+                           f1: Halfspace,
+                           f2: Halfspace,
+                           f3: Halfspace) -> bool:
     n1 = f1.get_normal()
     n2 = f2.get_normal()
     n3 = f3.get_normal()
@@ -100,39 +100,39 @@ class Predicates3d(AbstractPredicates):
     return nx, ny, nz
 
   def _point_on_same_side(self, 
-                          f: Halfspace3D, 
-                          f1: Halfspace3D, 
-                          f2: Halfspace3D, 
-                          refHalfspace: Halfspace3D, 
-                          refPoint: Point3D) -> bool:
+                          f: Halfspace, 
+                          f1: Halfspace, 
+                          f2: Halfspace, 
+                          refHalfspace: Halfspace, 
+                          refPoint: Point) -> bool:
     # calcula si el punto implícito de intersección de tres planos tiene la misma orientación
     # que un punto interno refPoint
     oriImpPoint = self.orient_TPI_halfspaces(f, f1, f2, refHalfspace)
     oriRefPoint = self.orient(refPoint, refHalfspace)
     return oriImpPoint == oriRefPoint # qué pasa con los ON?
 
-  def _get_centroid(self, a: Point3D, b: Point3D, c: Point3D) -> Point3D:
+  def _get_centroid(self, a: Point, b: Point, c: Point) -> Point:
     # retorna un punto interno del politopo
-    # a futuro ver si hacer una función get_intern_point o algo así para reutilizar
-    cx = (a.x + b.x + c.x) / 3.0
-    cy = (a.y + b.y + c.y) / 3.0
-    cz = (a.z + b.z + c.z) / 3.0
-    return Point3D(cx, cy, cz)
+    # a futuro ver si hacer una función get_intern_point en polytope (get_centroid) para reutilizar
+    cx = (a[0] + b[1] + c[2]) / 3.0
+    cy = (a[0] + b[1] + c[2]) / 3.0
+    cz = (a[0] + b[1] + c[2]) / 3.0
+    return (cx, cy, cz)
 
   def implicit_point_in_polytope(self, 
                                       polytope: Polytope, 
-                                      f1: Halfspace3D, 
-                                      f2: Halfspace3D) -> bool: 
+                                      f1: Halfspace, 
+                                      f2: Halfspace) -> bool: 
     # retorna si un punto implícito está en el plano de la CARA de un politopo
     vertices = polytope.get_vertices()
     if len(vertices) < 3:
       return False
     
-    a = Point3D(x=float(vertices[0][0]), y=float(vertices[0][1]), z=float(vertices[0][2]))
-    b = Point3D(x=float(vertices[1][0]), y=float(vertices[1][1]), z=float(vertices[1][2]))
-    c = Point3D(x=float(vertices[2][0]), y=float(vertices[2][1]), z=float(vertices[2][2]))
+    a = (float(vertices[0][0]), float(vertices[0][1]), float(vertices[0][2]))
+    b = (float(vertices[1][0]), float(vertices[1][1]), float(vertices[1][2]))
+    c = (float(vertices[2][0]), float(vertices[2][1]), float(vertices[2][2]))
     
-    f = Halfspace3D(points = (a, b, c))
+    f = Halfspace(points = [a, b, c])
     if self._parallel_halfspaces(f1, f2, f):
       return False
 
@@ -143,38 +143,38 @@ class Predicates3d(AbstractPredicates):
     nx, ny, nz = self._calculate_normal(a, b, c)
     edges = polytope.get_edges()
     for e in edges:
-      v1 = Point3D(float(e[0][0]), float(e[0][1]), float(e[0][2]))
-      v2 = Point3D(float(e[1][0]), float(e[1][1]), float(e[1][2]))
-      q = Point3D(v1.x + nx, v1.y + ny, v1.z + nz)
-      ref = Halfspace3D(points = (v1, v2, q))
+      v1 = (float(e[0][0]), float(e[0][1]), float(e[0][2]))
+      v2 = (float(e[1][0]), float(e[1][1]), float(e[1][2]))
+      q = (v1[0] + nx, v1[1] + ny, v1[2] + nz)
+      ref = Halfspace(points = [v1, v2, q])
       if not self._point_on_same_side(f, f1, f2, ref, centroid):
         return False
     return True
 
   def implicit_point_in_polytope_3d(self, 
                                      polytope: Polytope, 
-                                     f1: Halfspace3D, 
-                                     f2: Halfspace3D,
-                                     f3: Halfspace3D) -> bool:
+                                     f1: Halfspace, 
+                                     f2: Halfspace,
+                                     f3: Halfspace) -> bool:
     # intersección de punto implícito producto de 3 semiespacios con un politopo 3d
     vertices = polytope.get_vertices()
     if len(vertices) < 3:
       return False # o true?
-    a = Point3D(x=float(vertices[0][0]), y=float(vertices[0][1]), z=float(vertices[0][2]))
-    b = Point3D(x=float(vertices[1][0]), y=float(vertices[1][1]), z=float(vertices[1][2]))
-    c = Point3D(x=float(vertices[2][0]), y=float(vertices[2][1]), z=float(vertices[2][2]))
+    a = (float(vertices[0][0]), float(vertices[0][1]), float(vertices[0][2]))
+    b = (float(vertices[1][0]), float(vertices[1][1]), float(vertices[1][2]))
+    c = (float(vertices[2][0]), float(vertices[2][1]), float(vertices[2][2]))
     centroid = self._get_centroid(a, b, c)
     
     ret = True
-    faces = polytope.get_faces()
-    for p in faces:
-      vertices = p.get_vertices() # FUNCIÓN get_plane EN POLYTOPE? EN HALFSPACE?
-      if len(vertices) < 3:
+    faces = polytope.get_halfspaces()
+    for hs in faces:
+      points = hs.get_points()
+      if len(points) < 3:
         return False # o true?
-      a = Point3D(x=float(vertices[0][0]), y=float(vertices[0][1]), z=float(vertices[0][2]))
-      b = Point3D(x=float(vertices[1][0]), y=float(vertices[1][1]), z=float(vertices[1][2]))
-      c = Point3D(x=float(vertices[2][0]), y=float(vertices[2][1]), z=float(vertices[2][2]))
-      ref = Halfspace3D(points = (a, b, c))
+      a = (float(points[0][0]), float(points[0][1]), float(points[0][2]))
+      b = (float(points[1][0]), float(points[1][1]), float(points[1][2]))
+      c = (float(points[2][0]), float(points[2][1]), float(points[2][2]))
+      ref = Halfspace(points = [a, b, c])
       if not self._point_on_same_side(f1, f2, f3, ref, centroid):
         ret = False
         break
