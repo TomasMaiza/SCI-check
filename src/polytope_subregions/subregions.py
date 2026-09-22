@@ -52,7 +52,7 @@ class Subregions(SubregionsStrategy):
                      sas: SwitchedAffineSystem, 
                      polytope: Polytope, 
                      dwellTime: float, 
-                     K: int) -> PolytopeMap:
+                     K: int) -> list[Polytope]:
     # recibe un politopo, el sistema y los parámetros para devolver la lista de subregiones
     h = dwellTime/K
     self._K = K
@@ -61,8 +61,8 @@ class Subregions(SubregionsStrategy):
     polytopeMap = [] # inicializo el mapa de politopos para cada modo
     for i in modes:
       subsystem = sas.get_subsystem(i)
-      halfspaces = self.get_subregion(subsystem, polytope)
+      subregionPolytope = self.get_subregion(subsystem, polytope)
       #if len(halfspaces) != 0:
-      polytopeMap.append(halfspaces)
+      polytopeMap.append(subregionPolytope)
     return polytopeMap
 
