@@ -36,18 +36,7 @@ class Geometry2d(AbstractGeometry):
     return sortedVertices.tolist()
 
   def create_halfspaces_list(self, subregionPolytope: 'Polytope') -> list[Halfspace]:
-    sortedVertices = self._get_polytope_vertices_CCW(subregionPolytope)    
-    numVertices = len(sortedVertices)
-    halfspaces = []
-    for i in range(numVertices): # iteramos para armar los bordes del politopo (v1, v2)
-      v1 = sortedVertices[i]
-      v2 = sortedVertices[(i + 1) % numVertices]
-      p1 = tuple(v1)
-      p2 = tuple(v2)
-      #hs = self.create_halfspace((p1, p2))
-      hs = Halfspace(points = [p1, p2])
-      halfspaces.append(hs)
-    return halfspaces
+    return subregionPolytope.get_halfspaces() # ojo con tema orden
 
   def get_polytope_edges(self, polytope: 'Polytope') -> list['Edge']:
     # devuelve una lista de las aristas de un politopo como una lista de (Point2D, Point2D)
