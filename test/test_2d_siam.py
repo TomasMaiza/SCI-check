@@ -7,6 +7,7 @@ from coverage_checker import *
 from geometry import GeometryFactory, Polytope, PolytopeImp, ConcretePolytope2D
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
+import polytope as pc
 from common import PolytopeMap, setup_logger, Point
 
 def set_sci(polytope: PolytopeImp, sas: SwitchedAffineSystem):
@@ -45,7 +46,8 @@ def plot_filled_scenario(title: str, original_poly: Polytope, coverage_result: b
     fig, ax = plt.subplots(figsize=(10, 8))
     
     # 1. Dibujamos la caja original S como referencia (fondo gris)
-    original_poly.polytope.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
+    poly = pc.qhull(original_poly.get_vertices())
+    poly.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
     
     # Colores base para imitar la paleta de MATLAB
     colors = ['#1f77b4', '#ff7f0e', '#d62728', '#9467bd', '#2ca02c'] 
@@ -57,8 +59,9 @@ def plot_filled_scenario(title: str, original_poly: Polytope, coverage_result: b
             
         points = []
         for hs in halfspaces_list:
-            points.append([hs.p1.x, hs.p1.y])
-            points.append([hs.p2.x, hs.p2.y])
+            p = hs.get_points()
+            points.append(list(p[0]))
+            points.append(list(p[1]))
             
         points_array = np.array(points)
         
