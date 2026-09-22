@@ -4,7 +4,7 @@ from typing import Optional, TYPE_CHECKING
 from geometry import AbstractPoint, Halfspace, Hyperplane
 
 if TYPE_CHECKING:
-  from src.common.types import Point
+  from src.common.types import Point, Edge
 
 class Polytope(ABC):
   # Clase abstracta para representar politopos
@@ -37,7 +37,7 @@ class Polytope(ABC):
     pass
 
   @abstractmethod
-  def get_edges(self) -> list[tuple[tuple[float, ...], tuple[float, ...]]]:
+  def get_edges(self) -> list['Edge']:
     # retorna las aristas del politopo
     pass
 

@@ -8,7 +8,7 @@ from scipy.spatial import ConvexHull
 import itertools
 
 if TYPE_CHECKING:
-  from src.common.types import Point
+  from src.common.types import Point, Edge
 
 class ConcretePolytope2D(Polytope):
   # Implementación de politopos 2D (hoja del Composite)
@@ -72,7 +72,7 @@ class ConcretePolytope2D(Polytope):
     if self._A is not None and self._b is not None:
       return self._A, self._b
 
-  def get_edges(self) -> list[tuple[tuple[float, ...], tuple[float, ...]]]:
+  def get_edges(self) -> list['Edge']:
     # retorna las aristas del politopo
     if self._vertices is None:
       return [] 

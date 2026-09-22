@@ -7,7 +7,7 @@ import polytope as pc
 from .polytope_conc_2d import ConcretePolytope2D
 
 if TYPE_CHECKING:
-  from src.common.types import Point
+  from src.common.types import Point, Edge
 
 class ConcretePolytope(Polytope):
   # Implementación de politopos
@@ -72,7 +72,7 @@ class ConcretePolytope(Polytope):
     if self._A is not None and self._b is not None:
       return self._A, self._b
 
-  def get_edges(self) -> list[tuple[tuple[float, ...], tuple[float, ...]]]:
+  def get_edges(self) -> list['Edge']:
     # retorna las aristas del politopo
     pass
 
