@@ -167,14 +167,7 @@ class Predicates3d(AbstractPredicates):
     
     ret = True
     faces = polytope.get_halfspaces()
-    for hs in faces:
-      points = hs.get_points()
-      if len(points) < 3:
-        return False # o true?
-      a = (float(points[0][0]), float(points[0][1]), float(points[0][2]))
-      b = (float(points[1][0]), float(points[1][1]), float(points[1][2]))
-      c = (float(points[2][0]), float(points[2][1]), float(points[2][2]))
-      ref = Halfspace(points = [a, b, c])
+    for ref in faces:
       if not self._point_on_same_side(f1, f2, f3, ref, centroid):
         ret = False
         break
