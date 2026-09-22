@@ -4,7 +4,7 @@ import matplotlib.patches as patches
 from scipy.spatial import ConvexHull
 from sci import SCIChecker
 from coverage_checker import *
-from geometry import GeometryFactory, Polytope, PolytopeImp
+from geometry import GeometryFactory, Polytope, PolytopeImp, ConcretePolytope
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
 from common import PolytopeMap, setup_logger
@@ -12,7 +12,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import polytope as pc
 
 def set_sci(polytope: PolytopeImp, sas: SwitchedAffineSystem):
-  checker = SCIChecker(GeometryFactory[3](), PredicatesFactory[3](), CoverageCheckerFactory[3], polytope, sas)
+  checker = SCIChecker(3, GeometryFactory[3](), PredicatesFactory[3](), CoverageCheckerFactory[3], polytope, sas)
   return checker
 
 def politopo():
@@ -25,7 +25,7 @@ def politopo():
        geom.create_point(coord = (-0.05, 0.5, 0.02)),
        geom.create_point(coord = (-0.05, -0.5, -0.02)),
        geom.create_point(coord = (-0.05, -0.5, 0.02)))
-  polytope = PolytopeImp(vertices = v)
+  polytope = ConcretePolytope(intDim=3, ambDim=3, vertices=v)
   return polytope
 
 '''
@@ -123,7 +123,7 @@ def print_subregions_debug(subregions_map):
             
     print("\n" + "="*45 + "\n")
 
-def plot_3d_scenario(title: str, original_poly, coverage_result: bool, subregions_map):
+def plot_3d_scenario(title: str, original_poly: Polytope, coverage_result: bool, subregions_map):
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection='3d')
     

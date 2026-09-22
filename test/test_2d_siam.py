@@ -4,13 +4,13 @@ import matplotlib.patches as patches
 from scipy.spatial import ConvexHull
 from sci import SCIChecker
 from coverage_checker import *
-from geometry import GeometryFactory, Polytope, PolytopeImp
+from geometry import GeometryFactory, Polytope, PolytopeImp, ConcretePolytope2D
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
-from common import PolytopeMap, setup_logger
+from common import PolytopeMap, setup_logger, Point
 
 def set_sci(polytope: PolytopeImp, sas: SwitchedAffineSystem):
-  checker = SCIChecker(GeometryFactory[2](), PredicatesFactory[2](), CoverageCheckerFactory[2], polytope, sas)
+  checker = SCIChecker(2, GeometryFactory[2](), PredicatesFactory[2](), CoverageCheckerFactory[2], polytope, sas)
   return checker
 
 def politopo():
@@ -19,7 +19,7 @@ def politopo():
        geom.create_point(coord = (-np.sqrt(2), 0)),
        geom.create_point(coord = (0, np.sqrt(2))),
        geom.create_point(coord = (0, -np.sqrt(2))))
-  polytope = PolytopeImp(vertices = v)
+  polytope = ConcretePolytope2D(intDim = 2, ambDim = 2, vertices = v)
   return polytope
 
 def sistema():
