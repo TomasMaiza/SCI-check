@@ -1,7 +1,10 @@
 from abc import ABC, abstractmethod
 import numpy as np
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from geometry import AbstractPoint, Halfspace, Hyperplane
+
+if TYPE_CHECKING:
+  from src.common.types import Point
 
 class Polytope(ABC):
   # Clase abstracta para representar politopos
@@ -17,7 +20,8 @@ class Polytope(ABC):
   def __init__(self,
                intDim: int,
                ambDim: int,
-               vertices: Optional['tuple[AbstractPoint, ...]'] = None, 
+               vertices: Optional['list[Point]'] = None, 
+               verticesnp: Optional['np.ndarray'] = None,
                A: Optional['np.ndarray'] = None, 
                b: Optional['np.ndarray'] = None):
     pass
@@ -50,6 +54,11 @@ class Polytope(ABC):
   @abstractmethod
   def get_supporting_hyperplane(self) -> Hyperplane:
     # retorna el hiperplano que contiene al politopo si intDim < ambDim
+    pass
+
+  @abstractmethod
+  def get_centroid(self) -> 'Point':
+    # retorna el centroide del politopo
     pass
 
   @abstractmethod

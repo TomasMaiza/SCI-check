@@ -20,6 +20,7 @@ class ConcretePolytope2D(Polytope):
   _b: np.ndarray
   _supporting_hyperplane: Hyperplane
   _halfspaces: list[Halfspace]
+  _centroid: 'Point'
 
   def __init__(self, 
                intDim: int,
@@ -35,6 +36,7 @@ class ConcretePolytope2D(Polytope):
     self._intDim = 2
     self._ambDim = ambDim
     self._halfspaces = None
+    self._centroid = None
     self._A = A
     self._b = b
 
@@ -149,3 +151,10 @@ class ConcretePolytope2D(Polytope):
     poly = pc.Polytope(self._A, self._b)
     poly = pc.reduce(poly)
     self._A, self._b = poly.A, poly.b
+
+  def get_centroid(self) -> 'Point':
+    # retorna el centroide del politopo
+    if self._centroid is None:
+      centroidCoords = np.mean(self._vertices, axis=0)
+      self._centroid = tuple(float(c) for c in centroidCoords)
+    return self._centroid
