@@ -109,8 +109,8 @@ def print_subregions_debug(subregions_map):
             p = h.get_points()[0]
             
             # --- EXTRACTOR DINÁMICO ---
-            nx, ny, nz = n if isinstance(n, tuple) else (n.x, n.y, n.z)
-            px, py, pz = p if isinstance(p, tuple) else (p.x, p.y, p.z)
+            nx, ny, nz = n if isinstance(n, tuple) else (n[0], n[1], n[2])
+            px, py, pz = p if isinstance(p, tuple) else (p[0], p[1], p[2])
             
             nx, ny, nz = float(nx), float(ny), float(nz)
             px, py, pz = float(px), float(py), float(pz)
@@ -149,8 +149,8 @@ def plot_3d_scenario(title: str, original_poly: Polytope, coverage_result: bool,
             n = h.get_normal()
             p = h.get_points()[0]
             
-            nx, ny, nz = n if isinstance(n, tuple) else (n.x, n.y, n.z)
-            px, py, pz = p if isinstance(p, tuple) else (p.x, p.y, p.z)
+            nx, ny, nz = n if isinstance(n, tuple) else (n[0], n[1], n[2])
+            px, py, pz = p if isinstance(p, tuple) else (p[0], p[1], p[2])
             
             # Convertimos a float para que scipy/numpy no exploten con los objetos Fraction
             nx, ny, nz = float(nx), float(ny), float(nz)
