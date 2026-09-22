@@ -4,6 +4,7 @@ from geometry import Polytope, Geometry3d, Halfspace
 from .predicates import AbstractPredicates
 from fractions import Fraction
 from bindings import AtteneAdapter3D
+import numpy as np
 
 class Predicates3d(AbstractPredicates):
   # clase para implementar los predicados en 3d
@@ -109,44 +110,31 @@ class Predicates3d(AbstractPredicates):
     # que un punto interno refPoint
     oriImpPoint = self.orient_TPI_halfspaces(f, f1, f2, refHalfspace)
     oriRefPoint = self.orient(refPoint, refHalfspace)
-    return oriImpPoint == oriRefPoint # qué pasa con los ON?
-
-  def _get_centroid(self, a: Point, b: Point, c: Point) -> Point:
-    # retorna un punto interno del politopo
-    # a futuro ver si hacer una función get_intern_point en polytope (get_centroid) para reutilizar
-    cx = (a[0] + b[1] + c[2]) / 3.0
-    cy = (a[0] + b[1] + c[2]) / 3.0
-    cz = (a[0] + b[1] + c[2]) / 3.0
-    return (cx, cy, cz)
+    return oriImpPoint == oriRefPoint
 
   def implicit_point_in_polytope(self, 
                                       polytope: Polytope, 
                                       f1: Halfspace, 
                                       f2: Halfspace) -> bool: 
     # retorna si un punto implícito está en el plano de la CARA de un politopo
+    # lo usa el checker 2d, por eso hago get_edges y no get_boundaries
     vertices = polytope.get_vertices()
     if len(vertices) < 3:
       return False
     
-    a = (float(vertices[0][0]), float(vertices[0][1]), float(vertices[0][2]))
-    b = (float(vertices[1][0]), float(vertices[1][1]), float(vertices[1][2]))
-    c = (float(vertices[2][0]), float(vertices[2][1]), float(vertices[2][2]))
-    
-    f = Halfspace(points = [a, b, c])
-    if self._parallel_halfspaces(f1, f2, f):
-      return False
+    facePoints = [tuple(float(c) for c in v) for v in vertices]
+    f = Halfspace(points=facePoints)
 
-    centroid = self._get_centroid(a, b, c)
-    # centroide del triángulo abc
-    # es un punto interno del politopo para tomar de referencia
-
-    nx, ny, nz = self._calculate_normal(a, b, c)
+    centroid = polytope.get_centroid() # es un punto interno del politopo para tomar de referencia
+    normal = f.get_normal() 
     edges = polytope.get_edges()
     for e in edges:
-      v1 = (float(e[0][0]), float(e[0][1]), float(e[0][2]))
-      v2 = (float(e[1][0]), float(e[1][1]), float(e[1][2]))
-      q = (v1[0] + nx, v1[1] + ny, v1[2] + nz)
-      ref = Halfspace(points = [v1, v2, q])
+      ref_points = [tuple(float(c) for c in v) for v in e]
+      v_base = np.array(e[0])
+      q_array = v_base + normal
+      q = tuple(float(c) for c in q_array)
+      ref_points.append(q)
+      ref = Halfspace(points=ref_points)
       if not self._point_on_same_side(f, f1, f2, ref, centroid):
         return False
     return True
@@ -163,7 +151,7 @@ class Predicates3d(AbstractPredicates):
     a = (float(vertices[0][0]), float(vertices[0][1]), float(vertices[0][2]))
     b = (float(vertices[1][0]), float(vertices[1][1]), float(vertices[1][2]))
     c = (float(vertices[2][0]), float(vertices[2][1]), float(vertices[2][2]))
-    centroid = self._get_centroid(a, b, c)
+    centroid = polytope.get_centroid()
     
     ret = True
     faces = polytope.get_halfspaces()
