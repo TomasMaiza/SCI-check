@@ -4,18 +4,17 @@ import matplotlib.patches as patches
 from scipy.spatial import ConvexHull
 from sci import SCIChecker
 from coverage_checker import *
-from geometry import GeometryFactory, Polytope, PolytopeImp, ConcretePolytope2D
+from geometry import Polytope, ConcretePolytope2D
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
 import polytope as pc
-from common import PolytopeMap, setup_logger, Point
+from common import setup_logger, Point
 
-def set_sci(polytope: PolytopeImp, sas: SwitchedAffineSystem):
-  checker = SCIChecker(2, GeometryFactory[2](), PredicatesFactory[2](), CoverageCheckerFactory[2], polytope, sas)
+def set_sci(polytope: ConcretePolytope2D, sas: SwitchedAffineSystem):
+  checker = SCIChecker(2, PredicatesFactory[2](), CoverageCheckerFactory[2], polytope, sas)
   return checker
 
 def politopo():
-  geom = GeometryFactory[2]()
   v = ((np.sqrt(2), 0), 
        (-np.sqrt(2), 0),
        (0, np.sqrt(2)),
@@ -41,7 +40,7 @@ def ejecutar_test(T: float, K: int):
   print(f"El resultado es: {cov}")
   plot_filled_scenario("Test 2D SIAM", poly, cov, subregions)
 
-def plot_filled_scenario(title: str, original_poly: Polytope, coverage_result: bool, subregions_map: PolytopeMap):
+def plot_filled_scenario(title: str, original_poly: Polytope, coverage_result: bool, subregions_map: list[Polytope]):
     """Grafica el politopo y las subregiones con relleno traslúcido."""
     fig, ax = plt.subplots(figsize=(10, 8))
     
@@ -53,7 +52,8 @@ def plot_filled_scenario(title: str, original_poly: Polytope, coverage_result: b
     colors = ['#1f77b4', '#ff7f0e', '#d62728', '#9467bd', '#2ca02c'] 
     
     # 3. Reconstruimos los polígonos cerrados a partir de los puntos
-    for mode_idx, halfspaces_list in enumerate(subregions_map):
+    for mode_idx, p in enumerate(subregions_map):
+        halfspaces_list = p.get_halfspaces()
         if not halfspaces_list: 
             continue
             
