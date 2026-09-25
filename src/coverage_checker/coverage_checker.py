@@ -13,7 +13,7 @@ class _CoverageCheckerIntern:
     self._predicates = predicates
 
   def point_out(self, 
-                v: AbstractPoint, 
+                v: Point, 
                 subregionsMap: list[Polytope]) -> OrientResult:
     ret = OUT
     
@@ -33,8 +33,8 @@ class _CoverageCheckerIntern:
     return ret
 
   def points_on_same_side(self, 
-                          v1: AbstractPoint, 
-                          v2: AbstractPoint, 
+                          v1: Point, 
+                          v2: Point, 
                           f: Halfspace) -> bool:
     ori1 = self._predicates.orient(v1, f)
     ori2 = self._predicates.orient(v2, f)
@@ -57,8 +57,8 @@ class _CoverageCheckerIntern:
     return ret
 
   def implicit_point_in_polytope_LPI(self, 
-                                     v1: AbstractPoint, 
-                                     v2: AbstractPoint, 
+                                     v1: Point, 
+                                     v2: Point, 
                                      f: Halfspace, 
                                      p: Polytope) -> bool:
     ret = True
@@ -73,8 +73,8 @@ class _CoverageCheckerIntern:
     return ret
 
   def edge_plane_out(self, 
-                    v1: AbstractPoint, 
-                    v2: AbstractPoint, 
+                    v1: Point, 
+                    v2: Point, 
                     f: Halfspace, 
                     subregionsMap: list[Polytope], 
                     currentpIndex: int) -> OrientResult:
