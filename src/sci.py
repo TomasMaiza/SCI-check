@@ -1,6 +1,6 @@
 from coverage_checker import CoverageCheckStrategy, CoverageChecker, AbstractPredicates
 from geometry import AbstractGeometry, AbstractSimplex, Polytope
-from common import PolytopeMap, ON, OUT, IN
+from common import ON, OUT, IN
 from triangulation import *
 import numpy as np
 from aabbtree import AABB, AABBTree
@@ -112,7 +112,7 @@ class SCIChecker():
       ret = False
     return ret
 
-  def sci_check(self, dwellTime: float, K: int) -> tuple[bool, PolytopeMap]: # hace todo el proceso
+  def sci_check(self, dwellTime: float, K: int) -> tuple[bool, list[Polytope]]: # hace todo el proceso
     self.get_subregions(dwellTime, K)
     # self.triangulate_polytope()
     # self.create_aabb_tree() # estrategia de aceleración 1
