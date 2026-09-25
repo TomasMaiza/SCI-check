@@ -10,10 +10,8 @@ import itertools
 # Patrón Decorator
 class CoverageChecker3D(CoverageChecker):
   def __init__(self, 
-               geometry: AbstractGeometry, 
                predicates: AbstractPredicates) -> None:
-    self._checker = CoverageChecker(geometry, Predicates3d())
-    self._geometry = geometry
+    self._checker = CoverageChecker(Predicates3d())
     self._predicates = Predicates3d()
 
   def implicit_point_in_polytope_TPI(self, # la muevo a predicates3d?
