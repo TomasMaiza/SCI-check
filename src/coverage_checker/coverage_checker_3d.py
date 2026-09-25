@@ -1,6 +1,5 @@
 from .predicates import AbstractPredicates, Predicates3d
 from geometry import *
-from geometry.structs_3d import *
 from common import *
 from .strategy import CoverageCheckStrategy
 from .coverage_checker import CoverageChecker
