@@ -4,19 +4,18 @@ import matplotlib.patches as patches
 from scipy.spatial import ConvexHull
 from sci import SCIChecker
 from coverage_checker import *
-from geometry import GeometryFactory, Polytope, PolytopeImp, ConcretePolytope
+from geometry import Polytope, ConcretePolytope
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
-from common import PolytopeMap, setup_logger
+from common import setup_logger
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import polytope as pc
 
-def set_sci(polytope: PolytopeImp, sas: SwitchedAffineSystem):
-  checker = SCIChecker(3, GeometryFactory[3](), PredicatesFactory[3](), CoverageCheckerFactory[3], polytope, sas)
+def set_sci(polytope: ConcretePolytope, sas: SwitchedAffineSystem):
+  checker = SCIChecker(3, PredicatesFactory[3](), CoverageCheckerFactory[3], polytope, sas)
   return checker
 
 def politopo():
-  geom = GeometryFactory[3]()
   v = ((0.05, -0.5, 0.02), 
        (0.05, -0.5, -0.02),
        (0.05, 0.5, 0.02),
@@ -123,7 +122,7 @@ def print_subregions_debug(subregions_map):
             
     print("\n" + "="*45 + "\n")
 
-def plot_3d_scenario(title: str, original_poly: Polytope, coverage_result: bool, subregions_map):
+def plot_3d_scenario(title: str, original_poly: Polytope, coverage_result: bool, subregions_map: list[Polytope]):
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection='3d')
     
@@ -139,7 +138,8 @@ def plot_3d_scenario(title: str, original_poly: Polytope, coverage_result: bool,
     colors = ['#1f77b4', '#ff7f0e', '#d62728', '#9467bd', '#2ca02c'] 
 
     # 2. Reconstruimos los polígonos cerrados de las subregiones
-    for mode_idx, halfspace_list in enumerate(subregions_map):
+    for mode_idx, p in enumerate(subregions_map):
+        halfspace_list = p.get_halfspaces()
         if not halfspace_list: 
             continue
             
