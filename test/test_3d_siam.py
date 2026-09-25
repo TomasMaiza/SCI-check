@@ -91,12 +91,13 @@ def ejecutar_test(T: float, K: int):
   print_subregions_debug(subregions)
   plot_3d_scenario("Test 3D SIAM", poly, cov, subregions)
 
-def print_subregions_debug(subregions_map):
+def print_subregions_debug(subregions_map: list[Polytope]):
     print("\n" + "="*45)
     print(" DEBUG: DEFINICIÓN ALGEBRAICA DE SUBREGIONES")
     print("="*45)
     
-    for mode_idx, halfspace_list in enumerate(subregions_map):
+    for mode_idx, p in enumerate(subregions_map):
+        halfspace_list = p.get_halfspaces()
         if not halfspace_list:
             print(f"Modo {mode_idx}: Vacío (Sin semiespacios)")
             continue
