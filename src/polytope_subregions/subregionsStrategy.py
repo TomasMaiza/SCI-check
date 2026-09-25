@@ -2,13 +2,12 @@ from abc import ABC, abstractmethod
 import numpy as np
 import numpy.typing as npt
 from affine_system import *
-from common import PolytopeMap
-from geometry import AbstractHalfspace, Polytope
+from geometry import Halfspace, Polytope
 from affine_system import SwitchedAffineSystem
 
 class SubregionsStrategy(ABC):
   @abstractmethod
-  def get_subregion(self, subsystem: AffineMode, polytope: Polytope) -> list[AbstractHalfspace]:
+  def get_subregion(self, subsystem: AffineMode, polytope: Polytope) -> Polytope:
     # obtiene la subregión para un modo particular
     pass
 
@@ -17,7 +16,7 @@ class SubregionsStrategy(ABC):
                      sas: SwitchedAffineSystem, 
                      polytope: Polytope, 
                      dwellTime: float, 
-                     K: int) -> PolytopeMap:
+                     K: int) -> list[Polytope]:
     # recibe un politopo (y todo lo necesario) para devolver la lista de subregiones
     pass
 

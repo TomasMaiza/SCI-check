@@ -1,5 +1,6 @@
-from .halfspace import AbstractHalfspace
+from .halfspace import Halfspace
 from .point import AbstractPoint
 from .simplex import AbstractSimplex
+from .hyperplane import Hyperplane
 
-__all__ = ["AbstractHalfspace", "AbstractPoint", "AbstractSimplex"]
+__all__ = ["Halfspace", "AbstractPoint", "AbstractSimplex", "Hyperplane"]

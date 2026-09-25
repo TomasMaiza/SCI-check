@@ -4,22 +4,22 @@ import matplotlib.patches as patches
 from scipy.spatial import ConvexHull
 from sci import SCIChecker
 from coverage_checker import *
-from geometry import GeometryFactory, Polytope, PolytopeImp
+from geometry import Polytope, ConcretePolytope2D
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
-from common import PolytopeMap, setup_logger
+import polytope as pc
+from common import setup_logger, Point
 
-def set_sci(polytope: PolytopeImp, sas: SwitchedAffineSystem):
-  checker = SCIChecker(GeometryFactory[2](), PredicatesFactory[2](), CoverageCheckerFactory[2], polytope, sas)
+def set_sci(polytope: ConcretePolytope2D, sas: SwitchedAffineSystem):
+  checker = SCIChecker(2, PredicatesFactory[2](), CoverageCheckerFactory[2], polytope, sas)
   return checker
 
 def politopo():
-  geom = GeometryFactory[2]()
-  v = (geom.create_point(coord = (np.sqrt(2), 0)), 
-       geom.create_point(coord = (-np.sqrt(2), 0)),
-       geom.create_point(coord = (0, np.sqrt(2))),
-       geom.create_point(coord = (0, -np.sqrt(2))))
-  polytope = PolytopeImp(vertices = v)
+  v = ((np.sqrt(2), 0), 
+       (-np.sqrt(2), 0),
+       (0, np.sqrt(2)),
+       (0, -np.sqrt(2)))
+  polytope = ConcretePolytope2D(intDim = 2, ambDim = 2, vertices = v)
   return polytope
 
 def sistema():
@@ -40,25 +40,28 @@ def ejecutar_test(T: float, K: int):
   print(f"El resultado es: {cov}")
   plot_filled_scenario("Test 2D SIAM", poly, cov, subregions)
 
-def plot_filled_scenario(title: str, original_poly: Polytope, coverage_result: bool, subregions_map: PolytopeMap):
+def plot_filled_scenario(title: str, original_poly: Polytope, coverage_result: bool, subregions_map: list[Polytope]):
     """Grafica el politopo y las subregiones con relleno traslúcido."""
     fig, ax = plt.subplots(figsize=(10, 8))
     
     # 1. Dibujamos la caja original S como referencia (fondo gris)
-    original_poly.polytope.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
+    poly = pc.qhull(original_poly.get_vertices())
+    poly.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
     
     # Colores base para imitar la paleta de MATLAB
     colors = ['#1f77b4', '#ff7f0e', '#d62728', '#9467bd', '#2ca02c'] 
     
     # 3. Reconstruimos los polígonos cerrados a partir de los puntos
-    for mode_idx, halfspaces_list in enumerate(subregions_map):
+    for mode_idx, p in enumerate(subregions_map):
+        halfspaces_list = p.get_halfspaces()
         if not halfspaces_list: 
             continue
             
         points = []
         for hs in halfspaces_list:
-            points.append([hs.p1.x, hs.p1.y])
-            points.append([hs.p2.x, hs.p2.y])
+            p = hs.get_points()
+            points.append(list(p[0]))
+            points.append(list(p[1]))
             
         points_array = np.array(points)
         

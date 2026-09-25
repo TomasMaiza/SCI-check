@@ -1,12 +1,10 @@
 from abc import ABC, abstractmethod
-from common import PolytopeMap, OrientResult, VerticesIndex, EdgesIndex
-from geometry import AbstractSimplex
+from common import OrientResult
+from geometry import Polytope
 
 class CoverageCheckStrategy(ABC):
   @abstractmethod
   def envelope_check(self, 
-                     triangle: AbstractSimplex, 
-                     polytopeSet: PolytopeMap, 
-                     verticesIndex: VerticesIndex, 
-                     edgesIndex: EdgesIndex) -> OrientResult:
+                     polytope: Polytope, 
+                     subregionsMap: list[Polytope]) -> OrientResult: 
     pass

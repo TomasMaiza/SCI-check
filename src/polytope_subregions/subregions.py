@@ -3,20 +3,19 @@ import numpy.typing as npt
 from scipy.spatial import ConvexHull
 from .subregionsStrategy import SubregionsStrategy
 from affine_system import *
-from common import PolytopeMap
-from geometry import AbstractHalfspace, AbstractGeometry, Polytope
+from geometry import Halfspace, AbstractGeometry, Polytope
 from .approximations import Euler, Taylor
 from affine_system import SwitchedAffineSystem, AffineMode
 from .matrices import partition_matrices
 
 class Subregions(SubregionsStrategy):
-  def __init__(self, geometry: AbstractGeometry):
+  def __init__(self, dimension: int):
     self._approxMethod = Taylor
-    self._geometry = geometry
+    self._dimension = dimension
   
   def get_subregion(self, 
                     subsystem: AffineMode, 
-                    polytope: Polytope) -> list[AbstractHalfspace]:
+                    polytope: Polytope) -> Polytope:
     # obtiene la subregión para un modo particular
     approx = self._approxMethod(subsystem, polytope, scaling=1, order=4)
     r = 0 # r_0
@@ -42,15 +41,15 @@ class Subregions(SubregionsStrategy):
     # obtengo A y b separando la última columna de matrixH y me queda que Ax <= c - b
     matrixA, matrixb = np.hsplit(matrixH, [dim - 1]) # obtiene A y b separando la últ col de H
     matrixb = matrixc - matrixb
-    subregionPolytope = type(polytope)(A = matrixA, b = matrixb)
-    subregionPolytope.reduce()
-    return self._geometry.create_halfspaces_list(subregionPolytope)
+    subregionPolytope = type(polytope)(intDim = self._dimension, ambDim = self._dimension, A = matrixA, b = matrixb)
+    #subregionPolytope.reduce()
+    return subregionPolytope
 
   def get_subregions(self, 
                      sas: SwitchedAffineSystem, 
                      polytope: Polytope, 
                      dwellTime: float, 
-                     K: int) -> PolytopeMap:
+                     K: int) -> list[Polytope]:
     # recibe un politopo, el sistema y los parámetros para devolver la lista de subregiones
     h = dwellTime/K
     self._K = K
@@ -59,8 +58,8 @@ class Subregions(SubregionsStrategy):
     polytopeMap = [] # inicializo el mapa de politopos para cada modo
     for i in modes:
       subsystem = sas.get_subsystem(i)
-      halfspaces = self.get_subregion(subsystem, polytope)
+      subregionPolytope = self.get_subregion(subsystem, polytope)
       #if len(halfspaces) != 0:
-      polytopeMap.append(halfspaces)
+      polytopeMap.append(subregionPolytope)
     return polytopeMap
 

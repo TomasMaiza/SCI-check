@@ -4,28 +4,27 @@ import matplotlib.patches as patches
 from scipy.spatial import ConvexHull
 from sci import SCIChecker
 from coverage_checker import *
-from geometry import GeometryFactory, Polytope, PolytopeImp
+from geometry import Polytope, ConcretePolytope
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
-from common import PolytopeMap, setup_logger
+from common import setup_logger
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import polytope as pc
 
-def set_sci(polytope: PolytopeImp, sas: SwitchedAffineSystem):
-  checker = SCIChecker(GeometryFactory[3](), PredicatesFactory[3](), CoverageCheckerFactory[3], polytope, sas)
+def set_sci(polytope: ConcretePolytope, sas: SwitchedAffineSystem):
+  checker = SCIChecker(3, PredicatesFactory[3](), CoverageCheckerFactory[3], polytope, sas)
   return checker
 
 def politopo():
-  geom = GeometryFactory[3]()
-  v = (geom.create_point(coord = (0.05, -0.5, 0.02)), 
-       geom.create_point(coord = (0.05, -0.5, -0.02)),
-       geom.create_point(coord = (0.05, 0.5, 0.02)),
-       geom.create_point(coord = (0.05, 0.5, -0.02)),
-       geom.create_point(coord = (-0.05, 0.5, -0.02)),
-       geom.create_point(coord = (-0.05, 0.5, 0.02)),
-       geom.create_point(coord = (-0.05, -0.5, -0.02)),
-       geom.create_point(coord = (-0.05, -0.5, 0.02)))
-  polytope = PolytopeImp(vertices = v)
+  v = ((0.05, -0.5, 0.02), 
+       (0.05, -0.5, -0.02),
+       (0.05, 0.5, 0.02),
+       (0.05, 0.5, -0.02),
+       (-0.05, 0.5, -0.02),
+       (-0.05, 0.5, 0.02),
+       (-0.05, -0.5, -0.02),
+       (-0.05, -0.5, 0.02))
+  polytope = ConcretePolytope(intDim=3, ambDim=3, vertices=v)
   return polytope
 
 '''
@@ -92,12 +91,13 @@ def ejecutar_test(T: float, K: int):
   print_subregions_debug(subregions)
   plot_3d_scenario("Test 3D SIAM", poly, cov, subregions)
 
-def print_subregions_debug(subregions_map):
+def print_subregions_debug(subregions_map: list[Polytope]):
     print("\n" + "="*45)
     print(" DEBUG: DEFINICIÓN ALGEBRAICA DE SUBREGIONES")
     print("="*45)
     
-    for mode_idx, halfspace_list in enumerate(subregions_map):
+    for mode_idx, p in enumerate(subregions_map):
+        halfspace_list = p.get_halfspaces()
         if not halfspace_list:
             print(f"Modo {mode_idx}: Vacío (Sin semiespacios)")
             continue
@@ -109,8 +109,8 @@ def print_subregions_debug(subregions_map):
             p = h.get_points()[0]
             
             # --- EXTRACTOR DINÁMICO ---
-            nx, ny, nz = n if isinstance(n, tuple) else (n.x, n.y, n.z)
-            px, py, pz = p if isinstance(p, tuple) else (p.x, p.y, p.z)
+            nx, ny, nz = n if isinstance(n, tuple) else (n[0], n[1], n[2])
+            px, py, pz = p if isinstance(p, tuple) else (p[0], p[1], p[2])
             
             nx, ny, nz = float(nx), float(ny), float(nz)
             px, py, pz = float(px), float(py), float(pz)
@@ -123,7 +123,7 @@ def print_subregions_debug(subregions_map):
             
     print("\n" + "="*45 + "\n")
 
-def plot_3d_scenario(title: str, original_poly, coverage_result: bool, subregions_map):
+def plot_3d_scenario(title: str, original_poly: Polytope, coverage_result: bool, subregions_map: list[Polytope]):
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection='3d')
     
@@ -139,7 +139,8 @@ def plot_3d_scenario(title: str, original_poly, coverage_result: bool, subregion
     colors = ['#1f77b4', '#ff7f0e', '#d62728', '#9467bd', '#2ca02c'] 
 
     # 2. Reconstruimos los polígonos cerrados de las subregiones
-    for mode_idx, halfspace_list in enumerate(subregions_map):
+    for mode_idx, p in enumerate(subregions_map):
+        halfspace_list = p.get_halfspaces()
         if not halfspace_list: 
             continue
             
@@ -149,8 +150,8 @@ def plot_3d_scenario(title: str, original_poly, coverage_result: bool, subregion
             n = h.get_normal()
             p = h.get_points()[0]
             
-            nx, ny, nz = n if isinstance(n, tuple) else (n.x, n.y, n.z)
-            px, py, pz = p if isinstance(p, tuple) else (p.x, p.y, p.z)
+            nx, ny, nz = n if isinstance(n, tuple) else (n[0], n[1], n[2])
+            px, py, pz = p if isinstance(p, tuple) else (p[0], p[1], p[2])
             
             # Convertimos a float para que scipy/numpy no exploten con los objetos Fraction
             nx, ny, nz = float(nx), float(ny), float(nz)

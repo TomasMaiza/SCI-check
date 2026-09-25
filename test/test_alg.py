@@ -4,31 +4,36 @@ import matplotlib.patches as patches
 from scipy.spatial import ConvexHull
 from sci import SCIChecker
 from coverage_checker import *
-from geometry import GeometryFactory, Polytope, PolytopeImp
+from geometry import Polytope, ConcretePolytope2D
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
-from common import PolytopeMap, setup_logger
+from common import setup_logger
+import polytope as pc
 
 
-def plot_filled_scenario(title: str, original_poly: Polytope, checker: 'SCIChecker', coverage_result: bool, subregions_map: PolytopeMap):
+def plot_filled_scenario(title: str, original_poly: Polytope, checker: 'SCIChecker', coverage_result: bool, subregions_map: list[Polytope]):
     """Grafica el politopo y las subregiones con relleno traslúcido."""
     fig, ax = plt.subplots(figsize=(10, 8))
+
+    poly = pc.qhull(vertices = original_poly.get_vertices())
     
     # 1. Dibujamos la caja original S como referencia (fondo gris)
-    original_poly.polytope.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
+    poly.plot(ax, color='lightgray', alpha=0.3, edgecolor='black', linewidth=2)
     
     # Colores base para imitar la paleta de MATLAB
     colors = ['#1f77b4', '#ff7f0e', '#d62728', '#9467bd', '#2ca02c'] 
     
     # 3. Reconstruimos los polígonos cerrados a partir de los puntos
-    for mode_idx, halfspaces_list in enumerate(subregions_map):
+    for mode_idx, p in enumerate(subregions_map):
+        halfspaces_list = p.get_halfspaces()
         if not halfspaces_list: 
             continue
             
         points = []
         for hs in halfspaces_list:
-            points.append([hs.p1.x, hs.p1.y])
-            points.append([hs.p2.x, hs.p2.y])
+            p = hs.get_points()
+            points.append(list(p[0]))
+            points.append(list(p[1]))
             
         points_array = np.array(points)
         
@@ -66,7 +71,6 @@ def plot_filled_scenario(title: str, original_poly: Polytope, checker: 'SCICheck
 
 def run_matlab_validation():
     # Setup de dependencias compartidas
-    geometry_2d = GeometryFactory[2]()
     predicates_2d = PredicatesFactory[2]() 
     
     # --- 3. Conjunto Objetivo S (Caja [-1, 1] x [-1, 1]) ---
@@ -75,7 +79,7 @@ def run_matlab_validation():
                        [ 0.0,  1.0], 
                        [ 0.0, -1.0]])
     b_poly = np.array([[1.0], [1.0], [1.0], [1.0]]) 
-    base_polytope = PolytopeImp(A = A_poly, b = b_poly)
+    base_polytope = ConcretePolytope2D(2, 2, A = A_poly, b = b_poly)
 
     # --- 2. Definición del Sistema Afín Conmutado ---
     rho = 10.15
@@ -103,7 +107,7 @@ def run_matlab_validation():
     # Experimento 1: K = 3 (Debería dejar huecos)
     # =================================================================
     print("Ejecutando Experimento K=3 (h ≈ 0.067)...")
-    checker_k3 = SCIChecker(geometry=geometry_2d, 
+    checker_k3 = SCIChecker(dimension=2, 
                                     predicates=predicates_2d, 
                                     coverageChecker=CoverageChecker,
                                     polytope=base_polytope, 
@@ -116,7 +120,7 @@ def run_matlab_validation():
     # Experimento 2: K = 12 (NO debería cubrir)
     # =================================================================
     print("\nEjecutando Experimento K=12 (h ≈ 0.017)...")
-    checker_k12 = SCIChecker(geometry=geometry_2d, 
+    checker_k12 = SCIChecker(dimension=2,
                                         predicates=predicates_2d, 
                                         coverageChecker=CoverageChecker,
                                         polytope=base_polytope, 
@@ -129,7 +133,7 @@ def run_matlab_validation():
     # Experimento 3: K = 350 (Debería cubrir?)
     # =================================================================
     print("\nEjecutando Experimento K=11 (h ≈ )...")
-    checker_k350 = SCIChecker(geometry=geometry_2d, 
+    checker_k350 = SCIChecker(dimension=2,
                                         predicates=predicates_2d, 
                                         coverageChecker=CoverageChecker,
                                         polytope=base_polytope, 

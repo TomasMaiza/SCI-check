@@ -1,4 +1,4 @@
-from geometry.abstract_structs.halfspace import AbstractHalfspace
+from geometry.abstract_structs.halfspace_old import AbstractHalfspace
 from .point2d import Point2D
 import numpy as np
 from typing import Optional

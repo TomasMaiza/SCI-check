@@ -6,9 +6,9 @@ IN = OrientResult.IN
 OUT = OrientResult.OUT
 ON = OrientResult.ON
 
-__all__ = ["OrientResult", 
-           "PolytopeMap", 
+__all__ = ["OrientResult",  
            "SerializedPolytopeMap",
+           "Point",
            "Edge", 
            "VerticesIndex", 
            "EdgesIndex", 

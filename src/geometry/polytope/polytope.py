@@ -1,13 +1,27 @@
 from abc import ABC, abstractmethod
 import numpy as np
-from typing import Optional
-from geometry import AbstractPoint, AbstractHalfspace
+from typing import Optional, TYPE_CHECKING
+from geometry import AbstractPoint, Halfspace, Hyperplane
+
+if TYPE_CHECKING:
+  from src.common.types import Point, Edge
 
 class Polytope(ABC):
   # Clase abstracta para representar politopos
 
-  def __init__(self, 
-               vertices: Optional['tuple[AbstractPoint, ...]'] = None, 
+  _intDim: int # dimensión intrínseca del politopo
+  _ambDim: int # dimensión ambiental
+  _boundaries: list['Polytope']
+  _vertices: np.ndarray
+  _A: np.ndarray 
+  _b: np.ndarray
+  # _supporting_hyperplane: Hyperplane | None
+
+  def __init__(self,
+               intDim: int,
+               ambDim: int,
+               vertices: Optional['list[Point]'] = None, 
+               verticesnp: Optional['np.ndarray'] = None,
                A: Optional['np.ndarray'] = None, 
                b: Optional['np.ndarray'] = None):
     pass
@@ -19,49 +33,32 @@ class Polytope(ABC):
 
   @abstractmethod
   def get_hrep(self) -> tuple[np.ndarray, np.ndarray]:
-    # permite obtener las matrices A y b que definen al politopo
+    # permite obtener las matrices A y b que definen al politopo (Ax <= b)
     pass
 
   @abstractmethod
-  def get_edges(self) -> list[tuple[tuple[float, ...], tuple[float, ...]]]:
+  def get_edges(self) -> list['Edge']:
     # retorna las aristas del politopo
     pass
 
   @abstractmethod
-  def get_faces(self) -> list['Polytope']:
+  def get_boundaries(self) -> list['Polytope']:
     # devuelve las caras del politopo como objetos Polytope
     pass
 
   @abstractmethod
-  def intersect(self, p: 'Polytope') -> 'Polytope':
-    # permite intersecar el politopo con otro
+  def get_halfspaces(self) -> list[Halfspace]:
+    # devuelve la lista de los semiespacios que definen al politopo
     pass
 
   @abstractmethod
-  def union(self, p: 'Polytope') -> list['Polytope']:
-    # permite calcular la unión del politopo con otro
-    # retorna una lista por si la región resultante no es convexa
+  def get_supporting_hyperplane(self) -> Hyperplane:
+    # retorna el hiperplano que contiene al politopo si intDim < ambDim
     pass
 
   @abstractmethod
-  def difference(self, p: 'Polytope') -> list['Polytope']:
-    # permite calcular la diferencia entre dos politopos
-    pass
-
-  @abstractmethod
-  def is_empty(self) -> bool:
-    # retorna si el politopo es vacío
-    pass
-
-  @abstractmethod
-  def contains(self, x: AbstractPoint):
-    # retorna si un punto pertenece al politopo
-    # usar predicados para hacerlo exacto?
-    pass
-
-  @abstractmethod
-  def subset(self, p: 'Polytope') -> bool:
-    # retorna si el politopo es subconjunto de p
+  def get_centroid(self) -> 'Point':
+    # retorna el centroide del politopo
     pass
 
   @abstractmethod
