@@ -7,11 +7,11 @@ from coverage_checker import *
 from geometry import GeometryFactory, Polytope, ConcretePolytope2D
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
-from common import PolytopeMap, setup_logger
+from common import setup_logger
 import polytope as pc
 
 
-def plot_filled_scenario(title: str, original_poly: Polytope, checker: 'SCIChecker', coverage_result: bool, subregions_map: PolytopeMap):
+def plot_filled_scenario(title: str, original_poly: Polytope, checker: 'SCIChecker', coverage_result: bool, subregions_map: list[Polytope]):
     """Grafica el politopo y las subregiones con relleno traslúcido."""
     fig, ax = plt.subplots(figsize=(10, 8))
 
@@ -24,7 +24,8 @@ def plot_filled_scenario(title: str, original_poly: Polytope, checker: 'SCICheck
     colors = ['#1f77b4', '#ff7f0e', '#d62728', '#9467bd', '#2ca02c'] 
     
     # 3. Reconstruimos los polígonos cerrados a partir de los puntos
-    for mode_idx, halfspaces_list in enumerate(subregions_map):
+    for mode_idx, p in enumerate(subregions_map):
+        halfspaces_list = p.get_halfspaces()
         if not halfspaces_list: 
             continue
             
