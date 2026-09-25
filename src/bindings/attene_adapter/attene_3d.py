@@ -1,4 +1,3 @@
-from geometry.structs_3d import *
 from .attene import AtteneAdapter
 from bindings import pyattene
 from geometry import Halfspace
