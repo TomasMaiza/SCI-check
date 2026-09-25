@@ -20,11 +20,12 @@ class CoverageChecker3D(CoverageChecker):
                                      f1: Halfspace,
                                      f2: Halfspace, 
                                      f3: Halfspace, 
-                                     p: list[Halfspace]) -> bool:
+                                     p: Polytope) -> bool:
     ret = True
-    if len(p) == 0:
+    halfspaces = p.get_halfspaces()
+    if len(halfspaces) == 0:
       ret = False
-    for fp in p:
+    for fp in halfspaces:
       ori = self._predicates.orient_TPI_halfspaces(f1, f2, f3, fp)
       if ori == OUT:
         ret = False
@@ -36,7 +37,7 @@ class CoverageChecker3D(CoverageChecker):
                                 f1: Halfspace, 
                                 f2: Halfspace, 
                                 f3: Halfspace, 
-                                polytopeMap: PolytopeMap, 
+                                subregionsMap: list[Polytope], 
                                 currentpIndex1: int,
                                 currentpIndex2: int, 
                                 currentpIndex3: int) -> OrientResult:
@@ -45,7 +46,7 @@ class CoverageChecker3D(CoverageChecker):
       return IN
     # faces = polytope.get_boundaries()
     ret = OUT
-    for i, p in enumerate(polytopeMap):
+    for i, p in enumerate(subregionsMap):
       #if i not in {currentpIndex1, currentpIndex2, currentpIndex3} and self.implicit_point_in_polytope_TPI(f1, f2, f3, p):
       if i not in {currentpIndex1, currentpIndex2, currentpIndex3} and self.implicit_point_in_polytope_TPI(f1, f2, f3, p):
         ret = IN
@@ -55,21 +56,21 @@ class CoverageChecker3D(CoverageChecker):
 
   def check_c4(self,
                polytope: Polytope,
-               polytopeSet: PolytopeMap) -> OrientResult:
-    faces = [(face, i) for i, p in enumerate(polytopeSet) for face in p]
+               subregionsMap: list[Polytope]) -> OrientResult:
+    faces = [(face, i) for i, p in enumerate(subregionsMap) for face in p]
     for (fi, i), (fj, j), (fk, k) in itertools.combinations(faces, 3): # no repetimos ternas
-      if self.plane_plane_plane_poly_out(polytope, fi, fj, fk, polytopeSet, i, j, k) == OUT:
+      if self.plane_plane_plane_poly_out(polytope, fi, fj, fk, subregionsMap, i, j, k) == OUT:
         return OUT
     return IN
 
   # chequea C1, C2 Y C3 para las caras del politopo
   def envelope_check_faces(self, 
                            polytope: Polytope, 
-                           polytopeSet: PolytopeMap) -> bool:
+                           subregionsMap: list[Polytope]) -> bool:
     faces = polytope.get_boundaries()
     ret = True
     for f in faces:
-      coverage = self._checker.envelope_check(f, polytopeSet)
+      coverage = self._checker.envelope_check(f, subregionsMap)
       if coverage == OUT:
         ret = False
         break
@@ -78,11 +79,11 @@ class CoverageChecker3D(CoverageChecker):
   # chequea un politopo 3d
   def envelope_check(self, 
                      polytope: Polytope, 
-                     polytopeSet: PolytopeMap) -> OrientResult: 
+                     subregionsMap: list[Polytope]) -> OrientResult: 
     ret = IN
-    if not self.envelope_check_faces(polytope, polytopeSet):
+    if not self.envelope_check_faces(polytope, subregionsMap):
       ret = OUT
-    elif self.check_c4(polytope, polytopeSet) == OUT:
+    elif self.check_c4(polytope, subregionsMap) == OUT:
       log.info("Falla C4")
       ret = OUT
     else:
