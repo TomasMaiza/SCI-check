@@ -3,7 +3,6 @@ import numpy.typing as npt
 from scipy.spatial import ConvexHull
 from .subregionsStrategy import SubregionsStrategy
 from affine_system import *
-from common import PolytopeMap
 from geometry import Halfspace, AbstractGeometry, Polytope
 from .approximations import Euler, Taylor
 from affine_system import SwitchedAffineSystem, AffineMode
