@@ -46,3 +46,14 @@ class Geometry2d(AbstractGeometry):
       v1, v2 = Point2D(x = e[0][0], y = e[0][1]), Point2D(x = e[1][0], y = e[1][1])
       geomEdges.append((v1, v2))
     return geomEdges
+
+  '''
+  def get_polytope_edges(self, polytope: 'Polytope') -> list['Edge']:
+    # devuelve una lista de las aristas de un politopo como una lista de (Point2D, Point2D)
+    edges = polytope.get_edges()
+    geomEdges = []
+    for e in edges:
+      v1, v2 = (e[0][0], e[0][1]), (e[1][0], e[1][1])
+      geomEdges.append((v1, v2))
+    return geomEdges
+  '''
