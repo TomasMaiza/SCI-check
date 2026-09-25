@@ -12,7 +12,7 @@ class Predicates3d(AbstractPredicates):
     self._adapter = AtteneAdapter3D()
 
   def orient(self, v: Point, f: Halfspace) -> OrientResult: # retorna IN, OUT, ON
-    ori = self._adapter.orient3dE(v.get_point(), f)
+    ori = self._adapter.orient3dE(v, f)
 
     if ori == -1: # REVISAR ORIENTACIÓN DEL HALFSPACE 3D
       ret = OrientResult.IN
@@ -28,7 +28,7 @@ class Predicates3d(AbstractPredicates):
                  f1: Halfspace, 
                  ref: Halfspace) -> OrientResult: # retorna IN, OUT, ON
     # queremos calcular la orientación de f1 \cap rs respecto a ref
-    pImp = self._adapter.create_implicit_point_lpi(r.get_point(), s.get_point(), f1) # Punto implícito: intersección de rs con f1
+    pImp = self._adapter.create_implicit_point_lpi(r, s, f1) # Punto implícito: intersección de rs con f1
     ori = self._adapter.orient3dI(pImp, ref)
 
     if ori == -1:

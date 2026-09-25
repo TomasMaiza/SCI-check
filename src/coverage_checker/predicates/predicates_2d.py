@@ -11,7 +11,7 @@ class Predicates2d(AbstractPredicates):
 
   def orient(self, v: Point, f: Halfspace) -> OrientResult: # retorna IN, OUT, ON
     # calcula la orientación de v respecto a f
-    ori = self._adapter.orient2d_EEE(v.get_point(), f)
+    ori = self._adapter.orient2d_EEE(v, f)
 
     if ori == 1:
       ret = OrientResult.IN
@@ -27,7 +27,7 @@ class Predicates2d(AbstractPredicates):
                  f1: Halfspace, 
                  ref: Halfspace) -> OrientResult:
     # queremos calcular la orientación de f1 \cap rs respecto a ref
-    pImp = self._adapter.create_implicit_point_ssi(r, r, f1) # Punto implícito: intersección de rs con f1
+    pImp = self._adapter.create_implicit_point_ssi(r, s, f1) # Punto implícito: intersección de rs con f1
     ori = self._adapter.orient2d_IEE(pImp, ref)
 
     if ori == 1:
