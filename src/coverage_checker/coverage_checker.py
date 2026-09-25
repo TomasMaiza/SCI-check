@@ -128,7 +128,8 @@ class _CoverageCheckerIntern:
     edges = self._geometry.get_polytope_edges(polytope)
     polytopes = enumerate(subregionsMap)
     for i, p in polytopes:
-      for f in p:
+      hs = p.get_halfspaces()
+      for f in hs:
         for e in edges:
           if self.edge_plane_out(e[0], e[1], f, subregionsMap, i) == OUT:
             return OUT
@@ -137,7 +138,7 @@ class _CoverageCheckerIntern:
   def check_c3(self, 
                polytope: Polytope, 
                subregionsMap: list[Polytope]) -> OrientResult:
-    faces = [(face, i) for i, p in enumerate(subregionsMap) for face in p]
+    faces = [(face, i) for i, p in enumerate(subregionsMap) for face in p.get_halfspaces()]
     ret = IN
     for (f1, i), (f2, j) in itertools.combinations(faces, 2):
       if self.plane_plane_poly_out(polytope, f1, f2, subregionsMap, i, j) == OUT:

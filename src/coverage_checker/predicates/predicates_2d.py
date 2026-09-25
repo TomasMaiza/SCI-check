@@ -1,4 +1,4 @@
-from common import OrientResult, IN, ON, OUT
+from common import OrientResult, IN, ON, OUT, Point
 from geometry.structs_2d import *
 from geometry import Polytope, Geometry2d, Halfspace
 from .predicates import AbstractPredicates
