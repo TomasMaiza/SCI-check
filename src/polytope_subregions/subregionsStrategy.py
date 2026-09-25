@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import numpy as np
 import numpy.typing as npt
 from affine_system import *
-from common import PolytopeMap
 from geometry import Halfspace, Polytope
 from affine_system import SwitchedAffineSystem
 
