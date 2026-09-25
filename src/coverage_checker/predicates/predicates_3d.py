@@ -1,6 +1,5 @@
 from common import OrientResult, IN, ON, OUT, Point
-from geometry.structs_3d import *
-from geometry import Polytope, Geometry3d, Halfspace
+from geometry import Polytope, Halfspace
 from .predicates import AbstractPredicates
 from fractions import Fraction
 from bindings import AtteneAdapter3D
@@ -12,7 +11,7 @@ class Predicates3d(AbstractPredicates):
   def __init__(self):
     self._adapter = AtteneAdapter3D()
 
-  def orient(self, v: Point3D, f: Halfspace) -> OrientResult: # retorna IN, OUT, ON
+  def orient(self, v: Point, f: Halfspace) -> OrientResult: # retorna IN, OUT, ON
     ori = self._adapter.orient3dE(v.get_point(), f)
 
     if ori == -1: # REVISAR ORIENTACIÓN DEL HALFSPACE 3D
@@ -24,8 +23,8 @@ class Predicates3d(AbstractPredicates):
     return ret
     
   def orient_LPI(self, 
-                 r: Point3D, 
-                 s: Point3D, 
+                 r: Point, 
+                 s: Point, 
                  f1: Halfspace, 
                  ref: Halfspace) -> OrientResult: # retorna IN, OUT, ON
     # queremos calcular la orientación de f1 \cap rs respecto a ref
@@ -83,22 +82,6 @@ class Predicates3d(AbstractPredicates):
     n3 = f3.get_normal()
     det = n1[0]*(n2[1]*n3[2] - n2[2]*n3[1]) - n1[1]*(n2[0]*n3[2] - n2[2]*n3[0]) + n1[2]*(n2[0]*n3[1] - n2[1]*n3[0])
     return det == 0
-
-  def _calculate_normal(self, a: Point3D, b: Point3D, c: Point3D) -> tuple[float, float, float]:
-    # Calcula el vector normal a la cara dados 3 vértices no colineales. 
-    ab_x = b.x - a.x
-    ab_y = b.y - a.y
-    ab_z = b.z - a.z
-
-    ac_x = c.x - a.x
-    ac_y = c.y - a.y
-    ac_z = c.z - a.z
-
-    nx = (ab_y * ac_z) - (ab_z * ac_y)
-    ny = (ab_z * ac_x) - (ab_x * ac_z)
-    nz = (ab_x * ac_y) - (ab_y * ac_x)
-    
-    return nx, ny, nz
 
   def _point_on_same_side(self, 
                           f: Halfspace, 

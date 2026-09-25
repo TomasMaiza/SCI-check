@@ -1,5 +1,5 @@
 from coverage_checker import CoverageCheckStrategy, CoverageChecker, AbstractPredicates
-from geometry import AbstractGeometry, AbstractSimplex, Polytope
+from geometry import Polytope
 from common import ON, OUT, IN
 from triangulation import *
 import numpy as np
@@ -10,18 +10,17 @@ from polytope_subregions import SubregionsStrategy, Subregions
 class SCIChecker():
   def __init__(self, 
                dimension: int,
-               geometry: AbstractGeometry, 
                predicates: AbstractPredicates, 
                coverageChecker: CoverageCheckStrategy,
                polytope: Polytope, 
                sas: SwitchedAffineSystem):
-    self._geometry = geometry
     self._predicates = predicates
     self._polytope = polytope
     self._sas = sas
-    self._subregionsAlgorithm = Subregions(geometry, dimension)
-    self._coverageChecker = coverageChecker(geometry, predicates)
+    self._subregionsAlgorithm = Subregions(dimension)
+    self._coverageChecker = coverageChecker(predicates)
 
+  '''
   def _create_simplices(self, simplices: list[np.ndarray]):
     self._simplices = [] # lista de triángulos en los que se dividió el politopo
     # convertimos a Simplex
@@ -49,6 +48,7 @@ class SCIChecker():
       edges = t.get_all_edges()
       for e in edges:
         self._edgesIndex[e] = False
+  '''
       
 
   def get_subregions(self, dwellTime: float, K: int):

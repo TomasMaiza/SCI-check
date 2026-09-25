@@ -9,9 +9,8 @@ from affine_system import SwitchedAffineSystem, AffineMode
 from .matrices import partition_matrices
 
 class Subregions(SubregionsStrategy):
-  def __init__(self, geometry: AbstractGeometry, dimension: int):
+  def __init__(self, dimension: int):
     self._approxMethod = Taylor
-    self._geometry = geometry
     self._dimension = dimension
   
   def get_subregion(self, 
@@ -44,7 +43,6 @@ class Subregions(SubregionsStrategy):
     matrixb = matrixc - matrixb
     subregionPolytope = type(polytope)(intDim = self._dimension, ambDim = self._dimension, A = matrixA, b = matrixb)
     #subregionPolytope.reduce()
-    #return self._geometry.create_halfspaces_list(subregionPolytope)
     return subregionPolytope
 
   def get_subregions(self, 

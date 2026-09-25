@@ -1,6 +1,5 @@
 from common import OrientResult, IN, ON, OUT, Point
-from geometry.structs_2d import *
-from geometry import Polytope, Geometry2d, Halfspace
+from geometry import Polytope, Halfspace
 from .predicates import AbstractPredicates
 from bindings import AtteneAdapter2D
 
@@ -10,7 +9,7 @@ class Predicates2d(AbstractPredicates):
   def __init__(self):
     self._adapter = AtteneAdapter2D()
 
-  def orient(self, v: Point2D, f: Halfspace) -> OrientResult: # retorna IN, OUT, ON
+  def orient(self, v: Point, f: Halfspace) -> OrientResult: # retorna IN, OUT, ON
     # calcula la orientación de v respecto a f
     ori = self._adapter.orient2d_EEE(v.get_point(), f)
 
@@ -23,14 +22,12 @@ class Predicates2d(AbstractPredicates):
     return ret
 
   def orient_LPI(self, 
-                 r: Point2D, 
-                 s: Point2D, 
+                 r: Point, 
+                 s: Point, 
                  f1: Halfspace, 
                  ref: Halfspace) -> OrientResult:
     # queremos calcular la orientación de f1 \cap rs respecto a ref
-    rpoint = r.get_point()
-    spoint = s.get_point()
-    pImp = self._adapter.create_implicit_point_ssi(rpoint, spoint, f1) # Punto implícito: intersección de rs con f1
+    pImp = self._adapter.create_implicit_point_ssi(r, r, f1) # Punto implícito: intersección de rs con f1
     ori = self._adapter.orient2d_IEE(pImp, ref)
 
     if ori == 1:
@@ -47,7 +44,7 @@ class Predicates2d(AbstractPredicates):
                  f2: Halfspace, 
                  ref: Halfspace) -> OrientResult: # retorna IN, OUT, ON
     points = f1.get_points()
-    r, s = Point2D(points[0][0], points[0][1]), Point2D(points[1][0], points[1][1])
+    r, s = (points[0][0], points[0][1]), (points[1][0], points[1][1])
     return self.orient_LPI(r, s, f2, ref)
 
   def implicit_point_in_polytope(self, 
@@ -57,7 +54,7 @@ class Predicates2d(AbstractPredicates):
     # determina si un punto (intersección de dos semiespacios) pertenece a un politopo
     #edges = polytope.get_edges()
     points = f1.get_points()
-    r, s = Point2D(points[0][0], points[0][1]), Point2D(points[1][0], points[1][1])
+    r, s = (points[0][0], points[0][1]), (points[1][0], points[1][1])
     hs = polytope.get_halfspaces()
     ret = True
     for f in hs:

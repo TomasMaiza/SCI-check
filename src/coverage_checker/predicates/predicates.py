@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from common import OrientResult
+from common import OrientResult, Point
 from geometry.abstract_structs import *
 from geometry import Polytope
 
@@ -7,13 +7,13 @@ class AbstractPredicates(ABC):
   # clase para implementar los predicados en dimensión n
     
   @abstractmethod
-  def orient(self, v: AbstractPoint, f: Halfspace) -> OrientResult: # retorna IN, OUT, ON
+  def orient(self, v: Point, f: Halfspace) -> OrientResult: # retorna IN, OUT, ON
     pass
 
   @abstractmethod
   def orient_LPI(self, 
-                 v1: AbstractPoint, 
-                 v2: AbstractPoint, 
+                 v1: Point, 
+                 v2: Point, 
                  f1: Halfspace, 
                  ref: Halfspace) -> OrientResult: # retorna IN, OUT, ON
     pass

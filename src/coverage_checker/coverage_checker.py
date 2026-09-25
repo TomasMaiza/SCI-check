@@ -9,9 +9,7 @@ import itertools
 # Patrón Proxy
 class _CoverageCheckerIntern:
   def __init__(self,
-               geometry: AbstractGeometry, 
                predicates: AbstractPredicates) -> None:
-    self._geometry = geometry
     self._predicates = predicates
 
   def point_out(self, 
@@ -114,8 +112,8 @@ class _CoverageCheckerIntern:
                subregionsMap: list[Polytope]) -> OrientResult:
     vertices = polytope.get_vertices()
     ret = IN
-    for v in vertices:
-      v = self._geometry.create_point(tuple(v))
+    for vert in vertices:
+      v = tuple(float(x) for x in vert)
       if self.point_out(v, subregionsMap) == OUT:
         #log.info(f"Vértice OUT: {v}")
         ret = OUT
@@ -125,7 +123,7 @@ class _CoverageCheckerIntern:
   def check_c2(self, 
                polytope: Polytope, 
                subregionsMap: list[Polytope]) -> OrientResult:
-    edges = self._geometry.get_polytope_edges(polytope)
+    edges = polytope.get_edges()
     polytopes = enumerate(subregionsMap)
     for i, p in polytopes:
       hs = p.get_halfspaces()
@@ -148,10 +146,9 @@ class _CoverageCheckerIntern:
     return ret
 
 class CoverageChecker(CoverageCheckStrategy):
-  def __init__(self, 
-               geometry: AbstractGeometry, 
+  def __init__(self,
                predicates: AbstractPredicates) -> None:
-    self._checker = _CoverageCheckerIntern(geometry, predicates)
+    self._checker = _CoverageCheckerIntern(predicates)
 
   # chequea UN triángulo
   def envelope_check(self, 
