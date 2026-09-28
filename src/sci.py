@@ -20,93 +20,11 @@ class SCIChecker():
     self._subregionsAlgorithm = Subregions(dimension)
     self._coverageChecker = coverageChecker(predicates)
 
-  '''
-  def _create_simplices(self, simplices: list[np.ndarray]):
-    self._simplices = [] # lista de triángulos en los que se dividió el politopo
-    # convertimos a Simplex
-    for t in simplices:
-      puntos = tuple(self._geometry.create_point(tuple(v)) for v in t)
-      simplex = self._geometry.create_simplex(puntos)
-      self._simplices.append(simplex)
-
-  def triangulate_polytope(self): # asignar índices a vértices y guardar todo en variables?
-    triangulator = PolytopeTriangulator(DelaunayTriangulation())
-    simplices = triangulator.triangulate(self._polytope)
-    self._create_simplices(simplices)
-    self._set_indices()
-
-  def _set_indices(self):
-    self._verticesIndex = {} # diccionario para ver si cada vértice ya se chequeó o no
-    self._edgesIndex = {} # diccionario para ver si cada arista ya se chequeó o no
-    for t in self._simplices:
-      vertices = t.get_vertices()
-      # si dos vértices tienen la misma coordenada ya estarían marcados en el diccionario
-      # como visitados con visitar uno solo
-      for v in vertices:
-        self._verticesIndex[v] = False # ningún vértice fue chequeado aún
-
-      edges = t.get_all_edges()
-      for e in edges:
-        self._edgesIndex[e] = False
-  '''
-      
-
   def get_subregions(self, dwellTime: float, K: int):
     self._subregions = self._subregionsAlgorithm.get_subregions(self._sas, self._polytope, dwellTime, K)
 
-  '''
-  def get_aabb_limits_p(self) -> list[list[tuple[float, float]]]:
-    limits = []
-    for p in self._subregions:
-      p1, p2 = p[0].get_points()
-      xmin = min(p1.x, p2.x)
-      xmax = max(p1.x, p2.x)
-      ymin = min(p1.y, p2.y)
-      ymax = max(p1.y, p2.y)
-      for f in p[1:]:
-        p1, p2 = f.get_points()
-        xmin = min(xmin, p1.x, p2.x)
-        xmax = max(xmax, p1.x, p2.x)
-        ymin = min(ymin, p1.y, p2.y)
-        ymax = max(ymax, p1.y, p2.y)
-      limits.append([(xmin, xmax), (ymin, ymax)])
-    return limits*/
-  
-  def _get_aabb_limits_t(self, triangle: AbstractSimplex) -> list[tuple[float, float]]:
-    v1, v2, v3 = triangle.get_vertices()
-    xmin = min(v1.x, v2.x, v3.x)
-    xmax = max(v1.x, v2.x, v3.x)
-    ymin = min(v1.y, v2.y, v3.y)
-    ymax = max(v1.y, v2.y, v3.y)
-    return [(xmin, xmax), (ymin, ymax)]
-
-  def create_aabb_tree(self):
-    self._aabbTree = AABBTree() # creo el árbol aabb
-    plimits = self.get_aabb_limits_p() # obtengo los límites
-
-    for i, lim in enumerate(plimits): # lleno el árbol
-        caja = AABB(lim)
-        self._aabbTree.add(caja, i)
-
-  def _get_filtered_map(self, triangle: AbstractSimplex):
-    limits = self._get_aabb_limits_t(triangle)
-    box = AABB(limits)
-    indices = self._aabbTree.overlap_values(box)
-    filteredMap = [self._subregions[i] for i in indices]
-    return filteredMap
-  '''
-
-  def check_coverage(self) -> bool: # itera sobre los triángulos
+  def check_coverage(self) -> bool:
     ret = True
-    '''
-    for t in self._simplices:
-      # filteredMap = self._get_filtered_map(t)
-      filteredMap = self._subregions
-      check = self._coverageChecker.envelope_check(t, filteredMap, self._verticesIndex, self._edgesIndex)
-      if check == OUT:
-        ret = False
-        break
-    '''
     check = self._coverageChecker.envelope_check(self._polytope, self._subregions)
     if check == OUT:
       ret = False
@@ -114,8 +32,6 @@ class SCIChecker():
 
   def sci_check(self, dwellTime: float, K: int) -> tuple[bool, list[Polytope]]: # hace todo el proceso
     self.get_subregions(dwellTime, K)
-    # self.triangulate_polytope()
-    # self.create_aabb_tree() # estrategia de aceleración 1
     cov = self.check_coverage()
     subregions = self._subregions
     self._subregions = [] # reinicializamos para un próximo chequeo con otros parámetros
