@@ -91,7 +91,7 @@ def ejecutar_test(T: float, K: int):
   print(f"El resultado es: {cov}")
   print_subregions_debug(subregions)
   plot_3d_scenario("Test 3D SIAM", poly, cov, subregions)
-  plot_projections_2d("Test 3D SIAM", poly, subregions)
+  #plot_projections_2d("Test 3D SIAM", poly, subregions)
 
 def print_subregions_debug(subregions_map: list[Polytope]):
     print("\n" + "="*45)
