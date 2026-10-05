@@ -35,6 +35,16 @@ class Subregions(SubregionsStrategy):
       if k < self._K:
         subregionH.append(Hplus @ phi_k)
         subregionc.append(c)
+
+      # Bloque temporal de depuración para extraer A y b en el paso k
+      temp_matrixH = np.vstack(subregionH)
+      temp_matrixc = np.vstack(subregionc)
+      temp_A, temp_last_col = np.hsplit(temp_matrixH, [dim - 1])
+      temp_b = temp_matrixc - temp_last_col
+      
+      #plot_polytope(temp_A, temp_b, k, polytope)
+      # fin bloque temporal
+
       phi_k = phi @ phi_k
     matrixH = np.vstack(subregionH)
     matrixc = np.vstack(subregionc)
@@ -62,4 +72,75 @@ class Subregions(SubregionsStrategy):
       #if len(halfspaces) != 0:
       polytopeMap.append(subregionPolytope)
     return polytopeMap
+
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+from scipy.spatial import ConvexHull
+import polytope as pc
+import numpy as np
+
+def plot_polytope(A, b, k, original_polytope):
+    try:
+        # 1. Vértices de la subregión dinámica
+        try:
+            poly_sub = pc.Polytope(A, b)
+            V_sub = pc.extreme(poly_sub)
+        except Exception:
+            V_sub = None
+            
+        # 2. Vértices del politopo original
+        V_orig = np.array(original_polytope.get_vertices(), dtype=float)
+        
+        fig = plt.figure(figsize=(8, 8))
+        ax = fig.add_subplot(111, projection='3d')
+        
+        # 3. JAULA ROJA: Trazamos las aristas con ax.plot (evita el bug de la caja negra)
+        if V_orig is not None and len(V_orig) >= 4:
+            hull_orig = ConvexHull(V_orig)
+            for simplex in hull_orig.simplices:
+                # Cerramos el triángulo agregando el primer punto al final
+                s = np.append(simplex, simplex[0])
+                ax.plot(V_orig[s, 0], V_orig[s, 1], V_orig[s, 2], color='red', linewidth=1.2, alpha=0.8)
+                
+        # 4. VOLUMEN CYAN: La subregión
+        if V_sub is not None and len(V_sub) >= 4:
+            hull_sub = ConvexHull(V_sub)
+            faces_sub = [V_sub[simplex] for simplex in hull_sub.simplices]
+            poly3d_sub = Poly3DCollection(faces_sub, facecolors='cyan', edgecolors='blue', linewidths=1.5, alpha=0.4)
+            ax.add_collection3d(poly3d_sub)
+        else:
+            # Si SVD orientó mal el normal, caerá directamente aquí en k=0
+            print(f"k={k}: La subregión cortó todo el volumen y quedó VACÍA.")
+            
+        # 5. Límites dinámicos
+        if V_sub is not None and len(V_sub) > 0 and V_orig is not None and len(V_orig) > 0:
+            all_V = np.vstack((V_orig, V_sub))
+        elif V_orig is not None and len(V_orig) > 0:
+            all_V = V_orig
+        elif V_sub is not None and len(V_sub) > 0:
+            all_V = V_sub
+        else:
+            all_V = np.array([[-1,-1,-1], [1,1,1]])
+            
+        ax.set_xlim([all_V[:,0].min() - 0.05, all_V[:,0].max() + 0.05])
+        ax.set_ylim([all_V[:,1].min() - 0.05, all_V[:,1].max() + 0.05])
+        ax.set_zlim([all_V[:,2].min() - 0.05, all_V[:,2].max() + 0.05])
+        
+        ax.set_title(f"Cobertura en k = {k}\nLíneas Rojas: Original | Volumen Cyan: Subregión")
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        
+        # 6. Control interactivo a prueba de clicks
+        plt.show(block=False) 
+        print(f"Mostrando k={k}. Usá el mouse para rotar. Presioná CUALQUIER TECLA para avanzar...")
+        
+        while True:
+            if plt.waitforbuttonpress():
+                break
+                
+        plt.close(fig) 
+        
+    except Exception as e:
+        print(f"No se pudo graficar en 3D para k={k}. Motivo general: {e}")
 

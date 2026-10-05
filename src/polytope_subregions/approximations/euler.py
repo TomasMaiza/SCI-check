@@ -49,3 +49,4 @@ class Euler(ApproximationStrategy):
     dim = self._homA.shape[0]
     I = np.eye(dim, dtype=np.float64)
     return I + s * self._homA
+  

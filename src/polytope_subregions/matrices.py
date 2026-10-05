@@ -17,7 +17,7 @@ def sas_augmented_matrix(subsystem: AffineMode) -> np.ndarray:
 
 def polytope_augmented_matrix(polytope: Polytope) -> np.ndarray:
   # dado el politopo Hx <= c calcula la matriz aumentada H tilde
-  H, c = polytope.get_hrep()
+  H, c = polytope.get_hrep_normalized()
   n = H.shape[0]
   c = c.reshape(n, 1) 
   return np.hstack((H, -c)) # matriz H tilde (homH)
