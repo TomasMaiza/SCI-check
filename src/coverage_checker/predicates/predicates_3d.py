@@ -47,7 +47,6 @@ class Predicates3d(AbstractPredicates):
     # calcula la orientación del punto intersección de f, f1 y f2 respecto a ref
     pImp = self._adapter.create_implicit_point_tpi(f, f1, f2) # Punto implícito: intersección del plano f con f1 y f2
     ori = self._adapter.orient3dI(pImp, ref)
-
     if ori == -1:
       ret = OrientResult.IN
     elif ori == 0:
@@ -105,7 +104,7 @@ class Predicates3d(AbstractPredicates):
     if len(vertices) < 3:
       return False
     
-    facePoints = [tuple(float(c) for c in v) for v in vertices]
+    facePoints = [tuple(float(c) for c in v) for v in vertices][:3]
     f = Halfspace(points=facePoints)
 
     centroid = polytope.get_centroid() # es un punto interno del politopo para tomar de referencia
