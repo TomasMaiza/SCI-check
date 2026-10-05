@@ -65,4 +65,18 @@ class Predicates2d(AbstractPredicates):
         break
     return ret
 
-    # VER ACÁ LO DE LOS CENTROIDES SI LAS ARISTAS NO ESTÁN ORDENADAS / PARA NO ORDENARLAS
+  def explicit_point_in_polytope(self,
+                                 point: Point,
+                                 polytope: Polytope) -> bool:
+    centroid = polytope.get_centroid()
+    halfspaces = polytope.get_halfspaces()
+    for f in halfspaces:
+      oriPoint = self.orient(point, f)
+      oriCentroid = self.orient(centroid, f)
+      if oriPoint != oriCentroid and oriPoint != ON:
+        return False
+    return True
+
+
+  
+  # VER ACÁ LO DE LOS CENTROIDES SI LAS ARISTAS NO ESTÁN ORDENADAS / PARA NO ORDENARLAS

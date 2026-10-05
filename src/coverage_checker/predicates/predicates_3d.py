@@ -127,14 +127,7 @@ class Predicates3d(AbstractPredicates):
                                      f2: Halfspace,
                                      f3: Halfspace) -> bool:
     # intersección de punto implícito producto de 3 semiespacios con un politopo 3d
-    vertices = polytope.get_vertices()
-    if len(vertices) < 3:
-      return False # o true?
-    a = (float(vertices[0][0]), float(vertices[0][1]), float(vertices[0][2]))
-    b = (float(vertices[1][0]), float(vertices[1][1]), float(vertices[1][2]))
-    c = (float(vertices[2][0]), float(vertices[2][1]), float(vertices[2][2]))
     centroid = polytope.get_centroid()
-    
     ret = True
     faces = polytope.get_halfspaces()
     for ref in faces:
@@ -142,3 +135,15 @@ class Predicates3d(AbstractPredicates):
         ret = False
         break
     return ret
+
+  def explicit_point_in_polytope(self,
+                                 point: Point,
+                                 polytope: Polytope) -> bool:
+    centroid = polytope.get_centroid()
+    halfspaces = polytope.get_halfspaces()
+    for f in halfspaces:
+      oriPoint = self.orient(point, f)
+      oriCentroid = self.orient(centroid, f)
+      if oriPoint != oriCentroid and oriPoint != ON:
+        return False
+    return True
