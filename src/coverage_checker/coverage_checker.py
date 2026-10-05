@@ -12,6 +12,7 @@ class _CoverageCheckerIntern:
                predicates: AbstractPredicates) -> None:
     self._predicates = predicates
 
+  '''
   def point_out(self, 
                 v: Point, 
                 subregionsMap: list[Polytope]) -> OrientResult:
@@ -31,6 +32,15 @@ class _CoverageCheckerIntern:
         ret = IN
         break
     return ret
+  '''
+
+  def point_out(self, 
+                v: Point, 
+                subregionsMap: list[Polytope]) -> OrientResult:  
+    for polytope in subregionsMap:
+      if self._predicates.explicit_point_in_polytope(v, polytope):
+        return IN
+    return OUT
 
   def points_on_same_side(self, 
                           v1: Point, 
@@ -49,9 +59,11 @@ class _CoverageCheckerIntern:
     halfspaces = p.get_halfspaces()
     if len(halfspaces) == 0:
       ret = False
+    centroid = p.get_centroid()
     for fp in halfspaces:
-      ori = self._predicates.orient_TPI(polytope, f1, f2, fp)
-      if ori != IN:
+      oriPoint = self._predicates.orient_TPI(polytope, f1, f2, fp)
+      oriCentroid = self._predicates.orient(centroid, fp)
+      if oriPoint != oriCentroid and oriPoint != ON:
         ret = False
         break
     return ret
@@ -65,9 +77,11 @@ class _CoverageCheckerIntern:
     halfspaces = p.get_halfspaces()
     if len(halfspaces) == 0:
       ret = False
+    centroid = p.get_centroid()
     for fp in halfspaces:
-      ori = self._predicates.orient_LPI(v1, v2, f, fp)
-      if ori == OUT:
+      oriPoint = self._predicates.orient_LPI(v1, v2, f, fp)
+      oriCentroid = self._predicates.orient(centroid, fp)
+      if oriPoint != oriCentroid and oriPoint != ON:
         ret = False
         break
     return ret
@@ -109,7 +123,7 @@ class _CoverageCheckerIntern:
   def check_c1(self, 
                polytope: Polytope, 
                subregionsMap: list[Polytope]) -> OrientResult:
-    return IN
+    #return IN
     vertices = polytope.get_vertices()
     ret = IN
     for vert in vertices:
@@ -123,7 +137,7 @@ class _CoverageCheckerIntern:
   def check_c2(self, 
                polytope: Polytope, 
                subregionsMap: list[Polytope]) -> OrientResult:
-    return IN
+    #return IN
     edges = polytope.get_edges()
     polytopes = enumerate(subregionsMap)
     for i, p in polytopes:
@@ -171,6 +185,7 @@ class _CoverageCheckerIntern:
       if self.plane_plane_poly_out(polytope, f1, f2, subregionsMap, i, j) == OUT:
         ret = OUT
         break 
+    #log.info(f"Check C3: {ret}")
     return ret
 
 class CoverageChecker(CoverageCheckStrategy):

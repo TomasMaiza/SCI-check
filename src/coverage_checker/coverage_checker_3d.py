@@ -22,9 +22,11 @@ class CoverageChecker3D(CoverageChecker):
     halfspaces = p.get_halfspaces()
     if len(halfspaces) == 0:
       ret = False
+    centroid = p.get_centroid()
     for fp in halfspaces:
-      ori = self._predicates.orient_TPI_halfspaces(f1, f2, f3, fp)
-      if ori == OUT:
+      oriImp = self._predicates.orient_TPI_halfspaces(f1, f2, f3, fp)
+      oriCentroid = self._predicates.orient(centroid, fp)
+      if oriImp != oriCentroid and oriImp != ON:
         ret = False
         break
     return ret
