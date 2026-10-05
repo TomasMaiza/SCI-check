@@ -37,9 +37,13 @@ class AtteneAdapter3D(AtteneAdapter):
     aExp, bExp, cExp = self.create_explicit_points_from_halfspace(p1)
     dExp, eExp, fExp = self.create_explicit_points_from_halfspace(p2)
     gExp, hExp, iExp = self.create_explicit_points_from_halfspace(p3)
-    return pyattene.ImplicitPoint3D_TPI(aExp, bExp, cExp,
+    pImp = pyattene.ImplicitPoint3D_TPI(aExp, bExp, cExp,
                                         dExp, eExp, fExp,
                                         gExp, hExp, iExp)
+    if not hasattr(self, '_keepalive_cache'):
+      self._keepalive_cache = []
+    self._keepalive_cache.append((aExp, bExp, cExp, dExp, eExp, fExp, gExp, hExp, iExp))
+    return pImp
 
   def orient3dE(self, 
                 p: Point,
