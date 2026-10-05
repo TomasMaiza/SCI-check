@@ -1,15 +1,12 @@
 import numpy as np
-from typing import Optional, TYPE_CHECKING
-from geometry.abstract_structs.point import AbstractPoint
+from typing import Optional
 from fractions import Fraction
-
-if TYPE_CHECKING:
-    from src.common.types import Point
+from common import Point
 
 class Halfspace():
   # representación de un semiespacio en un espacio n-dimensional
 
-  _points: list['Point']
+  _points: list[Point]
   _normal: np.ndarray
   _b: float
 
@@ -23,7 +20,7 @@ class Halfspace():
     if points is None and normalVector is None and b is None:
       raise ValueError("Inicialización inválida: Proveer puntos o (normalVector, b).")
 
-  def get_points(self) -> list['Point']: # retorna los puntos que definen el semiespacio
+  def get_points(self) -> list[Point]: # retorna los puntos que definen el semiespacio
     return self._points
 
   def create_from_normal_vector(self, normalVector: np.ndarray, b: float): 
@@ -33,8 +30,9 @@ class Halfspace():
   def get_normal(self) -> np.ndarray: # permite obtener el vector normal del semiespacio
     if self._normal is not None:
       return self._normal
-    p0 = self._points[0]
-    vectors = self._points[1:] - p0
+    p0 = np.array(self._points[0], dtype=float)
+    rest = np.array(self._points[1:], dtype=float)
+    vectors = rest - p0
     # SVD descompone la matriz. La última fila de Vh es siempre ortogonal a vectors
     _, _, Vh = np.linalg.svd(vectors)
     self._normal = Vh[-1]
