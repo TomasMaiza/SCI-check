@@ -37,6 +37,11 @@ class Polytope(ABC):
     pass
 
   @abstractmethod
+  def get_hrep_normalized(self) -> tuple[np.ndarray, np.ndarray]:
+    # permite obtener las matrices A y b que definen al politopo (Ax <= b) normalizadas
+    pass
+
+  @abstractmethod
   def get_edges(self) -> list['Edge']:
     # retorna las aristas del politopo
     pass

@@ -72,6 +72,13 @@ class ConcretePolytope(Polytope):
     if self._A is not None and self._b is not None:
       return self._A, self._b
 
+  def get_hrep_normalized(self) -> tuple[np.ndarray, np.ndarray]:
+    # permite obtener las matrices A y b que definen al politopo (Ax <= b) normalizadas
+    norms = np.linalg.norm(self._A, axis=1, keepdims=True)
+    H = self._A / norms
+    c = self._b.reshape(-1, 1) / norms
+    return H, c.flatten()
+
   def get_edges(self) -> list['Edge']:
     # retorna las aristas del politopo
     pass
