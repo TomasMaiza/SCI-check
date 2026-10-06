@@ -24,16 +24,13 @@ def polytope_augmented_matrix(polytope: Polytope) -> np.ndarray:
 
 def partition_matrices(polytope: Polytope, 
                        subsystem: AffineMode, 
-                       r: float, 
-                       h: float, 
-                       midErrorBound: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+                       h: float) -> tuple[np.ndarray, np.ndarray]:
   homA = sas_augmented_matrix(subsystem)
   homH = polytope_augmented_matrix(polytope)
 
   dim = homA.shape[0]
   I = np.eye(dim, dtype=np.float64)
   dim = homH.shape[0]
-  ones = np.ones((dim, 1), dtype=np.float64)
 
   Hplus = np.block([
       [homH],
@@ -45,12 +42,22 @@ def partition_matrices(polytope: Polytope,
         [homH @ (I - h/2 * homA)]
     ])
 
+  return Hplus, Hminus
+
+def partition_matrices_bound(polytope: Polytope, 
+                             r: float, 
+                             midErrorBound: float) -> np.ndarray:
+  homH = polytope_augmented_matrix(polytope)
+
+  dim = homH.shape[0]
+  ones = np.ones((dim, 1), dtype=np.float64)
+
   c = np.block([
         [-r * ones],
         [-midErrorBound * ones]
     ])
   
-  return Hplus, Hminus, c
+  return c
 
 def augmented_x(x: npt.NDArray[np.float64]) -> np.ndarray:
   # aumenta la matriz x a [x, 1]^T

@@ -6,7 +6,7 @@ from affine_system import *
 from geometry import Halfspace, AbstractGeometry, Polytope
 from .approximations import Euler, Taylor
 from affine_system import SwitchedAffineSystem, AffineMode
-from .matrices import partition_matrices
+from .matrices import partition_matrices, partition_matrices_bound
 
 class Subregions(SubregionsStrategy):
   def __init__(self, dimension: int):
@@ -23,28 +23,20 @@ class Subregions(SubregionsStrategy):
     phi = approx.get_matrix(self._h) # matriz de la aproximación
     dim = phi.shape[0]
     phi_k = np.eye(dim, dtype=np.float64) # matriz de la aproximación para el paso k
+    Hplus, Hminus = partition_matrices(polytope, subsystem, self._h)
     subregionH = [] # apilamos las matrices de las inecuaciones
     subregionc = []
     for k in range(0, self._K + 1):
       r = errorSeq[k]
       midr = approx.error_bound(r, self._h/2)
-      Hplus, Hminus, c = partition_matrices(polytope, subsystem, r, self._h, midr)
+      # calcular H una sola vez fuera del for
+      c = partition_matrices_bound(polytope, r, midr) 
       if k > 0:
         subregionH.append(Hminus @ phi_k)
         subregionc.append(c)
       if k < self._K:
         subregionH.append(Hplus @ phi_k)
         subregionc.append(c)
-
-      # Bloque temporal de depuración para extraer A y b en el paso k
-      temp_matrixH = np.vstack(subregionH)
-      temp_matrixc = np.vstack(subregionc)
-      temp_A, temp_last_col = np.hsplit(temp_matrixH, [dim - 1])
-      temp_b = temp_matrixc - temp_last_col
-      
-      #plot_polytope(temp_A, temp_b, k, polytope)
-      # fin bloque temporal
-
       phi_k = phi @ phi_k
     matrixH = np.vstack(subregionH)
     matrixc = np.vstack(subregionc)
