@@ -9,3 +9,8 @@ function sas_augmented_matrix(A::IntervalMatrix, b::Vector{Interval{Float64}})::
   return IntervalMatrix(homA)
 end
 
+function polytope_augmented_matrix(H::IntervalMatrix, c::Vector{Interval{Float64}})::IntervalMatrix
+  homH = [Matrix(H) -c]
+  return IntervalMatrix(homH)
+end
+
