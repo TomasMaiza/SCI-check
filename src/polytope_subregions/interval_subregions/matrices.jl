@@ -38,12 +38,12 @@ function partition_matrices_bound(H::IntervalMatrix, c::Vector{Interval{Float64}
   homH = polytope_augmented_matrix(H, c)
   dim = size(homH, 1)
   ones = ones(Interval{Float64}, dim, 1)
-  rInterval = interval(r)
-  midErrorInterval = interval(midErrorBound)
-
-  c = [-rInterval * ones;
-       -midErrorInterval * ones]
+  c = [-r * ones;
+       -midErrorBound * ones]
 
   return c
 end
 
+function augmented_x(x::Vector{Interval{Float64}})::Vector{Interval{Float64}}
+  return [x; interval(1.0)]
+end
