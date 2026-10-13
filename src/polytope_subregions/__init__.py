@@ -1,11 +1,3 @@
-from .matrices import sas_augmented_matrix, polytope_augmented_matrix, partition_matrices, partition_matrices_bound, augmented_x
-from .subregions import Subregions
-from .subregionsStrategy import SubregionsStrategy
+from .float_subregions import FloatSubregions
 
-__all__ = ["sas_augmented_matrix",
-           "polytope_augmented_matrix",
-           "partition_matrices",
-           "partition_matrices_bound",
-           "augmented_x",
-           "Subregions",
-           "SubregionsStrategy"]
+__all__ = ["FloatSubregions"]

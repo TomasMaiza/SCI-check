@@ -1,12 +1,11 @@
 import numpy as np
-from .subregionsStrategy import SubregionsStrategy
+from .subregions_strategy import SubregionsStrategy
 from affine_system import *
 from geometry import Polytope
-from .approximations import Euler, Taylor
+from .float_imp import Euler, Taylor, partition_matrices, partition_matrices_bound
 from affine_system import SwitchedAffineSystem, AffineMode
-from .matrices import partition_matrices, partition_matrices_bound
 
-class Subregions(SubregionsStrategy):
+class FloatSubregions(SubregionsStrategy):
   def __init__(self, dimension: int):
     self._approxMethod = Taylor
     self._dimension = dimension

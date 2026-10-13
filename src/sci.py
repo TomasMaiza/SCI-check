@@ -4,7 +4,7 @@ from common import ON, OUT, IN
 import numpy as np
 from aabbtree import AABB, AABBTree
 from affine_system import SwitchedAffineSystem
-from polytope_subregions import SubregionsStrategy, Subregions
+from polytope_subregions import FloatSubregions
 
 class SCIChecker():
   def __init__(self, 
@@ -16,7 +16,7 @@ class SCIChecker():
     self._predicates = predicates
     self._polytope = polytope
     self._sas = sas
-    self._subregionsAlgorithm = Subregions(dimension)
+    self._subregionsAlgorithm = FloatSubregions(dimension)
     self._coverageChecker = coverageChecker(predicates)
 
   def get_subregions(self, dwellTime: float, K: int):
