@@ -15,3 +15,4 @@ env/
 *.log
 Estructura
 pruebas_julia
+struct_subr.txt

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from typing import Optional, TYPE_CHECKING
-from geometry import AbstractPoint, Halfspace, Hyperplane
+from geometry import Halfspace, Hyperplane
 from .polytope import Polytope
 import polytope as pc
 from scipy.spatial import ConvexHull

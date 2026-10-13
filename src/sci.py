@@ -1,7 +1,6 @@
 from coverage_checker import CoverageCheckStrategy, CoverageChecker, AbstractPredicates
 from geometry import Polytope
 from common import ON, OUT, IN
-from triangulation import *
 import numpy as np
 from aabbtree import AABB, AABBTree
 from affine_system import SwitchedAffineSystem
