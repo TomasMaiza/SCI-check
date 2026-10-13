@@ -4,11 +4,11 @@ using LinearAlgebra
 
 abstract type ApproximationStrategy end
 
-function apply(approx::ApproximationStrategy, s::Float64, x::Vector{Float64})::Vector{Float64}
+function apply(approx::ApproximationStrategy, s::Float64, x::Vector{Float64})::Vector{Interval{Float64}}
   error("El método apply() no está implementado para la estrategia $(typeof(approx))")
 end
 
-function error_bound(approx::ApproximationStrategy, r::Float64, tau::Float64)::Vector{Interval{Float64}}
+function error_bound(approx::ApproximationStrategy, r::Interval{Float64}, tau::Float64)::Interval{Float64}
   error("El método error_bound() no está implementado para la estrategia $(typeof(approx))")
 end
 
