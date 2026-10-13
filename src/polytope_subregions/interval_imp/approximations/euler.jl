@@ -10,12 +10,12 @@ struct Euler <: ApproximationStrategy
 end
 
 # si queda así borrarlo, Julia lo asume así por defecto
-function Euler(A::IntervalMatrix, 
-               b::Vector{Interval{Float64}}, 
-               homA::IntervalMatrix, 
-               S::Vector{Vector{Interval{Float64}}})::Euler
-    return Euler(A, b, homA, S)
-end
+#function Euler(A::IntervalMatrix, 
+#               b::Vector{Interval{Float64}}, 
+#               homA::IntervalMatrix, 
+#               S::Vector{Vector{Interval{Float64}}})::Euler
+#    return Euler(A, b, homA, S)
+#end
 
 function apply(approx::Euler, s::Float64, x::Vector{Float64})::Vector{Interval{Float64}}
   return x + s * (approx.A * x + approx.b)
@@ -24,7 +24,8 @@ end
 function error_bound(approx::Euler, 
                      r::Interval{Float64}, 
                      tau::Float64)::Interval{Float64}
-  normA = interval(opnorm(approx.A, 2))
+  magA = mag.(Matrix(approx.A)) # matriz de magnitudes puras Float64 (valor absoluto máximo)
+  normA = interval(opnorm(magA, 2))
   M = _get_M(approx, normA)
   oneInt = interval(1.0)
   return r * (oneInt + normA * tau) + M * (exp(normA * tau) - oneInt - normA * tau)
