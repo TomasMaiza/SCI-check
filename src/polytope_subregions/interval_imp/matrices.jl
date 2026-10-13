@@ -21,13 +21,13 @@ function partition_matrices(H::IntervalMatrix, c::Vector{Interval{Float64}},
   homA = sas_augmented_matrix(A, b)
   homH = polytope_augmented_matrix(H, c)
   dimA = size(homA, 1)
-  I = Matrix{Interval{Float64}}(I, dimA, dimA)
+  matrixI = IntervalMatrix(Matrix{Interval{Float64}}(I, dimA, dimA))
 
   Hplus = [Matrix(homH);
-           Matrix(homH * (I + h/2 * homA))]
+           Matrix(homH * (matrixI + h/2 * homA))]
   
   Hminus = [Matrix(homH);
-            Matrix(homH * (I - h/2 * homA))]
+            Matrix(homH * (matrixI - h/2 * homA))]
 
   return IntervalMatrix(Hplus), IntervalMatrix(Hminus)
 end
@@ -37,9 +37,9 @@ function partition_matrices_bound(H::IntervalMatrix, c::Vector{Interval{Float64}
                                   midErrorBound::Float64)::Vector{Interval{Float64}}
   homH = polytope_augmented_matrix(H, c)
   dim = size(homH, 1)
-  ones = ones(Interval{Float64}, dim, 1)
-  c = [-r * ones;
-       -midErrorBound * ones]
+  onesVector = ones(Interval{Float64}, dim)
+  c = [-r * onesVector;
+       -midErrorBound * onesVector]
 
   return c
 end
