@@ -17,7 +17,7 @@ end
 
 function partition_matrices(H::IntervalMatrix, c::Vector{Interval{Float64}}, 
                             A::IntervalMatrix, b::Vector{Interval{Float64}},
-                            h::Float64)::(IntervalMatrix, IntervalMatrix)
+                            h::Float64)::Tuple{IntervalMatrix, IntervalMatrix}
   homA = sas_augmented_matrix(A, b)
   homH = polytope_augmented_matrix(H, c)
   dimA = size(homA, 1)
