@@ -27,7 +27,6 @@ class Subregions(SubregionsStrategy):
     for k in range(0, self._K + 1):
       r = errorSeq[k]
       midr = approx.error_bound(r, self._h/2)
-      # calcular H una sola vez fuera del for
       c = self._engine.partition_matrices_bound(polytope, r, midr) 
       if k > 0:
         subregionH.append(Hminus @ phi_k)
