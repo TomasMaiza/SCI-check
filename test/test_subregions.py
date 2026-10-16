@@ -822,7 +822,7 @@ def test_get_subregion():
 
 def test_get_subregions():
   geometry_2d = GeometryFactory[2]()
-  subregions = FloatSubregions(geometry=geometry_2d)
+  subregions = Subregions(geometry=geometry_2d)
     
   # Caja inicial de [-1, 1]
   A_poly = np.array([[ 1.0,  0.0], [-1.0,  0.0], [ 0.0,  1.0], [ 0.0, -1.0]])
