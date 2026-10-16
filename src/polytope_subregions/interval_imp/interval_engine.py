@@ -2,9 +2,12 @@ from affine_system import AffineMode
 from geometry import Polytope
 import numpy as np
 from polytope_subregions.engine_strategy import EngineStrategy
+from juliacall import Main as jl
+
+jl.include("interval_main.jl") # ojo si falla esto
 
 class IntervalEngine(EngineStrategy):
-  _approxMethodDict = {"Euler": , "Taylor": }
+  _approxMethodDict = {"Euler": jl.Euler, "Taylor": jl.Taylor}
 
   def __init__(self, approxMethodName: str):
     # permite inicializar el motor con el método deseado (es decir, se setea en subregions)
