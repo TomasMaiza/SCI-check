@@ -1,7 +1,6 @@
 using IntervalArithmetic
 using IntervalMatrices
 using LinearAlgebra
-using matrices
 
 struct Taylor <: ApproximationStrategy
   A::IntervalMatrix
@@ -88,6 +87,6 @@ function get_matrix(approx::Taylor, h::Float64)::IntervalMatrix
     term = (term * (approx.homA * tau)) * interval(1.0 / j)
     Q = Q + term
   end
-  
+
   return Q^approx.scaling
 end
