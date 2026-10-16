@@ -24,7 +24,7 @@ end
 function error_bound(approx::Euler, 
                      r::Interval{Float64}, 
                      tau::Float64)::Interval{Float64}
-  magA = mag.(Matrix(approx.A)) # matriz de magnitudes puras Float64 (valor absoluto máximo)
+  magA = mag.(Matrix(approx.A)) # matriz de magnitudes Float64 (valor absoluto máximo)
   normA = interval(opnorm(magA, 2))
   M = _get_M(approx, normA)
   oneInt = interval(1.0)
