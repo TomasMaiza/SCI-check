@@ -1,0 +1,65 @@
+import numpy as np
+from .subregions_strategy import SubregionsStrategy
+from geometry import Polytope
+from .float_imp import FloatEngine
+# from .interval_imp import ...
+from affine_system import SwitchedAffineSystem, AffineMode
+
+class Subregions(SubregionsStrategy):
+  def __init__(self, dimension: int):
+    self._engine = FloatEngine("Taylor")
+    #self._mathStrategy = Float
+    self._dimension = dimension
+  
+  def get_subregion(self, 
+                    subsystem: AffineMode, 
+                    polytope: Polytope) -> Polytope:
+    # obtiene la subregión para un modo particular
+    approx = self._engine.approxMethod(subsystem, polytope, scaling=1, order=4)
+    r = 0 # r_0
+    errorSeq = approx.error_sequence(self._h, self._K)
+    phi = approx.get_matrix(self._h) # matriz de la aproximación
+    dim = phi.shape[0]
+    phi_k = np.eye(dim, dtype=np.float64) # matriz de la aproximación para el paso k
+    Hplus, Hminus = self._engine.partition_matrices(polytope, subsystem, self._h)
+    subregionH = [] # apilamos las matrices de las inecuaciones
+    subregionc = []
+    for k in range(0, self._K + 1):
+      r = errorSeq[k]
+      midr = approx.error_bound(r, self._h/2)
+      # calcular H una sola vez fuera del for
+      c = self._engine.partition_matrices_bound(polytope, r, midr) 
+      if k > 0:
+        subregionH.append(Hminus @ phi_k)
+        subregionc.append(c)
+      if k < self._K:
+        subregionH.append(Hplus @ phi_k)
+        subregionc.append(c)
+      phi_k = phi @ phi_k
+    matrixH = np.vstack(subregionH)
+    matrixc = np.vstack(subregionc)
+    # obtengo A y b separando la última columna de matrixH y me queda que Ax <= c - b
+    matrixA, matrixb = np.hsplit(matrixH, [dim - 1]) # obtiene A y b separando la últ col de H
+    matrixb = matrixc - matrixb
+    subregionPolytope = type(polytope)(intDim = self._dimension, ambDim = self._dimension, A = matrixA, b = matrixb)
+    #subregionPolytope.reduce()
+    return subregionPolytope
+
+  def get_subregions(self, 
+                     sas: SwitchedAffineSystem, 
+                     polytope: Polytope, 
+                     dwellTime: float, 
+                     K: int) -> list[Polytope]:
+    # recibe un politopo, el sistema y los parámetros para devolver la lista de subregiones
+    h = dwellTime/K
+    self._K = K
+    self._h = h
+    modes = sas.get_all_modes()
+    polytopeMap = [] # inicializo el mapa de politopos para cada modo
+    for i in modes:
+      subsystem = sas.get_subsystem(i)
+      subregionPolytope = self.get_subregion(subsystem, polytope)
+      #if len(halfspaces) != 0:
+      polytopeMap.append(subregionPolytope)
+    return polytopeMap
+
