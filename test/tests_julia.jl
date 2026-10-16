@@ -4,10 +4,10 @@ using IntervalMatrices
 using LinearAlgebra
 
 # 1. Importamos los archivos que vamos a testear
-# Asegurate de que los nombres coincidan exactamente con tus archivos
 include("../src/polytope_subregions/interval_imp/approximations/strategy.jl")
 include("../src/polytope_subregions/interval_imp/matrices.jl")
 include("../src/polytope_subregions/interval_imp/approximations/euler.jl")
+include("../src/polytope_subregions/interval_imp/approximations/taylor.jl")
 
 @testset "Suite de Pruebas SCI-check" begin
 
@@ -52,7 +52,6 @@ include("../src/polytope_subregions/interval_imp/approximations/euler.jl")
             @test size(Hminus) == (4, 3)
             
             # Caso Borde: h = 0.0
-            # Si h=0, Hplus y Hminus deberían ser simplemente [homH; homH]
             Hp_zero, Hm_zero = partition_matrices(H, c, A, b, 0.0)
             @test Hp_zero[1:2, :] == Hp_zero[3:4, :]
             @test Hm_zero[1:2, :] == Hm_zero[3:4, :]
@@ -84,74 +83,126 @@ include("../src/polytope_subregions/interval_imp/approximations/euler.jl")
         end
     end
 
-    @testset "Pruebas de euler_3.jl" begin
-        # Setup: Creamos un sistema dummy para inyectar en la estrategia de Euler
+    @testset "Pruebas de euler.jl" begin
         A_dummy = IntervalMatrix([0.0 1.0; -1.0 0.0])
         b_dummy = [interval(0.0), interval(0.0)]
         homA_dummy = sas_augmented_matrix(A_dummy, b_dummy)
         S_dummy = [[interval(1.0), interval(1.0)], [interval(-1.0), interval(-1.0)]]
         
-        # Instanciamos la estrategia
         euler_strat = Euler(A_dummy, b_dummy, homA_dummy, S_dummy)
         
         @testset "Constructor Euler" begin
-            # Verificamos que el constructor externo (o interno) guardó bien los datos
             @test size(euler_strat.A) == (2, 2)
             @test length(euler_strat.S) == 2
         end
 
         @testset "apply" begin
-            # Caso Normal: paso s = 0.1
-            x = [1.0, 1.0] # Vector exacto Float64
+            x = [1.0, 1.0]
             x_next = apply(euler_strat, 0.1, x)
             @test length(x_next) == 2
             @test typeof(x_next) == Vector{Interval{Float64}}
             
-            # Caso Borde: paso s = 0.0 -> el estado no debería cambiar (x_next == x)
             x_zero = apply(euler_strat, 0.0, x)
             @test inf(x_zero[1]) == 1.0 && sup(x_zero[1]) == 1.0
         end
 
         @testset "_get_M" begin
-            # Calculamos M manualmente. 
-            # normA es 1.0. Para S = [1, 1], A*x+b = [1, -1], su norma 2 es sqrt(2)
             M_int = _get_M(euler_strat, interval(1.0))
             @test typeof(M_int) == Interval{Float64}
-            # Comprobamos que contiene el valor aproximado de raíz de 2
             @test inf(M_int) <= sqrt(2.0) <= sup(M_int)
         end
 
         @testset "error_bound" begin
-            # Caso Borde: sin error inicial y sin paso (tau = 0.0)
             err_zero = error_bound(euler_strat, interval(0.0), 0.0)
             @test inf(err_zero) == 0.0 && sup(err_zero) == 0.0
             
-            # Caso Normal: r = 0, tau = 0.1
             err_normal = error_bound(euler_strat, interval(0.0), 0.1)
-            # El error introducido por la aproximación debe ser estrictamente positivo
             @test inf(err_normal) >= 0.0 
         end
 
         @testset "error_sequence" begin
-            # Caso Normal: K = 3
             seq = error_sequence(euler_strat, 0.1, 3)
-            # Si K=3, la secuencia tiene K+1 (4) elementos
             @test length(seq) == 4
-            # El primer elemento r0 debe ser 0.0
             @test seq[1] == interval(0.0)
-            # El error debe ser creciente r_k <= r_{k+1}
             @test sup(seq[1]) <= inf(seq[2])
             @test sup(seq[2]) <= inf(seq[3])
         end
 
         @testset "get_matrix" begin
-            # Caso Normal: s = 0.1
             phi = get_matrix(euler_strat, 0.1)
-            @test size(phi) == (3, 3) # Dimensión de homA
+            @test size(phi) == (3, 3) 
             
-            # Caso Borde: s = 0.0
-            # Si el paso es 0, la matriz de aproximación Phi debe ser exactamente la Identidad
             phi_zero = get_matrix(euler_strat, 0.0)
+            @test phi_zero[1, 1] == interval(1.0)
+            @test phi_zero[1, 2] == interval(0.0)
+        end
+    end
+
+    @testset "Pruebas de taylor.jl" begin
+        # Setup similar a Euler pero agregamos scaling y order
+        A_dummy = IntervalMatrix([0.0 1.0; -1.0 0.0])
+        b_dummy = [interval(0.0), interval(0.0)]
+        homA_dummy = sas_augmented_matrix(A_dummy, b_dummy)
+        S_dummy = [[interval(1.0), interval(1.0)], [interval(-1.0), interval(-1.0)]]
+        scaling = 2
+        order = 3
+        
+        taylor_strat = Taylor(A_dummy, b_dummy, homA_dummy, S_dummy, scaling, order)
+
+        @testset "Constructor Taylor" begin
+            @test taylor_strat.scaling == 2
+            @test taylor_strat.order == 3
+            
+            # Prueba del cálculo de R_S (polyRad):
+            # Los vértices son [1, 1] y [-1, -1]. Aumentados son [1, 1, 1] y [-1, -1, 1].
+            # La norma 2 de [1, 1, 1] es sqrt(1^2 + 1^2 + 1^2) = sqrt(3)
+            @test inf(taylor_strat.polyRad) <= sqrt(3.0) <= sup(taylor_strat.polyRad)
+        end
+
+        @testset "apply" begin
+            x = [1.0, 1.0] 
+            x_next = apply(taylor_strat, 0.1, x)
+            # Verificamos que se descartó la coordenada homogénea al final (dimensión 2, no 3)
+            @test length(x_next) == 2
+            @test typeof(x_next) == Vector{Interval{Float64}}
+        end
+
+        @testset "_get_M" begin
+            M_int = _get_M(taylor_strat, interval(1.0))
+            @test typeof(M_int) == Interval{Float64}
+            @test inf(M_int) <= sqrt(2.0) <= sup(M_int)
+        end
+        
+        @testset "_get_C_err" begin
+            # Evaluamos la función específica de Taylor
+            C_err = _get_C_err(taylor_strat, interval(1.0), 0.1)
+            @test typeof(C_err) == Interval{Float64}
+            @test inf(C_err) > 0.0
+        end
+
+        @testset "error_bound" begin
+            err_zero = error_bound(taylor_strat, interval(0.0), 0.0)
+            @test inf(err_zero) == 0.0 && sup(err_zero) == 0.0
+            
+            err_normal = error_bound(taylor_strat, interval(0.0), 0.1)
+            @test inf(err_normal) >= 0.0 
+        end
+
+        @testset "error_sequence" begin
+            seq = error_sequence(taylor_strat, 0.1, 3)
+            @test length(seq) == 4
+            @test seq[1] == interval(0.0)
+            # El error en Taylor también debe ser monotónico creciente
+            @test sup(seq[1]) <= inf(seq[2])
+            @test sup(seq[2]) <= inf(seq[3])
+        end
+
+        @testset "get_matrix" begin
+            phi = get_matrix(taylor_strat, 0.1)
+            @test size(phi) == (3, 3) 
+            
+            # Si el paso es 0, Q es I, tau es 0, por ende Q^s debe ser la Identidad
+            phi_zero = get_matrix(taylor_strat, 0.0)
             @test phi_zero[1, 1] == interval(1.0)
             @test phi_zero[1, 2] == interval(0.0)
         end
