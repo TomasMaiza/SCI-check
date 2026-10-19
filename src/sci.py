@@ -4,7 +4,7 @@ from common import ON, OUT, IN
 import numpy as np
 from aabbtree import AABB, AABBTree
 from affine_system import SwitchedAffineSystem
-from polytope_subregions import FloatSubregions, IntervalSubregions
+from polytope_subregions import FloatSubregions
 
 class SCIChecker():
   def __init__(self, 
