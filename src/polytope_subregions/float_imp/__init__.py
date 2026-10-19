@@ -1,3 +1,4 @@
-from .float_engine import FloatEngine
+from .approximations import Euler, Taylor
+from .matrices import partition_matrices, partition_matrices_bound
 
-__all__ = ["FloatEngine"]
+__all__ = ["Euler", "Taylor", "partition_matrices", "partition_matrices_bound"]

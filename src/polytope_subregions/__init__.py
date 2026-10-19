@@ -1,3 +1,3 @@
-from .subregions import Subregions
+from .float_subregions import FloatSubregions
 
-__all__ = ["Subregions"]
+__all__ = ["FloatSubregions"]
