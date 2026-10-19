@@ -44,5 +44,17 @@ function get_subregion(approx::ApproximationStrategy,
   matrixb_col = matrixH[:, dim]
   matrixb = matrixc .- matrixb_col
 
-  return IntervalMatrix(matrixA), matrixb
+  ## Compensación del error de matrixA, REVISAR
+  # 1. Calculamos el radio de incertidumbre de matrixA: (sup - inf) / 2
+  A_rad = (sup.(matrixA) .- inf.(matrixA)) ./ 2.0
+
+  # 2. Buscamos la coordenada máxima absoluta entre los vértices del politopo (approx.S)
+  n_dim = size(matrixA, 2)
+  x_max = [maximum(sup(abs(v[j])) for v in approx.S) for j in 1:n_dim]
+
+  # 3. Restamos ese peor caso angular a matrixb para achicar la pared de forma segura
+  matrixb_safe = matrixb .- (A_rad * x_max)
+  ##
+
+  return IntervalMatrix(matrixA), matrixb_safe
 end
