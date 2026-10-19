@@ -3,6 +3,7 @@ from .subregions_strategy import SubregionsStrategy
 from affine_system import *
 from geometry import Polytope
 #from .float_imp import Euler, Taylor, partition_matrices, partition_matrices_bound
+#from .interval_imp import *
 from affine_system import SwitchedAffineSystem, AffineMode
 
 class IntervalSubregions(SubregionsStrategy):
@@ -13,7 +14,16 @@ class IntervalSubregions(SubregionsStrategy):
                     subsystem: AffineMode, 
                     polytope: Polytope) -> Polytope:
     # obtiene la subregión para un modo particular
-    pass
+    H, c = polytope.get_hrep_normalized() # normalized o no?
+    A, b = subsystem.get_subsystem()
+
+    H_jl = np_to_interval_matrix(H)
+    c_jl = np_to_interval_vector(c)
+    A_jl = np_to_interval_matrix(A)
+    b_jl = np_to_interval_vector(b)
+
+    # llamar a jl.get_subregion
+    # Indico desde acá el método de aprox?
 
   def get_subregions(self, 
                      sas: SwitchedAffineSystem, 
