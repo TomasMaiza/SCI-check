@@ -32,3 +32,21 @@ def set_approx_method(methodName: str):
   # crea y retorna una instancia del método de aproximación deseado
   dict = {"Euler": jl.Euler, "Taylor": jl.Taylor}
   return dict[methodName]
+
+def get_subregion_from_julia(methodName: str,
+                             H: np.ndarray,
+                             c: np.ndarray,
+                             A: np.ndarray,
+                             b: np.ndarray,
+                             h: float,
+                             K: int):
+  # ejecuta get_subregion de Julia y retorna las matrices del politopo en formato np
+  H_jl = np_to_interval_matrix(H)
+  c_jl = np_to_interval_vector(c)
+  A_jl = np_to_interval_matrix(A)
+  b_jl = np_to_interval_vector(b)
+  approx = set_approx_method(methodName)
+  subregionA_jl, subregionb_jl = jl.get_subregion(approx, H_jl, c_jl, A_jl, b_jl, h, K)
+  subregionA = interval_to_np_matrix(subregionA_jl)
+  subregionb = interval_to_np_vector(subregionb_jl)
+  return subregionA, subregionb
