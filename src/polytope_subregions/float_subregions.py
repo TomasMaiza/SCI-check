@@ -15,7 +15,6 @@ class FloatSubregions(SubregionsStrategy):
                     polytope: Polytope) -> Polytope:
     # obtiene la subregión para un modo particular
     approx = self._approxMethod(subsystem, polytope, scaling=1, order=4)
-    r = 0 # r_0
     errorSeq = approx.error_sequence(self._h, self._K)
     phi = approx.get_matrix(self._h) # matriz de la aproximación
     dim = phi.shape[0]
