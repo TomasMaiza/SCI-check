@@ -27,3 +27,8 @@ def interval_to_np_vector(jlVector) -> np.ndarray:
 
 def interval_to_np_matrix(jlMatrix) -> np.ndarray:
   return np.array(_get_mid_mat(jlMatrix))
+
+def set_approx_method(methodName: str):
+  # crea y retorna una instancia del método de aproximación deseado
+  dict = {"Euler": jl.Euler, "Taylor": jl.Taylor}
+  return dict[methodName]
