@@ -1,6 +1,6 @@
 import os
 
-os.environ["PYTHON_JULIAPKG_EXE"] = "/home/tomi/.juliaup/bin/julia"
+os.environ["PYTHON_JULIAPKG_EXE"] = "/home/tomi/.julia/juliaup/julia-1.13.1+0.x64.linux.gnu/bin/julia"
 os.environ["PYTHON_JULIAPKG_OFFLINE"] = "yes"
 os.environ["JULIA_PROJECT"] = os.path.expanduser("~/.julia/environments/v1.13")
 
@@ -12,16 +12,17 @@ jl.include(os.path.join(script_dir, "interval_main.jl"))
 
 # adaptador para convertir datos python a los que necesita julia y viceversa
 
-_to_int_vec = jl.seval("x -> interval.(x)")
+_to_int_vec = jl.seval("x -> interval.(vec(x))")
 _to_int_mat = jl.seval("x -> IntervalMatrix(interval.(x))")
 _get_inf_vec = jl.seval("x -> inf.(x)")
 _get_mid_mat = jl.seval("x -> Matrix(mid.(x))")
+_to_S_type = jl.seval("x -> convert(Vector{Vector{Interval{Float64}}}, x)")
 
 ## Traducción de Python a Julia
 
 def np_to_interval_vector(arr: np.ndarray):
   # convierte un vector de numpy a un Vector{Interval}
-  return _to_int_vec(arr)
+  return _to_int_vec(np.asarray(arr, dtype=np.float64).flatten())
 
 def np_to_interval_matrix(mat: np.ndarray):
   # convierte una matriz de numpy a una InteralMatrix
@@ -36,10 +37,10 @@ def interval_to_np_vector(jlVector) -> np.ndarray:
 def interval_to_np_matrix(jlMatrix) -> np.ndarray:
   return np.array(_get_mid_mat(jlMatrix))
 
-def set_approx_method(methodName: str, A, b, S):
+def set_approx_method(methodName: str, A, b, S, scaling=1, order=4):
   approx_dict = {
         "Euler": lambda: jl.Euler(A, b, S),
-        "Taylor": lambda: jl.Taylor(A, b, S, 1, 4) # Hardcodeas o pasás scaling=1, order=4
+        "Taylor": lambda: jl.Taylor(A, b, S, scaling, order)
   }
     
   return approx_dict[methodName]() # Ejecuta la lambda elegida
@@ -58,7 +59,7 @@ def get_subregion_from_julia(methodName: str,
   A_jl = np_to_interval_matrix(A)
   b_jl = np_to_interval_vector(b)
   vert_jl = [np_to_interval_vector(v) for v in vertices]
-  S_jl = jl.Vector(vert_jl)
+  S_jl = _to_S_type(vert_jl)
   approx = set_approx_method(methodName, A_jl, b_jl, S_jl)
   subregionA_jl, subregionb_jl = jl.get_subregion(approx, H_jl, c_jl, A_jl, b_jl, h, K)
   subregionA = interval_to_np_matrix(subregionA_jl)
