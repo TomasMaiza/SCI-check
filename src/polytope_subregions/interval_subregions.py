@@ -37,6 +37,5 @@ class IntervalSubregions(SubregionsStrategy):
     for i in modes:
       subsystem = sas.get_subsystem(i)
       subregionPolytope = self.get_subregion(subsystem, polytope)
-      #if len(halfspaces) != 0:
       polytopeMap.append(subregionPolytope)
     return polytopeMap
