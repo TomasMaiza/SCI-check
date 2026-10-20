@@ -16,9 +16,10 @@ class IntervalSubregions(SubregionsStrategy):
                     polytope: Polytope) -> Polytope:
     # obtiene la subregión para un modo particular
     H, c = polytope.get_hrep_normalized() # normalized o no?
+    S = polytope.get_vertices()
     A, b = subsystem.get_subsystem()
     
-    matrixA, matrixb = get_subregion_from_julia(self._approx, H, c, A, b, self._h, self._K)
+    matrixA, matrixb = get_subregion_from_julia(self._approx, H, c, S, A, b, self._h, self._K)
     subregionPolytope = type(polytope)(intDim = self._dimension, ambDim = self._dimension, A = matrixA, b = matrixb)
     return subregionPolytope
 
