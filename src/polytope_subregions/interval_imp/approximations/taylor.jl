@@ -14,10 +14,10 @@ end
 
 function Taylor(A::IntervalMatrix,
                 b::Vector{Interval{Float64}},
-                homA::IntervalMatrix,
                 S::Vector{Vector{Interval{Float64}}},
                 scaling::Int,
                 order::Int)
+  homA = sas_augmented_matrix(A, b)
   R_S_max = -1.0
   for x in S
     homx = augmented_x(x)

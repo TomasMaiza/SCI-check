@@ -9,13 +9,12 @@ struct Euler <: ApproximationStrategy
   S::Vector{Vector{Interval{Float64}}}
 end
 
-# si queda así borrarlo, Julia lo asume así por defecto
-#function Euler(A::IntervalMatrix, 
-#               b::Vector{Interval{Float64}}, 
-#               homA::IntervalMatrix, 
-#               S::Vector{Vector{Interval{Float64}}})::Euler
-#    return Euler(A, b, homA, S)
-#end
+function Euler(A::IntervalMatrix, 
+               b::Vector{Interval{Float64}}, 
+               S::Vector{Vector{Interval{Float64}}})::Euler
+  homA = sas_augmented_matrix(A, b)
+  return Euler(A, b, homA, S)
+end
 
 function apply(approx::Euler, s::Float64, x::Vector{Float64})::Vector{Interval{Float64}}
   return x + s * (approx.A * x + approx.b)
