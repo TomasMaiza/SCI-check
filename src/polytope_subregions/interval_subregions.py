@@ -2,7 +2,6 @@ import numpy as np
 from .subregions_strategy import SubregionsStrategy
 from affine_system import *
 from geometry import Polytope
-#from .float_imp import Euler, Taylor, partition_matrices, partition_matrices_bound
 from .interval_imp import get_subregion_from_julia
 from affine_system import SwitchedAffineSystem, AffineMode
 
