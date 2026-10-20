@@ -1,6 +1,14 @@
+import os
+
+os.environ["PYTHON_JULIAPKG_EXE"] = "/home/tomi/.juliaup/bin/julia"
+os.environ["PYTHON_JULIAPKG_OFFLINE"] = "yes"
+os.environ["JULIA_PROJECT"] = os.path.expanduser("~/.julia/environments/v1.13")
+
 import numpy as np
 from juliacall import Main as jl
-jl.include("interval_main.jl")
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+jl.include(os.path.join(script_dir, "interval_main.jl"))
 
 # adaptador para convertir datos python a los que necesita julia y viceversa
 
@@ -28,14 +36,18 @@ def interval_to_np_vector(jlVector) -> np.ndarray:
 def interval_to_np_matrix(jlMatrix) -> np.ndarray:
   return np.array(_get_mid_mat(jlMatrix))
 
-def set_approx_method(methodName: str):
-  # crea y retorna una instancia del método de aproximación deseado
-  dict = {"Euler": jl.Euler, "Taylor": jl.Taylor}
-  return dict[methodName]
+def set_approx_method(methodName: str, A, b, S):
+  approx_dict = {
+        "Euler": lambda: jl.Euler(A, b, S),
+        "Taylor": lambda: jl.Taylor(A, b, S, 1, 4) # Hardcodeas o pasás scaling=1, order=4
+  }
+    
+  return approx_dict[methodName]() # Ejecuta la lambda elegida
 
 def get_subregion_from_julia(methodName: str,
                              H: np.ndarray,
                              c: np.ndarray,
+                             vertices: np.ndarray,
                              A: np.ndarray,
                              b: np.ndarray,
                              h: float,
@@ -45,7 +57,9 @@ def get_subregion_from_julia(methodName: str,
   c_jl = np_to_interval_vector(c)
   A_jl = np_to_interval_matrix(A)
   b_jl = np_to_interval_vector(b)
-  approx = set_approx_method(methodName)
+  vert_jl = [np_to_interval_vector(v) for v in vertices]
+  S_jl = jl.Vector(vert_jl)
+  approx = set_approx_method(methodName, A_jl, b_jl, S_jl)
   subregionA_jl, subregionb_jl = jl.get_subregion(approx, H_jl, c_jl, A_jl, b_jl, h, K)
   subregionA = interval_to_np_matrix(subregionA_jl)
   subregionb = interval_to_np_vector(subregionb_jl)
