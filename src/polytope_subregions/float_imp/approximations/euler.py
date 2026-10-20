@@ -2,7 +2,7 @@ import numpy as np
 import numpy.typing as npt
 from .strategy import ApproximationStrategy
 from affine_system import *
-from polytope_subregions.matrices import sas_augmented_matrix
+from polytope_subregions.float_imp.matrices import sas_augmented_matrix
 from geometry import Polytope
 
 class Euler(ApproximationStrategy):
@@ -49,3 +49,4 @@ class Euler(ApproximationStrategy):
     dim = self._homA.shape[0]
     I = np.eye(dim, dtype=np.float64)
     return I + s * self._homA
+  

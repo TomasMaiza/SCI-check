@@ -1,5 +1,4 @@
 import numpy as np
-from geometry.abstract_structs.point import AbstractPoint
 from fractions import Fraction
 from typing import TYPE_CHECKING
 

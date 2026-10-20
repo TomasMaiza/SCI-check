@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from typing import Optional, TYPE_CHECKING
-from geometry import AbstractPoint, Halfspace, Hyperplane
+from geometry import Halfspace, Hyperplane
 
 if TYPE_CHECKING:
   from src.common.types import Point, Edge
@@ -34,6 +34,11 @@ class Polytope(ABC):
   @abstractmethod
   def get_hrep(self) -> tuple[np.ndarray, np.ndarray]:
     # permite obtener las matrices A y b que definen al politopo (Ax <= b)
+    pass
+
+  @abstractmethod
+  def get_hrep_normalized(self) -> tuple[np.ndarray, np.ndarray]:
+    # permite obtener las matrices A y b que definen al politopo (Ax <= b) normalizadas
     pass
 
   @abstractmethod

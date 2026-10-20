@@ -47,7 +47,6 @@ class Predicates3d(AbstractPredicates):
     # calcula la orientación del punto intersección de f, f1 y f2 respecto a ref
     pImp = self._adapter.create_implicit_point_tpi(f, f1, f2) # Punto implícito: intersección del plano f con f1 y f2
     ori = self._adapter.orient3dI(pImp, ref)
-
     if ori == -1:
       ret = OrientResult.IN
     elif ori == 0:
@@ -105,7 +104,7 @@ class Predicates3d(AbstractPredicates):
     if len(vertices) < 3:
       return False
     
-    facePoints = [tuple(float(c) for c in v) for v in vertices]
+    facePoints = [tuple(float(c) for c in v) for v in vertices][:3]
     f = Halfspace(points=facePoints)
 
     centroid = polytope.get_centroid() # es un punto interno del politopo para tomar de referencia
@@ -128,14 +127,7 @@ class Predicates3d(AbstractPredicates):
                                      f2: Halfspace,
                                      f3: Halfspace) -> bool:
     # intersección de punto implícito producto de 3 semiespacios con un politopo 3d
-    vertices = polytope.get_vertices()
-    if len(vertices) < 3:
-      return False # o true?
-    a = (float(vertices[0][0]), float(vertices[0][1]), float(vertices[0][2]))
-    b = (float(vertices[1][0]), float(vertices[1][1]), float(vertices[1][2]))
-    c = (float(vertices[2][0]), float(vertices[2][1]), float(vertices[2][2]))
     centroid = polytope.get_centroid()
-    
     ret = True
     faces = polytope.get_halfspaces()
     for ref in faces:
@@ -143,3 +135,15 @@ class Predicates3d(AbstractPredicates):
         ret = False
         break
     return ret
+
+  def explicit_point_in_polytope(self,
+                                 point: Point,
+                                 polytope: Polytope) -> bool:
+    centroid = polytope.get_centroid()
+    halfspaces = polytope.get_halfspaces()
+    for f in halfspaces:
+      oriPoint = self.orient(point, f)
+      oriCentroid = self.orient(centroid, f)
+      if oriPoint != oriCentroid and oriPoint != ON:
+        return False
+    return True

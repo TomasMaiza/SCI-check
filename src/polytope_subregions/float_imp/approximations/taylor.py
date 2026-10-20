@@ -2,7 +2,7 @@ import numpy as np
 import numpy.typing as npt
 from .strategy import ApproximationStrategy
 from affine_system import *
-from polytope_subregions.matrices import sas_augmented_matrix, augmented_x
+from polytope_subregions.float_imp.matrices import sas_augmented_matrix, augmented_x
 from math import factorial
 from geometry import Polytope
 
@@ -26,7 +26,7 @@ class Taylor(ApproximationStrategy):
     homx = augmented_x(x)
     Phi = self.get_matrix(h)
     return Phi @ homx
-
+  
   def error_bound(self, r: float, tau: float) -> float:
     # calcula el error de la aproximación
     normA = float(np.linalg.norm(self._A, ord=2))
@@ -44,7 +44,7 @@ class Taylor(ApproximationStrategy):
       if norm > m:
         m = norm
     return 1/normA * m
-
+  
   def error_sequence(self, h: float, K: int) -> list[float]:
     # calcula la secuencia de errores para el método
     normHomA = float(np.linalg.norm(self._homA, ord=2))

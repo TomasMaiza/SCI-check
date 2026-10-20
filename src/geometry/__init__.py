@@ -1,9 +1,7 @@
-from .geometry import AbstractGeometry
 from .abstract_structs import *
 from .polytope import *
 
-__all__ = ["AbstractGeometry", 
-           "Halfspace", 
+__all__ = ["Halfspace", 
            "Hyperplane",
            "Polytope",
            "ConcretePolytope",

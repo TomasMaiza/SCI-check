@@ -1,14 +1,11 @@
 import numpy as np
-import numpy.typing as npt
-from scipy.spatial import ConvexHull
-from .subregionsStrategy import SubregionsStrategy
+from .subregions_strategy import SubregionsStrategy
 from affine_system import *
-from geometry import Halfspace, AbstractGeometry, Polytope
-from .approximations import Euler, Taylor
+from geometry import Polytope
+from .float_imp import Euler, Taylor, partition_matrices, partition_matrices_bound
 from affine_system import SwitchedAffineSystem, AffineMode
-from .matrices import partition_matrices
 
-class Subregions(SubregionsStrategy):
+class FloatSubregions(SubregionsStrategy):
   def __init__(self, dimension: int):
     self._approxMethod = Taylor
     self._dimension = dimension
@@ -18,17 +15,17 @@ class Subregions(SubregionsStrategy):
                     polytope: Polytope) -> Polytope:
     # obtiene la subregión para un modo particular
     approx = self._approxMethod(subsystem, polytope, scaling=1, order=4)
-    r = 0 # r_0
     errorSeq = approx.error_sequence(self._h, self._K)
     phi = approx.get_matrix(self._h) # matriz de la aproximación
     dim = phi.shape[0]
     phi_k = np.eye(dim, dtype=np.float64) # matriz de la aproximación para el paso k
+    Hplus, Hminus = partition_matrices(polytope, subsystem, self._h)
     subregionH = [] # apilamos las matrices de las inecuaciones
     subregionc = []
     for k in range(0, self._K + 1):
       r = errorSeq[k]
       midr = approx.error_bound(r, self._h/2)
-      Hplus, Hminus, c = partition_matrices(polytope, subsystem, r, self._h, midr)
+      c = partition_matrices_bound(polytope, r, midr) 
       if k > 0:
         subregionH.append(Hminus @ phi_k)
         subregionc.append(c)
@@ -62,4 +59,3 @@ class Subregions(SubregionsStrategy):
       #if len(halfspaces) != 0:
       polytopeMap.append(subregionPolytope)
     return polytopeMap
-

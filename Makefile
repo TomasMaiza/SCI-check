@@ -18,6 +18,12 @@ run2d: compile
 run3d: compile
 	@PYTHONPATH=./src python3 test/test_3d_siam.py
 
+runc4: compile
+	@PYTHONPATH=./src python3 test/test_c4.py
+
+runc42: compile
+	@PYTHONPATH=./src python3 test/test_c4_2.py
+
 run3d2: compile
 	@PYTHONPATH=./src python3 test/test_3d.py
 

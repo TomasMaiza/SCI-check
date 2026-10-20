@@ -1,5 +1,3 @@
-from geometry.abstract_structs import Halfspace
-
 #type PolytopeMap = list[list[Halfspace]]
 # diccionario que relaciona cada subregion con un conjunto de los semiespacios que la definen
 

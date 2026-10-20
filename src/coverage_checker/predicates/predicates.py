@@ -33,3 +33,11 @@ class AbstractPredicates(ABC):
                                  f2: Halfspace) -> bool: 
     # retorna si un punto implícito está en el plano de un triángulo
     pass
+  # MODIFICAR PARA QUE TOME UNA LISTA DE HALFSPACES PARA LA INTERSECCIÓN?
+
+  @abstractmethod
+  def explicit_point_in_polytope(self,
+                                 point: Point,
+                                 polytope: Polytope) -> bool:
+    # retorna si un punto explícito está dentro de un politopo
+    pass

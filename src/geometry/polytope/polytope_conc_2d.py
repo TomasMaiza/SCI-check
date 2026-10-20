@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from typing import Optional, TYPE_CHECKING
-from geometry import AbstractPoint, Halfspace, Hyperplane
+from geometry import Halfspace, Hyperplane
 from .polytope import Polytope
 import polytope as pc
 from scipy.spatial import ConvexHull
@@ -60,6 +60,12 @@ class ConcretePolytope2D(Polytope):
 
   def _set_h_rep_from_vertices(self):
     # calcula A y b si se inicializó con vértices
+    if self._ambDim > self._intDim:
+        self._A = np.array([])
+        self._b = np.array([])
+        return
+        
+    # Calcula A y b solo si se inicializó en un espacio 2D puro
     poly = pc.qhull(self._vertices)
     self._A, self._b = poly.A, poly.b
 
@@ -72,12 +78,19 @@ class ConcretePolytope2D(Polytope):
     if self._A is not None and self._b is not None:
       return self._A, self._b
 
+  def get_hrep_normalized(self) -> tuple[np.ndarray, np.ndarray]:
+    # permite obtener las matrices A y b que definen al politopo (Ax <= b) normalizadas
+    norms = np.linalg.norm(self._A, axis=1, keepdims=True)
+    H = self._A / norms
+    c = self._b.reshape(-1, 1) / norms
+    return H, c.flatten()
+
   def get_edges(self) -> list['Edge']:
     # retorna las aristas del politopo
     if self._vertices is None:
       return [] 
         
-    hull = ConvexHull(self._vertices)
+    hull = ConvexHull(self._vertices, qhull_options='QJ')
     unique_edges = set()
     
     for simplex in hull.simplices:
@@ -148,6 +161,9 @@ class ConcretePolytope2D(Polytope):
 
   def reduce(self):
     # elimina las inecuaciones redundantes
+    if self._A is None or len(self._A) == 0:
+      return
+        
     poly = pc.Polytope(self._A, self._b)
     poly = pc.reduce(poly)
     self._A, self._b = poly.A, poly.b
