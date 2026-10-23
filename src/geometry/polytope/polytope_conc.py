@@ -5,9 +5,7 @@ from geometry import Halfspace, Hyperplane
 from .polytope import Polytope
 import polytope as pc
 from .polytope_conc_2d import ConcretePolytope2D
-
-if TYPE_CHECKING:
-  from src.common.types import Point, Edge
+from common import Point, Edge
 
 class ConcretePolytope(Polytope):
   # Implementación de politopos

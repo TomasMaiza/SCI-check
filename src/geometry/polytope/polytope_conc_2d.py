@@ -6,9 +6,7 @@ from .polytope import Polytope
 import polytope as pc
 from scipy.spatial import ConvexHull
 import itertools
-
-if TYPE_CHECKING:
-  from src.common.types import Point, Edge
+from common import Point, Edge
 
 class ConcretePolytope2D(Polytope):
   # Implementación de politopos 2D (hoja del Composite)
