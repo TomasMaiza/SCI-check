@@ -3,6 +3,7 @@ from typing import Optional, TYPE_CHECKING
 from geometry import Halfspace, Hyperplane
 from polytope import Polytope
 from .fraction_polytope_2d import ConcretePolytope2D
+from .julia_adapter import create_polytope, get_poly_vertices
 from common import Point, Edge
 
 class FractionPolytope(Polytope):
@@ -44,25 +45,15 @@ class FractionPolytope(Polytope):
     else:
       self._vertices = None
 
-    if self._vertices is None:
-      self._set_vertices_from_hrep()
-    elif self._A is None or self._b is None:
-      self._set_h_rep_from_vertices()
-    self.reduce()
-
-  def _set_vertices_from_hrep(self):
-    # calcula los vértices si se inicializó con h-rep
-    poly = pc.Polytope(self._A, self._b)
-    self._vertices = pc.extreme(poly)
-
-  def _set_h_rep_from_vertices(self):
-    # calcula A y b si se inicializó con vértices
-    poly = pc.qhull(self._vertices)
-    self._A, self._b = poly.A, poly.b
+    if jlPoly is not None:
+      self._jlPoly = jlPoly
+    else:
+      self._jlPoly = create_polytope(self._vertices, A, b)
 
   def get_vertices(self) -> np.ndarray:
-    if self._vertices is not None:
-      return self._vertices
+    if self._vertices is None:
+      self._vertices = get_poly_vertices(self._jlPoly)
+    return self._vertices
 
   def get_hrep(self) -> tuple[np.ndarray, np.ndarray]:
     # permite obtener las matrices A y b que definen al politopo (Ax <= b)
