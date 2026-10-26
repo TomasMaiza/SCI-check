@@ -29,17 +29,31 @@ function create_polytope(vertices::Union{Nothing, Matrix{Float64}} = nothing,
   return poly
 end
 
+function get_centroid(poly::Polyhedron)::Vector{Rational{BigInt}}
+  vertices = collect(Polyhedra.points(Polyhedra.vrep(poly)))
+  numVertices = length(vertices)
+  if numVertices == 0
+    return zeros(Rational{BigInt}, Polyhedra.ambientdim(poly))
+  end
+  return sum(vertices) .// numVertices
+end
+
 function get_vertices(poly::Polyhedron)::Matrix{Float64}
   vertices = collect(Polyhedra.points(Polyhedra.vrep(poly)))
   numVertices = length(vertices)
+  ambDim = Polyhedra.ambientdim(poly)
 
   if numVertices == 0
     return Matrix{Float64}(undef, 0, Polyhedra.ambientdim(poly))
   end
 
   verticesMatrix = Matrix{Float64}(undef, numVertices, Polyhedra.ambientdim(poly))
+  centroid = get_centroid(poly)
+
   for (i, p) in enumerate(vertices)
-    verticesMatrix[i, :] = Float64.(p)
+    for j in 1:ambDim
+    verticesMatrix[i, j] = p[j] >= centroid[j] ? Float64(p[j], RoundUp) : Float64(p[j], RoundDown)
+    end
   end
   return verticesMatrix
 end
