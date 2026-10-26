@@ -21,6 +21,9 @@ def get_poly_vertices(jlPoly) -> np.ndarray:
   # retorna una arreglo con los vértices del politopo
   return np.array(jl.get_vertices(jlPoly))
 
+def get_poly_centroid(jlPoly) -> np.ndarray:
+  return np.array(jl.get_centroid(jlPoly), dtype=np.float64)
+
 def get_pessimistic_hrep(jl_poly: Any) -> tuple[np.ndarray, np.ndarray]:
   # Julia devuelve la tupla (Matrix{Float64}, Vector{Float64})
   # juliacall los convierte automáticamente, pero nos aseguramos de que sean numpy arrays
