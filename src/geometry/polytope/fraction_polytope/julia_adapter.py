@@ -14,8 +14,12 @@ jl.include(os.path.join(script_dir, "functions.jl"))
 # adaptador para convertir datos python a los que necesita julia y viceversa
 
 def create_polytope(vertices: np.ndarray = None, A: np.ndarray = None, b: np.ndarray = None) -> Any:
-  # Retorna la referencia al objeto Polyhedron de Julia
-  return jl.create_exact_polyhedron(vertices, A, b)
+  # retorna referencia al objeto Polyhedron de Julia
+  return jl.create_polytope(vertices, A, b)
+
+def get_poly_vertices(jlPoly) -> np.ndarray:
+  # retorna una arreglo con los vértices del politopo
+  return np.array(jl.get_vertices(jlPoly))
 
 def get_pessimistic_hrep(jl_poly: Any) -> tuple[np.ndarray, np.ndarray]:
   # Julia devuelve la tupla (Matrix{Float64}, Vector{Float64})
