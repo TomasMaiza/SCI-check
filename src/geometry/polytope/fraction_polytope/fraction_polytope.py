@@ -3,7 +3,7 @@ from typing import Optional, TYPE_CHECKING
 from geometry import Halfspace, Hyperplane
 from polytope import Polytope
 from .fraction_polytope_2d import ConcretePolytope2D
-from .julia_adapter import create_polytope, get_poly_vertices
+from .julia_adapter import create_polytope, get_poly_vertices, get_poly_centroid
 from common import Point, Edge
 
 class FractionPolytope(Polytope):
@@ -166,6 +166,5 @@ class FractionPolytope(Polytope):
   def get_centroid(self) -> 'Point':
     # retorna el centroide del politopo
     if self._centroid is None:
-      centroidCoords = np.mean(self._vertices, axis=0)
-      self._centroid = tuple(float(c) for c in centroidCoords)
+      self._centroid = get_poly_centroid(self._jlPoly)
     return self._centroid
