@@ -28,3 +28,18 @@ function create_polytope(vertices::Union{Nothing, Matrix{Float64}} = nothing,
   Polyhedra.removehredundancy!(poly)
   return poly
 end
+
+function get_vertices(poly::Polyhedron)::Matrix{Float64}
+  vertices = collect(Polyhedra.points(Polyhedra.vrep(poly)))
+  numVertices = length(vertices)
+
+  if numVertices == 0
+    return Matrix{Float64}(undef, 0, Polyhedra.ambientdim(poly))
+  end
+
+  verticesMatrix = Matrix{Float64}(undef, numVertices, Polyhedra.ambientdim(poly))
+  for (i, p) in enumerate(vertices)
+    verticesMatrix[i, :] = Float64.(p)
+  end
+  return verticesMatrix
+end
