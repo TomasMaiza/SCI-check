@@ -139,3 +139,33 @@ function get_boundaries(poly::Polyhedron)::Vector{Polyhedron}
   end
   return facets
 end
+
+function get_edges(poly::Polyhedron)::Vector{Tuple{Vector{Float64}, Vector{Float64}}}
+  hs = collect(Polyhedra.halfspaces(Polyhedra.hrep(poly)))
+  hyps = collect(Polyhedra.hyperplanes(Polyhedra.hrep(poly)))
+  verts = collect(Polyhedra.points(Polyhedra.vrep(poly)))
+  
+  constraints = vcat(hs, hyps) # unimos inecuaciones e igualdades
+  edges = Vector{Tuple{Vector{Float64}, Vector{Float64}}}()
+  numVerts = length(verts)
+  
+  for i in 1:numVerts
+    for j in (i+1):numVerts
+      v1 = verts[i]
+      v2 = verts[j]
+      
+      # Buscamos qué restricciones comparten de forma estricta
+      sharedConstraints = filter(c -> c.a ⋅ v1 == c.β && c.a ⋅ v2 == c.β, constraints)
+      
+      # Contamos cuántos vértices en TOTAL cumplen con estas restricciones compartidas
+      count = sum(1 for v in verts if all(c -> c.a ⋅ v == c.β, sharedConstraints))
+      
+      # Si solo son v1 y v2, es matemáticamente una arista
+      if count == 2
+        push!(edges, (Float64.(v1), Float64.(v2)))
+      end
+    end
+  end
+  
+  return edges
+end

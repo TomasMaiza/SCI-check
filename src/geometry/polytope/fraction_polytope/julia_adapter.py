@@ -38,3 +38,6 @@ def get_poly_hrep_normalized(jlPoly) -> tuple[np.ndarray, np.ndarray]:
 def get_poly_facets(jlPoly) -> list[Any]:
   # devuelve una lista de referencias a los facets del politopo
   return list(jl.get_boundaries(jlPoly))
+
+def get_poly_edges(jlPoly) -> np.ndarray:
+  return np.array(jl.get_edges(jlPoly))

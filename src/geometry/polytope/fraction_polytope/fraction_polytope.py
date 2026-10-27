@@ -67,7 +67,8 @@ class FractionPolytope(Polytope):
 
   def get_edges(self) -> list['Edge']:
     # retorna las aristas del politopo
-    pass
+    edges = get_poly_edges(self._jlPoly)
+    return [(tuple(p1), tuple(p2)) for p1, p2 in edges]
 
   def get_boundaries(self):
     if hasattr(self, '_boundaries') and self._boundaries:

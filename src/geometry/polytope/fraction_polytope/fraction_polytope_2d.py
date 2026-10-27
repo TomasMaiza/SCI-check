@@ -66,23 +66,8 @@ class FractionPolytope2D(Polytope):
 
   def get_edges(self) -> list['Edge']:
     # retorna las aristas del politopo
-    if self._vertices is None:
-      return [] 
-        
-    hull = ConvexHull(self._vertices, qhull_options='QJ')
-    unique_edges = set()
-    
-    for simplex in hull.simplices:
-      # itertools.combinations saca todos los pares posibles del simplex
-      # En 2D saca 1 par. En 3D saca 3 pares (los 3 lados del triángulo).
-      for i, j in itertools.combinations(simplex, 2):
-        # Ordenamos los índices para que (v1, v2) y (v2, v1) colapsen en el set
-        idx_min, idx_max = min(i, j), max(i, j)
-        p1 = tuple(self._vertices[idx_min])
-        p2 = tuple(self._vertices[idx_max])
-        unique_edges.add((p1, p2))   
-            
-    return list(unique_edges)
+    edges = get_poly_edges(self._jlPoly)
+    return [(tuple(p1), tuple(p2)) for p1, p2 in edges]
 
   def get_boundaries(self):
     return
