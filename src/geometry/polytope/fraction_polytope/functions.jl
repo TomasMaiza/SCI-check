@@ -169,3 +169,27 @@ function get_edges(poly::Polyhedron)::Vector{Tuple{Vector{Float64}, Vector{Float
   
   return edges
 end
+
+function get_halfspace_points(poly::Polyhedron)::Vector{Matrix{Float64}}
+  hs = collect(Polyhedra.halfspaces(Polyhedra.hrep(poly)))
+  vertices = collect(Polyhedra.points(Polyhedra.vrep(poly)))
+  ambDim = Polyhedra.ambientdim(poly)
+  
+  result = Vector{Matrix{Float64}}()
+  
+  centroid = get_centroid(poly)
+  
+  for h in hs
+    facePoints = filter(p -> h.a ⋅ p == h.β, vertices) # filtramos los vértices exactos que pertenecen a esta pared 
+    
+    mat = Matrix{Float64}(undef, length(facePoints), ambDim)
+    for (i, p) in enumerate(facePoints)
+      for j in 1:ambDim
+         mat[i, j] = p[j] >= centroid[j] ? Float64(p[j], RoundUp) : Float64(p[j], RoundDown)
+      end
+    end
+    push!(result, mat)
+  end
+  
+  return result
+end

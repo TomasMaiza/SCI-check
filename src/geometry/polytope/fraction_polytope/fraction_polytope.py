@@ -95,12 +95,11 @@ class FractionPolytope(Polytope):
     if self._halfspaces is None:
       self._halfspaces = []
       A, b = self.get_hrep()
-      boundaries = self.get_boundaries()
+      hsPoints = get_poly_halfspace_points(self._jlPoly)
       for i in range(len(b)):
         normal = A[i]
         offset = b[i]
-        faceVertices = boundaries[i].get_vertices()
-        facePoints = [tuple(float(coord) for coord in vertex) for vertex in faceVertices]
+        facePoints = [tuple(float(coord) for coord in point) for point in hsPoints[i]]
         hs = Halfspace(points=facePoints, normalVector=normal, b=offset)
         self._halfspaces.append(hs)
     return self._halfspaces
