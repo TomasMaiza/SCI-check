@@ -70,7 +70,7 @@ class FractionPolytope2D(Polytope):
     return [(tuple(p1), tuple(p2)) for p1, p2 in edges]
 
   def get_boundaries(self):
-    return
+    return []
 
   def get_halfspaces(self) -> list[Halfspace]:
     if self._halfspaces is None:
