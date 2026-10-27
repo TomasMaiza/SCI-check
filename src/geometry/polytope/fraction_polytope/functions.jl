@@ -57,3 +57,35 @@ function get_vertices(poly::Polyhedron)::Matrix{Float64}
   end
   return verticesMatrix
 end
+
+function get_hrep(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Float64}}
+  hs = collect(Polyhedra.halfspaces(Polyhedra.hrep(poly)))
+  vertices = collect(Polyhedra.points(Polyhedra.vrep(poly))) 
+  
+  numHalfspaces = length(hs)
+  ambDim = Polyhedra.ambientdim(poly)
+  
+  if numHalfspaces == 0
+    return Matrix{Float64}(undef, 0, ambDim), Vector{Float64}(undef, 0)
+  end
+  
+  A = Matrix{Float64}(undef, numHalfspaces, ambDim)
+  b = Vector{Float64}(undef, numHalfspaces)
+  
+  for (i, h) in enumerate(hs)
+    for j in 1:ambDim
+      A[i, j] = Float64(h.a[j]) 
+    end
+    
+    if isempty(vertices)
+      b[i] = Float64(h.β, RoundUp) # caso borde: poliedro no acotado
+    else
+      ratA = Rational{BigInt}.(A[i, :]) # volvemos a fracciones para operar
+      # Producto escalar exacto de la nueva normal con todos los vértices, buscamos el máximo
+      maxExactb = maximum(sum(ratA[j] * v[j] for j in 1:ambDim) for v in vertices)
+      b[i] = Float64(maxExactb, RoundUp) # redondeamos el máximo absoluto hacia arriba
+    end
+  end
+  
+  return A, b
+end

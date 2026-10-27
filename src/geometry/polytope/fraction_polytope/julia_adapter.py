@@ -22,13 +22,13 @@ def get_poly_vertices(jlPoly) -> np.ndarray:
   return np.array(jl.get_vertices(jlPoly))
 
 def get_poly_centroid(jlPoly) -> np.ndarray:
+  # consulta el centroide del politopo
   return np.array(jl.get_centroid(jlPoly), dtype=np.float64)
 
-def get_pessimistic_hrep(jl_poly: Any) -> tuple[np.ndarray, np.ndarray]:
-  # Julia devuelve la tupla (Matrix{Float64}, Vector{Float64})
-  # juliacall los convierte automáticamente, pero nos aseguramos de que sean numpy arrays
-  A_float, b_pesimista = jl.get_pessimistic_hrep(jl_poly)
-  return np.array(A_float), np.array(b_pesimista).flatten()
+def get_poly_hrep(jl_poly: Any) -> tuple[np.ndarray, np.ndarray]:
+  # retorna las hrep del politopo Ax <= b
+  A, b = jl.get_hrep(jl_poly)
+  return np.array(A), np.array(b).flatten()
 
 def get_exact_facets(jl_poly: Any) -> list[Any]:
   # Devuelve una lista de referencias a sub-poliedros de Julia

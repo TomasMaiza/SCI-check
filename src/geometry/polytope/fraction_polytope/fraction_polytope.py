@@ -3,7 +3,7 @@ from typing import Optional, TYPE_CHECKING
 from geometry import Halfspace, Hyperplane
 from polytope import Polytope
 from .fraction_polytope_2d import ConcretePolytope2D
-from .julia_adapter import create_polytope, get_poly_vertices, get_poly_centroid
+from .julia_adapter import *
 from common import Point, Edge
 
 class FractionPolytope(Polytope):
@@ -57,8 +57,9 @@ class FractionPolytope(Polytope):
 
   def get_hrep(self) -> tuple[np.ndarray, np.ndarray]:
     # permite obtener las matrices A y b que definen al politopo (Ax <= b)
-    if self._A is not None and self._b is not None:
-      return self._A, self._b
+    if self._A is None or self._b is None:
+      self._A, self._b = get_poly_hrep(self._jlPoly)
+    return self._A, self._b
 
   def get_hrep_normalized(self) -> tuple[np.ndarray, np.ndarray]:
     # permite obtener las matrices A y b que definen al politopo (Ax <= b) normalizadas
