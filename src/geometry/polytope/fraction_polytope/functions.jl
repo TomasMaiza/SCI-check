@@ -89,3 +89,40 @@ function get_hrep(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Float64}}
   
   return A, b
 end
+
+function get_hrep_normalized(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Float64}}
+  hs = collect(Polyhedra.halfspaces(Polyhedra.hrep(poly)))
+  vertices = collect(Polyhedra.points(Polyhedra.vrep(poly))) 
+  
+  numHalfspaces = length(hs)
+  ambDim = Polyhedra.ambientdim(poly)
+  
+  if numHalfspaces == 0
+    return Matrix{Float64}(undef, 0, ambDim), Vector{Float64}(undef, 0)
+  end
+  
+  A = Matrix{Float64}(undef, numHalfspaces, ambDim)
+  b = Vector{Float64}(undef, numHalfspaces)
+  
+  for (i, h) in enumerate(hs)
+    aInterval = Interval.(h.a) # cálculo de la norma con intervalos
+    normsq = sum(aInterval .^ 2)
+    normInv = 1.0 / sqrt(normsq) 
+    aNormInterval = aInterval .* normInv
+    
+    for j in 1:ambDim
+      A[i, j] = mid(aNormInterval[j])
+    end
+    
+    if isempty(vertices)
+      bInterval = Interval(h.β) * normInv # caso borde: si no hay vértices, acotamos con el intervalo
+      b[i] = inf(bInterval) # queremos achicar?
+    else
+      ratA = Rational{BigInt}.(A[i, :])
+      maxExactb = maximum(sum(ratA[j] * v[j] for j in 1:ambDim) for v in vertices)
+      b[i] = Float64(maxExactb, RoundDown) # queremos achicar?
+    end
+  end
+  
+  return A, b
+end

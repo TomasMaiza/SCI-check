@@ -30,6 +30,11 @@ def get_poly_hrep(jl_poly: Any) -> tuple[np.ndarray, np.ndarray]:
   A, b = jl.get_hrep(jl_poly)
   return np.array(A), np.array(b).flatten()
 
+def get_poly_hrep_normalized(jl_poly: Any) -> tuple[np.ndarray, np.ndarray]:
+  # retorna las hrep del politopo Ax <= b
+  A, b = jl.get_hrep_normalized(jl_poly)
+  return np.array(A), np.array(b).flatten()
+
 def get_exact_facets(jl_poly: Any) -> list[Any]:
   # Devuelve una lista de referencias a sub-poliedros de Julia
   return list(jl.get_exact_facets(jl_poly))
