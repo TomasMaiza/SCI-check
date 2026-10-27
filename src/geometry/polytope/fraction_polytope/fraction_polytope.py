@@ -93,42 +93,24 @@ class FractionPolytope(Polytope):
   def get_halfspaces(self) -> list[Halfspace]:
     if self._halfspaces is None:
       self._halfspaces = []
-      TOL = 1e-8 
-      
-      for i in range(len(self._b)):
-        normal = self._A[i]
-        offset = self._b[i]
-        
-        # 1. Buscamos qué vértices pertenecen a este hiperplano N-dimensional
-        distances = np.dot(self._vertices, normal) - offset
-        in_plane_indices = np.where(np.isclose(distances, 0.0, atol=TOL))[0]
-        
-        # 2. Extracción genérica para N dimensiones (tupla de N floats)
-        face_points = [
-            tuple(float(coord) for coord in self._vertices[idx])
-            for idx in in_plane_indices
-        ]
-        
-        # 3. Instanciamos el semiespacio inyectando matrices Y puntos
-        hs = Halfspace(points=face_points, normalVector=normal, b=offset)
+      A, b = self.get_hrep()
+      boundaries = self.get_boundaries()
+      for i in range(len(b)):
+        normal = A[i]
+        offset = b[i]
+        faceVertices = boundaries[i].get_vertices()
+        facePoints = [tuple(float(coord) for coord in vertex) for vertex in faceVertices]
+        hs = Halfspace(points=facePoints, normalVector=normal, b=offset)
         self._halfspaces.append(hs)
-        
     return self._halfspaces
 
   def get_supporting_hyperplane(self) -> Hyperplane:
     # retorna el hiperplano que contiene al politopo si intDim < ambDim
-    if self._intDim == self._ambDim:
-      return
-    points = []
-    for i in range(self._intDim):
-      points[i] = self._vertices[i]
-    return Hyperplane(points)
+    pass
 
   def reduce(self):
     # elimina las inecuaciones redundantes
-    poly = pc.Polytope(self._A, self._b)
-    poly = pc.reduce(poly)
-    self._A, self._b = poly.A, poly.b
+    pass
 
   def get_centroid(self) -> 'Point':
     # retorna el centroide del politopo
