@@ -126,3 +126,16 @@ function get_hrep_normalized(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Fl
   
   return A, b
 end
+
+function get_boundaries(poly::Polyhedron)::Vector{Polyhedron}
+  hs = collect(Polyhedra.halfspaces(Polyhedra.hrep(poly)))
+  facets = Vector{Polyhedron}()
+  for h in hs
+    hp = Polyhedra.Hyperplane(h.a, h.β)
+    facet_hrep = intersect(Polyhedra.hrep(poly), hp)
+    facet_poly = polyhedron(facet_hrep, lib)
+    Polyhedra.removehredundancy!(facet_poly)
+    push!(facets, facet_poly)
+  end
+  return facets
+end

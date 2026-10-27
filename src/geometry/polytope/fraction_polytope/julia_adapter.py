@@ -25,16 +25,16 @@ def get_poly_centroid(jlPoly) -> np.ndarray:
   # consulta el centroide del politopo
   return np.array(jl.get_centroid(jlPoly), dtype=np.float64)
 
-def get_poly_hrep(jl_poly: Any) -> tuple[np.ndarray, np.ndarray]:
+def get_poly_hrep(jlPoly) -> tuple[np.ndarray, np.ndarray]:
   # retorna las hrep del politopo Ax <= b
-  A, b = jl.get_hrep(jl_poly)
+  A, b = jl.get_hrep(jlPoly)
   return np.array(A), np.array(b).flatten()
 
-def get_poly_hrep_normalized(jl_poly: Any) -> tuple[np.ndarray, np.ndarray]:
+def get_poly_hrep_normalized(jlPoly) -> tuple[np.ndarray, np.ndarray]:
   # retorna las hrep del politopo Ax <= b
-  A, b = jl.get_hrep_normalized(jl_poly)
+  A, b = jl.get_hrep_normalized(jlPoly)
   return np.array(A), np.array(b).flatten()
 
-def get_exact_facets(jl_poly: Any) -> list[Any]:
-  # Devuelve una lista de referencias a sub-poliedros de Julia
-  return list(jl.get_exact_facets(jl_poly))
+def get_poly_facets(jlPoly) -> list[Any]:
+  # devuelve una lista de referencias a los facets del politopo
+  return list(jl.get_boundaries(jlPoly))

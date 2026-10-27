@@ -2,7 +2,7 @@ import numpy as np
 from typing import Optional, TYPE_CHECKING
 from geometry import Halfspace, Hyperplane
 from polytope import Polytope
-from .fraction_polytope_2d import ConcretePolytope2D
+from .fraction_polytope_2d import FractionPolytope2D
 from .julia_adapter import *
 from common import Point, Edge
 
@@ -74,49 +74,18 @@ class FractionPolytope(Polytope):
       return self._boundaries
 
     self._boundaries = []
-      
-    # Si llegamos a la dimensión mínima útil (ej: vértice), cortamos la recursión
-    # if self._intDim <= 0:
-    #  return self._boundaries
 
-    # Tolerancia estándar para compensar el punto flotante de la librería polytope
-    TOL = 1e-8 
+    jlFacets = get_poly_facets(self._jlPoly)
 
-    # Iteramos sobre cada inecuación (fila de A y b)
-    for i in range(len(self._A)):
-      normal = self._A[i]
-      offset = self._b[i]
-
-      # MAGIA NUMPY: Calculamos la distancia de TODOS los vértices al plano de una sola vez
-      # Ecuación: Ax - b. Si da ~0, el vértice está en el plano.
-      distances = np.dot(self._vertices, normal) - offset # OJO CON ERROR DE CÁLCULO
-
-      # Obtenemos los índices de los vértices que cumplen la condición
-      in_plane_indices = np.where(np.isclose(distances, 0.0, atol=TOL))[0]
-
-      # Un hiperplano de dimensión N necesita al menos N vértices para formar una cara
-      # Ej: Una cara 2D necesita mínimo 3 vértices. Si tiene menos, no es una cara válida.
-      if len(in_plane_indices) >= self._intDim:
-        face_vertices = self._vertices[in_plane_indices]
-
-        # diccionario del composite para instanciar según dimensión (si es hoja o no)
-        if self._intDim == 3:
-          boundary = ConcretePolytope2D(
-            intDim = 2,
-            ambDim = self._ambDim,
-            verticesnp = face_vertices
-          )
-
-        # Instanciamos la cara reduciendo la dimensión intrínseca
-        else:
-          boundary = ConcretePolytope(
-            intDim=self._intDim - 1,
-            ambDim=self._ambDim,
-            verticesnp=face_vertices
-          )
-          
-      # (Opcional a futuro): face._supp_hyperplane = Hyperplane(normal, offset)
-          
+    for facet in jlFacets:
+      if self._intDim == 3:
+        boundary = FractionPolytope2D(intDim=2,
+                                      ambDim = self._ambDim,
+                                      jlPoly=facet)
+      else:
+        boundary = FractionPolytope(intDim=self._intDim - 1,
+                                    ambDim=self._ambDim,
+                                    jlPoly = facet)  
       self._boundaries.append(boundary)
 
     return self._boundaries

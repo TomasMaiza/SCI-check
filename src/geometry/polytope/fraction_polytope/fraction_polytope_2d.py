@@ -23,7 +23,8 @@ class FractionPolytope2D(Polytope):
                vertices: Optional['list[Point]'] = None,
                verticesnp: Optional['np.ndarray'] = None,
                A: Optional['np.ndarray'] = None, 
-               b: Optional['np.ndarray'] = None):
+               b: Optional['np.ndarray'] = None,
+               jlPoly = None):
 
     if (A is None or b is None) and vertices is None and verticesnp is None:
       raise ValueError("Inicialización inválida: Proveer vértices o (A, b)")
