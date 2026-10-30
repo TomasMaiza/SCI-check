@@ -35,7 +35,7 @@ function get_centroid(poly::Polyhedron)::Vector{Rational{BigInt}}
   vertices = collect(Polyhedra.points(Polyhedra.vrep(poly)))
   numVertices = length(vertices)
   if numVertices == 0
-    return zeros(Rational{BigInt}, Polyhedra.ambientdim(poly))
+    return zeros(Rational{BigInt}, Polyhedra.fulldim(poly))
   end
   return sum(vertices) .// numVertices
 end
@@ -43,13 +43,13 @@ end
 function get_vertices(poly::Polyhedron)::Matrix{Float64}
   vertices = collect(Polyhedra.points(Polyhedra.vrep(poly)))
   numVertices = length(vertices)
-  ambDim = Polyhedra.ambientdim(poly)
+  ambDim = Polyhedra.fulldim(poly)
 
   if numVertices == 0
-    return Matrix{Float64}(undef, 0, Polyhedra.ambientdim(poly))
+    return Matrix{Float64}(undef, 0, Polyhedra.fulldim(poly))
   end
 
-  verticesMatrix = Matrix{Float64}(undef, numVertices, Polyhedra.ambientdim(poly))
+  verticesMatrix = Matrix{Float64}(undef, numVertices, Polyhedra.fulldim(poly))
   centroid = get_centroid(poly)
 
   for (i, p) in enumerate(vertices)
@@ -65,7 +65,7 @@ function get_hrep(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Float64}}
   vertices = collect(Polyhedra.points(Polyhedra.vrep(poly))) 
   
   numHalfspaces = length(hs)
-  ambDim = Polyhedra.ambientdim(poly)
+  ambDim = Polyhedra.fulldim(poly)
   
   if numHalfspaces == 0
     return Matrix{Float64}(undef, 0, ambDim), Vector{Float64}(undef, 0)
@@ -97,7 +97,7 @@ function get_hrep_normalized(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Fl
   vertices = collect(Polyhedra.points(Polyhedra.vrep(poly))) 
   
   numHalfspaces = length(hs)
-  ambDim = Polyhedra.ambientdim(poly)
+  ambDim = Polyhedra.fulldim(poly)
   
   if numHalfspaces == 0
     return Matrix{Float64}(undef, 0, ambDim), Vector{Float64}(undef, 0)
@@ -175,7 +175,7 @@ end
 function get_halfspace_points(poly::Polyhedron)::Vector{Matrix{Float64}}
   hs = collect(Polyhedra.halfspaces(Polyhedra.hrep(poly)))
   vertices = collect(Polyhedra.points(Polyhedra.vrep(poly)))
-  ambDim = Polyhedra.ambientdim(poly)
+  ambDim = Polyhedra.fulldim(poly)
   
   result = Vector{Matrix{Float64}}()
   

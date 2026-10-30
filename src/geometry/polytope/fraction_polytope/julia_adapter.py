@@ -15,7 +15,16 @@ jl.include(os.path.join(script_dir, "functions.jl"))
 
 def create_polytope(vertices: np.ndarray = None, A: np.ndarray = None, b: np.ndarray = None) -> Any:
   # retorna referencia al objeto Polyhedron de Julia
-  return jl.create_polytope(vertices, A, b)
+  jlVertices = None
+  if vertices is not None:
+    jlVertices = jl.Array(vertices.astype(np.float64))
+
+  jlA = None
+  jlb = None
+  if A is not None and b is not None:
+    jlA = jl.Array(A.astype(np.float64))
+    jlb = jl.Array(b.flatten().astype(np.float64))
+  return jl.create_polytope(jlVertices, jlA, jlb)
 
 def get_poly_vertices(jlPoly) -> np.ndarray:
   # retorna una arreglo con los vértices del politopo
