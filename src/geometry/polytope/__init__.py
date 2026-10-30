@@ -1,5 +1,9 @@
 from .polytope import Polytope
-from .float_polytope.float_polytope import ConcretePolytope
-from .float_polytope.float_polytope_2d import ConcretePolytope2D
+from .float_polytope import *
+from .fraction_polytope import *
 
-__all__ = ["Polytope", "ConcretePolytope", "ConcretePolytope2D"]
+__all__ = ["Polytope", 
+           "FloatPolytope", 
+           "FloatPolytope2D",
+           "FractionPolytope",
+           "FractionPolytope2D"]
