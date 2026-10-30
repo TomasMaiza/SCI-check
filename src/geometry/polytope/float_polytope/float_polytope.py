@@ -4,10 +4,10 @@ from typing import Optional, TYPE_CHECKING
 from geometry import Halfspace, Hyperplane
 from ..polytope import Polytope
 import polytope as pc
-from .polytope_conc_2d import ConcretePolytope2D
+from .float_polytope_2d import FloatPolytope2D
 from common import Point, Edge
 
-class ConcretePolytope(Polytope):
+class FloatPolytope(Polytope):
   # Implementación de politopos
 
   _intDim: int # dimensión intrínseca del politopo
@@ -113,7 +113,7 @@ class ConcretePolytope(Polytope):
 
         # diccionario del composite para instanciar según dimensión (si es hoja o no)
         if self._intDim == 3:
-          boundary = ConcretePolytope2D(
+          boundary = FloatPolytope2D(
             intDim = 2,
             ambDim = self._ambDim,
             verticesnp = face_vertices
@@ -121,7 +121,7 @@ class ConcretePolytope(Polytope):
 
         # Instanciamos la cara reduciendo la dimensión intrínseca
         else:
-          boundary = ConcretePolytope(
+          boundary = FloatPolytope(
             intDim=self._intDim - 1,
             ambDim=self._ambDim,
             verticesnp=face_vertices

@@ -8,7 +8,7 @@ from scipy.spatial import ConvexHull
 import itertools
 from common import Point, Edge
 
-class ConcretePolytope2D(Polytope):
+class FloatPolytope2D(Polytope):
   # Implementación de politopos 2D (hoja del Composite)
 
   _ambDim: int # dimensión ambiental
