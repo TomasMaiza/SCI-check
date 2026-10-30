@@ -2,6 +2,8 @@ using Polyhedra
 using CDDLib
 using IntervalArithmetic
 
+const Interval = IntervalArithmetic.Interval
+
 const FractionPoint = Vector{Rational{BigInt}}
 const FractionEdge  = Tuple{FractionPoint, FractionPoint}
 const lib = CDDLib.Library(:exact)
