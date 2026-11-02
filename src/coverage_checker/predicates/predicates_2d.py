@@ -59,8 +59,10 @@ class Predicates2d(AbstractPredicates):
     ret = True
     for f in hs:
       # queremos calcular la orientación de f1 \cap f2 respecto a v1v2
-      ori = self.orient_LPI(r, s, f2, f)
-      if ori != IN:
+      oriPoint = self.orient_LPI(r, s, f2, f)
+      centroid = polytope.get_centroid()
+      oriCentroid = self.orient(centroid, f)
+      if oriPoint != oriCentroid: # REVISAR, saco el ON por si está sobre una arista (de eso se encarga C2)
         ret = False
         break
     return ret

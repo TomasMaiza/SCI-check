@@ -64,6 +64,7 @@ class _CoverageCheckerIntern:
       oriPoint = self._predicates.orient_TPI(polytope, f1, f2, fp)
       oriCentroid = self._predicates.orient(centroid, fp)
       if oriPoint != oriCentroid and oriPoint != ON:
+        #log.info(f"Check C3: False con {f1.get_points()}, {f2.get_points()}, {fp.get_points()}")
         ret = False
         break
     return ret
@@ -114,6 +115,7 @@ class _CoverageCheckerIntern:
       return IN
     ret = OUT
     for i, p in enumerate(subregionsMap):
+      # log.info(f"Check C3: Entrando con modo = {i}, modos actuales {currentpIndex1} y {currentpIndex2}")
       if i not in {currentpIndex1, currentpIndex2} and self.implicit_point_in_polytope_TPI(polytope, f1, f2, p):
         ret = IN
         break
@@ -180,8 +182,8 @@ class _CoverageCheckerIntern:
     for (f1, i), (f2, j) in itertools.combinations(faces, 2):
       
       # Delegamos el chequeo de dependencia lineal / paralelismo a la función extra
-      #if not self._is_valid_intersection(polytope, f1, f2):
-      #    continue
+      if i == j:
+        continue
       if self.plane_plane_poly_out(polytope, f1, f2, subregionsMap, i, j) == OUT:
         ret = OUT
         break 

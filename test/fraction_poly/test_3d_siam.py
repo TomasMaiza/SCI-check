@@ -4,14 +4,14 @@ import matplotlib.patches as patches
 from scipy.spatial import ConvexHull
 from sci import SCIChecker
 from coverage_checker import *
-from geometry import Polytope, FloatPolytope
+from geometry import Polytope, FractionPolytope
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
 from common import setup_logger
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import polytope as pc
 
-def set_sci(polytope: FloatPolytope, sas: SwitchedAffineSystem):
+def set_sci(polytope: Polytope, sas: SwitchedAffineSystem):
   checker = SCIChecker(3, PredicatesFactory[3](), CoverageCheckerFactory[3], polytope, sas)
   return checker
 
@@ -24,7 +24,7 @@ def politopo():
        (-0.05, 0.5, 0.02),
        (-0.05, -0.5, -0.02),
        (-0.05, -0.5, 0.02))
-  polytope = FloatPolytope(intDim=3, ambDim=3, vertices=v)
+  polytope = FractionPolytope(intDim=3, ambDim=3, vertices=v)
   return polytope
 
 '''

@@ -54,7 +54,7 @@ function get_vertices(poly::Polyhedron)::Matrix{Float64}
 
   for (i, p) in enumerate(vertices)
     for j in 1:ambDim
-    verticesMatrix[i, j] = p[j] >= centroid[j] ? Float64(p[j], RoundUp) : Float64(p[j], RoundDown)
+      verticesMatrix[i, j] = p[j] >= centroid[j] ? Float64(p[j], RoundUp) : Float64(p[j], RoundDown)
     end
   end
   return verticesMatrix
@@ -133,7 +133,7 @@ function get_boundaries(poly::Polyhedron)::Vector{Polyhedron}
   hs = collect(Polyhedra.halfspaces(Polyhedra.hrep(poly)))
   facets = Vector{Polyhedron}()
   for h in hs
-    hp = Polyhedra.Hyperplane(h.a, h.β)
+    hp = Polyhedra.HyperPlane(h.a, h.β)
     facet_hrep = intersect(Polyhedra.hrep(poly), hp)
     facet_poly = polyhedron(facet_hrep, lib)
     Polyhedra.removehredundancy!(facet_poly)

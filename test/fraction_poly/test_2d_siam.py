@@ -4,13 +4,13 @@ import matplotlib.patches as patches
 from scipy.spatial import ConvexHull
 from sci import SCIChecker
 from coverage_checker import *
-from geometry import Polytope, FloatPolytope2D
+from geometry import Polytope, FractionPolytope2D
 from coverage_checker import PredicatesFactory
 from affine_system import SwitchedAffineSystem
 import polytope as pc
 from common import setup_logger, Point
 
-def set_sci(polytope: FloatPolytope2D, sas: SwitchedAffineSystem):
+def set_sci(polytope: FractionPolytope2D, sas: SwitchedAffineSystem):
   checker = SCIChecker(2, PredicatesFactory[2](), CoverageCheckerFactory[2], polytope, sas)
   return checker
 
@@ -19,7 +19,7 @@ def politopo():
        (-np.sqrt(2), 0),
        (0, np.sqrt(2)),
        (0, -np.sqrt(2)))
-  polytope = FloatPolytope2D(intDim = 2, ambDim = 2, vertices = v)
+  polytope = FractionPolytope2D(intDim = 2, ambDim = 2, vertices = v)
   return polytope
 
 def sistema():
@@ -53,35 +53,8 @@ def plot_filled_scenario(title: str, original_poly: Polytope, coverage_result: b
     
     # 3. Reconstruimos los polígonos cerrados a partir de los puntos
     for mode_idx, p in enumerate(subregions_map):
-        halfspaces_list = p.get_halfspaces()
-        if not halfspaces_list: 
-            continue
-            
-        points = []
-        for hs in halfspaces_list:
-            p = hs.get_points()
-            points.append(list(p[0]))
-            points.append(list(p[1]))
-            
-        points_array = np.array(points)
-        
-        # Usamos ConvexHull para asegurar que los puntos formen un polígono perfecto
-        if len(points_array) >= 3:
-            try:
-                hull = ConvexHull(points_array)
-                # Creamos el parche relleno
-                poly_patch = patches.Polygon(
-                    points_array[hull.vertices], 
-                    closed=True,
-                    facecolor=colors[mode_idx % len(colors)],
-                    edgecolor=colors[mode_idx % len(colors)],
-                    alpha=0.6, # Transparencia para ver superposiciones
-                    linewidth=1.5,
-                    label=f'Modo {mode_idx}'
-                )
-                ax.add_patch(poly_patch)
-            except Exception as e:
-                print(f"No se pudo rellenar el Modo {mode_idx}: {e}")
+        subrPoly = pc.qhull(vertices = p.get_vertices())
+        subrPoly.plot(ax, color=colors[mode_idx], alpha=0.3, edgecolor='black', linewidth=2)
 
     # Configuraciones estéticas
     ax.set_title(f"{title}\nResultado de Cobertura: {coverage_result}", fontsize=14)

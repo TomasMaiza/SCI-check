@@ -25,35 +25,8 @@ def plot_filled_scenario(title: str, original_poly: Polytope, checker: 'SCICheck
     
     # 3. Reconstruimos los polígonos cerrados a partir de los puntos
     for mode_idx, p in enumerate(subregions_map):
-        halfspaces_list = p.get_halfspaces()
-        if not halfspaces_list: 
-            continue
-            
-        points = []
-        for hs in halfspaces_list:
-            p = hs.get_points()
-            points.append(list(p[0]))
-            points.append(list(p[1]))
-            
-        points_array = np.array(points)
-        
-        # Usamos ConvexHull para asegurar que los puntos formen un polígono perfecto
-        if len(points_array) >= 3:
-            try:
-                hull = ConvexHull(points_array)
-                # Creamos el parche relleno
-                poly_patch = patches.Polygon(
-                    points_array[hull.vertices], 
-                    closed=True,
-                    facecolor=colors[mode_idx % len(colors)],
-                    edgecolor=colors[mode_idx % len(colors)],
-                    alpha=0.6, # Transparencia para ver superposiciones
-                    linewidth=1.5,
-                    label=f'Modo {mode_idx}'
-                )
-                ax.add_patch(poly_patch)
-            except Exception as e:
-                print(f"No se pudo rellenar el Modo {mode_idx}: {e}")
+        subrPoly = pc.qhull(vertices = p.get_vertices())
+        subrPoly.plot(ax, color=colors[mode_idx], alpha=0.3, edgecolor='black', linewidth=2)
 
     # Configuraciones estéticas
     ax.set_title(f"{title}\nResultado de Cobertura: {coverage_result}", fontsize=14)
@@ -106,6 +79,7 @@ def run_matlab_validation():
     # =================================================================
     # Experimento 1: K = 3 (Debería dejar huecos)
     # =================================================================
+    '''
     print("Ejecutando Experimento K=3 (h ≈ 0.067)...")
     checker_k3 = SCIChecker(dimension=2, 
                                     predicates=predicates_2d, 
@@ -115,6 +89,7 @@ def run_matlab_validation():
     
     result_k3, sub_k3 = checker_k3.sci_check(dwellTime=dwell_time, K=3)
     plot_filled_scenario("K = 3 (h = 0.067)", base_polytope, checker_k3, result_k3, sub_k3)
+    '''
 
     # =================================================================
     # Experimento 2: K = 12 (NO debería cubrir)
@@ -132,6 +107,7 @@ def run_matlab_validation():
     # =================================================================
     # Experimento 3: K = 350 (Debería cubrir?)
     # =================================================================
+    '''
     print("\nEjecutando Experimento K=11 (h ≈ )...")
     checker_k350 = SCIChecker(dimension=2,
                                         predicates=predicates_2d, 
@@ -139,8 +115,9 @@ def run_matlab_validation():
                                         polytope=base_polytope, 
                                         sas=sas)
         
-    result_k350, sub_k350 = checker_k350.sci_check(dwellTime=dwell_time, K=10)
-    plot_filled_scenario("K = 11 (h = )", base_polytope, checker_k350, result_k350, sub_k350)
+    result_k350, sub_k350 = checker_k350.sci_check(dwellTime=dwell_time, K=20)
+    plot_filled_scenario("K = 20 (h = )", base_polytope, checker_k350, result_k350, sub_k350)
+    '''
 
 if __name__ == "__main__":
     setup_logger()

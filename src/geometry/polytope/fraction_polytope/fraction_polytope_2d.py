@@ -34,20 +34,17 @@ class FractionPolytope2D(Polytope):
     self._ambDim = ambDim
     self._halfspaces = None
     self._centroid = None
-    self._A = A
-    self._b = b
+    self._A = None
+    self._b = None
+    self._vertices = None
 
     if verticesnp is not None:
-      self._vertices = verticesnp
-    elif vertices is not None:
-      self._vertices = np.array(vertices) 
-    else:
-      self._vertices = None
+      vertices = verticesnp
 
     if jlPoly is not None:
       self._jlPoly = jlPoly
     else:
-      self._jlPoly = create_polytope(self._vertices, A, b)
+      self._jlPoly = create_polytope(vertices, A, b)
 
   def get_vertices(self) -> np.ndarray:
     if self._vertices is None:

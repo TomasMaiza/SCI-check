@@ -17,7 +17,7 @@ def create_polytope(vertices: np.ndarray = None, A: np.ndarray = None, b: np.nda
   # retorna referencia al objeto Polyhedron de Julia
   jlVertices = None
   if vertices is not None:
-    jlVertices = jl.Array(vertices.astype(np.float64))
+    jlVertices = jl.Array(np.array(vertices, dtype=np.float64))
 
   jlA = None
   jlb = None
