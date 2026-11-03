@@ -56,6 +56,10 @@ def get_poly_facets(jlPoly) -> list[Any]:
 def get_poly_edges(jlPoly) -> np.ndarray:
   return np.array(jl.get_edges(jlPoly))
 
-def get_poly_halfspace_points(jlPoly) -> list[np.ndarray]:
-    ptsMatrices = jl.get_halfspace_points(jlPoly)
+def get_poly_halfspace_points_inner(jlPoly) -> list[np.ndarray]:
+    ptsMatrices = jl.get_halfspace_points_inner(jlPoly)
+    return [np.array(mat) for mat in ptsMatrices]
+
+def get_poly_halfspace_points_outer(jlPoly) -> list[np.ndarray]:
+    ptsMatrices = jl.get_halfspace_points_outer(jlPoly)
     return [np.array(mat) for mat in ptsMatrices]

@@ -56,13 +56,13 @@ class FractionPolytope2D(Polytope):
       self._vertices = get_poly_vertices(self._jlPoly)
     return self._vertices
 
-  def get_hrep_inner(self) -> tuple[np.ndarray, np.ndarray]:
+  def _get_hrep_inner(self) -> tuple[np.ndarray, np.ndarray]:
     # permite obtener las matrices A y b que definen al politopo (Ax <= b)
     if self._A is None or self._b is None:
       self._A, self._b = get_poly_hrep_inner(self._jlPoly)
     return self._A, self._b
 
-  def get_hrep_outer(self) -> tuple[np.ndarray, np.ndarray]:
+  def _get_hrep_outer(self) -> tuple[np.ndarray, np.ndarray]:
     # permite obtener las matrices A y b que definen al politopo (Ax <= b)
     if self._A is None or self._b is None:
       self._A, self._b = get_poly_hrep_outer(self._jlPoly)
@@ -86,9 +86,10 @@ class FractionPolytope2D(Polytope):
 
   def get_halfspaces(self) -> list[Halfspace]:
     if self._halfspaces is None:
+      typeDict = {BASE: get_poly_halfspace_points_outer, SUBREGION: get_poly_halfspace_points_inner}
       self._halfspaces = []
       A, b = self.get_hrep()
-      hsPoints = get_poly_halfspace_points(self._jlPoly)
+      hsPoints = typeDict[self._type](self._jlPoly)
       for i in range(len(b)):
         normal = A[i]
         offset = b[i]

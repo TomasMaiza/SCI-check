@@ -249,25 +249,110 @@ function get_edges(poly::Polyhedron)::Vector{Tuple{Vector{Float64}, Vector{Float
   return edges
 end
 
-function get_halfspace_points(poly::Polyhedron)::Vector{Matrix{Float64}}
-  hs = collect(Polyhedra.halfspaces(Polyhedra.hrep(poly)))
-  vertices = collect(Polyhedra.points(Polyhedra.vrep(poly)))
+function get_halfspace_points_outer(poly::Polyhedron)::Vector{Matrix{Float64}}
+  A, b = get_hrep_outer(poly)
   ambDim = Polyhedra.fulldim(poly)
-  
   result = Vector{Matrix{Float64}}()
   
-  centroid = get_centroid(poly)
+  if length(b) == 0
+    return result
+  end
   
-  for h in hs
-    facePoints = filter(p -> h.a ⋅ p == h.β, vertices) # filtramos los vértices exactos que pertenecen a esta pared 
+  ratA = Rational{BigInt}.(A)
+  ratb = Rational{BigInt}.(b)
+  poly_outer = polyhedron(Polyhedra.hrep(ratA, ratb), lib)
+  Polyhedra.removehredundancy!(poly_outer)
+  verts = collect(Polyhedra.points(Polyhedra.vrep(poly_outer)))
+  
+  for i in 1:length(b)
+    facePoints = filter(p -> ratA[i, :] ⋅ p == ratb[i], verts)
     
-    mat = Matrix{Float64}(undef, length(facePoints), ambDim)
-    for (i, p) in enumerate(facePoints)
-      for j in 1:ambDim
-         mat[i, j] = p[j] >= centroid[j] ? Float64(p[j], RoundUp) : Float64(p[j], RoundDown)
-      end
+    # Si la cara intersecta suficientes vértices reales, los usamos
+    if length(facePoints) >= ambDim
+        mat = Matrix{Float64}(undef, ambDim, ambDim)
+        for (k, p) in enumerate(facePoints[1:ambDim])
+          for j in 1:ambDim
+             mat[k, j] = Float64(p[j])
+          end
+        end
+        push!(result, mat)
+    else
+        # FALLBACK EXACTO: Cara redundante (ej. Bounding Box).
+        # Generamos los puntos algebraicamente usando fracciones puras.
+        mat = Matrix{Float64}(undef, ambDim, ambDim)
+        max_idx = argmax(abs.(ratA[i, :])) # Eje seguro para evitar división por 0
+        
+        # Primer punto base
+        p1 = zeros(Rational{BigInt}, ambDim)
+        p1[max_idx] = ratb[i] // ratA[i, max_idx]
+        
+        for j in 1:ambDim; mat[1, j] = Float64(p1[j]); end
+        
+        # Puntos directores restantes
+        row = 2
+        for j in 1:ambDim
+            if j != max_idx
+                pj = copy(p1)
+                pj[max_idx] -= ratA[i, j]
+                pj[j] += ratA[i, max_idx]
+                for k in 1:ambDim; mat[row, k] = Float64(pj[k]); end
+                row += 1
+            end
+        end
+        push!(result, mat)
     end
-    push!(result, mat)
+  end
+  
+  return result
+end
+
+function get_halfspace_points_inner(poly::Polyhedron)::Vector{Matrix{Float64}}
+  A, b = get_hrep_inner(poly)
+  ambDim = Polyhedra.fulldim(poly)
+  result = Vector{Matrix{Float64}}()
+  
+  if length(b) == 0
+    return result
+  end
+  
+  ratA = Rational{BigInt}.(A)
+  ratb = Rational{BigInt}.(b)
+  poly_inner = polyhedron(Polyhedra.hrep(ratA, ratb), lib)
+  Polyhedra.removehredundancy!(poly_inner)
+  verts = collect(Polyhedra.points(Polyhedra.vrep(poly_inner)))
+  
+  for i in 1:length(b)
+    facePoints = filter(p -> ratA[i, :] ⋅ p == ratb[i], verts)
+    
+    if length(facePoints) >= ambDim
+        mat = Matrix{Float64}(undef, ambDim, ambDim)
+        for (k, p) in enumerate(facePoints[1:ambDim])
+          for j in 1:ambDim
+             mat[k, j] = Float64(p[j])
+          end
+        end
+        push!(result, mat)
+    else
+        mat = Matrix{Float64}(undef, ambDim, ambDim)
+        max_idx = argmax(abs.(ratA[i, :]))
+        
+        p1 = zeros(Rational{BigInt}, ambDim)
+        p1[max_idx] = ratb[i] // ratA[i, max_idx]
+        
+        for j in 1:ambDim; mat[1, j] = Float64(p1[j]); end
+        
+        row = 2
+        for j in 1:ambDim
+            if j != max_idx
+                pj = copy(p1)
+                pj[max_idx] -= ratA[i, j]
+                pj[j] += ratA[i, max_idx]
+                for k in 1:ambDim; mat[row, k] = Float64(pj[k]); end
+                row += 1
+            end
+        end
+        push!(result, mat)
+    end
   end
   
   return result

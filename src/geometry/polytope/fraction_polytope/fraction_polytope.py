@@ -105,9 +105,10 @@ class FractionPolytope(Polytope):
 
   def get_halfspaces(self) -> list[Halfspace]:
     if self._halfspaces is None:
+      typeDict = {BASE: get_poly_halfspace_points_outer, SUBREGION: get_poly_halfspace_points_inner}
       self._halfspaces = []
       A, b = self.get_hrep()
-      hsPoints = get_poly_halfspace_points(self._jlPoly)
+      hsPoints = typeDict[self._type](self._jlPoly)
       for i in range(len(b)):
         normal = A[i]
         offset = b[i]

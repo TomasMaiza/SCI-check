@@ -79,7 +79,6 @@ def run_matlab_validation():
     # =================================================================
     # Experimento 1: K = 3 (Debería dejar huecos)
     # =================================================================
-    '''
     print("Ejecutando Experimento K=3 (h ≈ 0.067)...")
     checker_k3 = SCIChecker(dimension=2, 
                                     predicates=predicates_2d, 
@@ -89,10 +88,9 @@ def run_matlab_validation():
     
     result_k3, sub_k3 = checker_k3.sci_check(dwellTime=dwell_time, K=3)
     plot_filled_scenario("K = 3 (h = 0.067)", base_polytope, checker_k3, result_k3, sub_k3)
-    '''
 
     # =================================================================
-    # Experimento 2: K = 12 (NO debería cubrir)
+    # Experimento 2: K = 12 (debería cubrir)
     # =================================================================
     print("\nEjecutando Experimento K=12 (h ≈ 0.017)...")
     checker_k12 = SCIChecker(dimension=2,
@@ -103,9 +101,8 @@ def run_matlab_validation():
     plot_filled_scenario("K = 12 (h = 0.017)", base_polytope, checker_k12, result_k12, sub_k12)
 
     # =================================================================
-    # Experimento 3: K = 350 (Debería cubrir?)
+    # Experimento 3: K = 11 (No Debería cubrir)
     # =================================================================
-    '''
     print("\nEjecutando Experimento K=11 (h ≈ )...")
     checker_k350 = SCIChecker(dimension=2,
                                         predicates=predicates_2d, 
@@ -113,9 +110,8 @@ def run_matlab_validation():
                                         polytope=base_polytope, 
                                         sas=sas)
         
-    result_k350, sub_k350 = checker_k350.sci_check(dwellTime=dwell_time, K=20)
+    result_k350, sub_k350 = checker_k350.sci_check(dwellTime=dwell_time, K=11)
     plot_filled_scenario("K = 20 (h = )", base_polytope, checker_k350, result_k350, sub_k350)
-    '''
 
 if __name__ == "__main__":
     setup_logger()
