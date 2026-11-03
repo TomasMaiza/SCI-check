@@ -1,4 +1,4 @@
-from coverage_checker import CoverageCheckStrategy, CoverageChecker, AbstractPredicates
+from coverage_checker import CoverageCheckStrategy, CoverageChecker, PredicatesFactory, CoverageCheckerFactory
 from geometry import Polytope
 from common import ON, OUT, IN
 from affine_system import SwitchedAffineSystem
@@ -12,18 +12,17 @@ Clase principal para ejecutar el algoritmo. Permite inicializarla con el politop
 class SCIChecker():
   def __init__(self, 
                dimension: int,
-               predicates: AbstractPredicates, 
-               coverageChecker: CoverageCheckStrategy,
                polytope: Polytope, 
                sas: SwitchedAffineSystem):
     """
     La clase se inicializa con el politopo, el sistema afín conmutado y la dimensión
     """
-    self._predicates = predicates # INICIALIZAR EN BASE A LA DIMENSIÓN
+    self._predicates = PredicatesFactory[dimension]()
     self._polytope = polytope
     self._sas = sas
     self._subregionsAlgorithm = IntervalSubregions(dimension) # le paso acá el método de aprox?
-    self._coverageChecker = coverageChecker(predicates)
+    covChecker = CoverageCheckerFactory[dimension]
+    self._coverageChecker = covChecker(self._predicates)
 
   def get_subregions(self, dwellTime: float, K: int):
     self._subregions = self._subregionsAlgorithm.get_subregions(self._sas, self._polytope, dwellTime, K)
