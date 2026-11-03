@@ -4,13 +4,14 @@ from geometry import Halfspace, Hyperplane
 from polytope import Polytope
 from .fraction_polytope_2d import FractionPolytope2D
 from .julia_adapter import *
-from common import Point, Edge
+from common import Point, Edge, SUBREGION, BASE, PolytopeType
 
 class FractionPolytope(Polytope):
   # Implementación de politopos
 
   _intDim: int # dimensión intrínseca del politopo
   _ambDim: int # dimensión ambiental
+  _type: PolytopeType
   _boundaries: list['Polytope']
   _vertices: np.ndarray
   _A: np.ndarray 
@@ -22,6 +23,7 @@ class FractionPolytope(Polytope):
   def __init__(self, 
                intDim: int,
                ambDim: int,
+               type: PolytopeType,
                vertices: Optional['list[Point]'] = None,
                verticesnp: Optional['np.ndarray'] = None,
                A: Optional['np.ndarray'] = None, 
@@ -33,30 +35,43 @@ class FractionPolytope(Polytope):
 
     self._intDim = intDim
     self._ambDim = ambDim
+    self._type = type
     self._halfspaces = None
     self._centroid = None
     self._A = None
     self._b = None
+    self._vertices = None
 
     if verticesnp is not None:
-      vertices = verticesnp
-    self._vertices = None
+      self._vertices = verticesnp
+    elif vertices is not None:
+      self._vertices = vertices
 
     if jlPoly is not None:
       self._jlPoly = jlPoly
     else:
-      self._jlPoly = create_polytope(vertices, A, b)
+      self._jlPoly = create_polytope(self._vertices, A, b)
 
   def get_vertices(self) -> np.ndarray:
     if self._vertices is None:
       self._vertices = get_poly_vertices(self._jlPoly)
     return self._vertices
 
-  def get_hrep(self) -> tuple[np.ndarray, np.ndarray]:
+  def _get_hrep_inner(self) -> tuple[np.ndarray, np.ndarray]:
     # permite obtener las matrices A y b que definen al politopo (Ax <= b)
     if self._A is None or self._b is None:
-      self._A, self._b = get_poly_hrep(self._jlPoly)
+      self._A, self._b = get_poly_hrep_inner(self._jlPoly)
     return self._A, self._b
+
+  def _get_hrep_outer(self) -> tuple[np.ndarray, np.ndarray]:
+    # permite obtener las matrices A y b que definen al politopo (Ax <= b)
+    if self._A is None or self._b is None:
+      self._A, self._b = get_poly_hrep_inner(self._jlPoly)
+    return self._A, self._b
+  
+  def get_hrep(self):
+    hrepDict = {BASE: self._get_hrep_outer, SUBREGION: self._get_hrep_inner}
+    return hrepDict[self._type]()
 
   def get_hrep_normalized(self) -> tuple[np.ndarray, np.ndarray]:
     # permite obtener las matrices A y b que definen al politopo (Ax <= b) normalizadas

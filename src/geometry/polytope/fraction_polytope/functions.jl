@@ -40,27 +40,45 @@ function get_centroid(poly::Polyhedron)::Vector{Rational{BigInt}}
   return sum(vertices) .// numVertices
 end
 
-function get_vertices(poly::Polyhedron)::Matrix{Float64}
-  vertices = collect(Polyhedra.points(Polyhedra.vrep(poly)))
-  numVertices = length(vertices)
+function get_vertices_outer(poly::Polyhedron)::Matrix{Float64}
+  verts = collect(Polyhedra.points(Polyhedra.vrep(poly)))
   ambDim = Polyhedra.fulldim(poly)
-
-  if numVertices == 0
-    return Matrix{Float64}(undef, 0, Polyhedra.fulldim(poly))
+  
+  if isempty(verts)
+    return Matrix{Float64}(undef, 0, ambDim)
   end
 
-  verticesMatrix = Matrix{Float64}(undef, numVertices, Polyhedra.fulldim(poly))
-  centroid = get_centroid(poly)
-
-  for (i, p) in enumerate(vertices)
-    for j in 1:ambDim
-      verticesMatrix[i, j] = p[j] >= centroid[j] ? Float64(p[j], RoundUp) : Float64(p[j], RoundDown)
+  corners_exact = Vector{Vector{Rational{BigInt}}}()
+  
+  # Generar las 2^n esquinas para la caja de redondeo de cada vértice
+  for v in verts
+    # Para cada coordenada, obtenemos los bordes exactos usando RoundDown y RoundUp
+    bounds = [(Rational{BigInt}(Float64(v[j], RoundDown)), 
+               Rational{BigInt}(Float64(v[j], RoundUp))) for j in 1:ambDim]
+               
+    # Hacemos el producto cartesiano para sacar todas las combinaciones posibles
+    for corner in Iterators.product(bounds...)
+        push!(corners_exact, collect(corner))
     end
   end
-  return verticesMatrix
+
+  # Calcular cápsula convexa exacta de todas las esquinas generadas
+  poly_outer = polyhedron(Polyhedra.vrep(corners_exact), lib)
+  Polyhedra.removevredundancy!(poly_outer)
+
+  outer_verts = collect(Polyhedra.points(Polyhedra.vrep(poly_outer)))
+  
+  # Ahora es 100% seguro pasarlos a Float64 (son flotantes exactos por construcción)
+  mat = Matrix{Float64}(undef, length(outer_verts), ambDim)
+  for (i, p) in enumerate(outer_verts)
+    for j in 1:ambDim
+      mat[i, j] = Float64(p[j])
+    end
+  end
+  return mat
 end
 
-function get_hrep(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Float64}}
+function get_hrep_outer(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Float64}}
   hs = collect(Polyhedra.halfspaces(Polyhedra.hrep(poly)))
   vertices = collect(Polyhedra.points(Polyhedra.vrep(poly))) 
   
@@ -92,7 +110,66 @@ function get_hrep(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Float64}}
   return A, b
 end
 
-function get_hrep_normalized(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Float64}}
+function get_hrep_inner(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Float64}}
+  hs = collect(Polyhedra.halfspaces(Polyhedra.hrep(poly)))
+  verts = collect(Polyhedra.points(Polyhedra.vrep(poly))) 
+  ambDim = Polyhedra.fulldim(poly)
+  
+  if isempty(hs)
+    return Matrix{Float64}(undef, 0, ambDim), Vector{Float64}(undef, 0)
+  end
+  if isempty(verts)
+    return get_hrep(poly) # Fallback si no está acotado
+  end
+
+  # 1. Calcular ξ_j (máximo valor absoluto por dimensión, redondeado hacia arriba)
+  xi = zeros(Rational{BigInt}, ambDim)
+  for j in 1:ambDim
+     max_val = maximum(abs(v[j]) for v in verts)
+     xi[j] = Rational{BigInt}(Float64(max_val, RoundUp))
+  end
+
+  num_rows = length(hs) + 2 * ambDim
+  A_inner = Matrix{Float64}(undef, num_rows, ambDim)
+  b_inner = Vector{Float64}(undef, num_rows)
+  
+  for (i, h) in enumerate(hs)
+    a_exact = h.a
+    beta_exact = h.β
+    
+    a_tilde = Float64.(a_exact)
+    a_tilde_rat = Rational{BigInt}.(a_tilde)
+    
+    # 2. Suma de errores exacta en valor absoluto
+    error_sum = sum(abs(a_exact[j] - a_tilde_rat[j]) * xi[j] for j in 1:ambDim)
+    
+    # 3. Compensación de la rotación en b
+    b_exact = beta_exact - error_sum
+    
+    for j in 1:ambDim
+      A_inner[i, j] = a_tilde[j]
+    end
+    b_inner[i] = Float64(b_exact, RoundDown)
+  end
+  
+  # 4. Agregar las inecuaciones de la caja (±x_j <= ξ_j)
+  row_idx = length(hs) + 1
+  for j in 1:ambDim
+    # +x_j <= ξ_j
+    for k in 1:ambDim; A_inner[row_idx, k] = (k == j ? 1.0 : 0.0); end
+    b_inner[row_idx] = Float64(xi[j], RoundDown)
+    row_idx += 1
+    
+    # -x_j <= ξ_j
+    for k in 1:ambDim; A_inner[row_idx, k] = (k == j ? -1.0 : 0.0); end
+    b_inner[row_idx] = Float64(xi[j], RoundDown)
+    row_idx += 1
+  end
+  
+  return A_inner, b_inner
+end
+
+function get_hrep_normalized_outer(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Float64}}
   hs = collect(Polyhedra.halfspaces(Polyhedra.hrep(poly)))
   vertices = collect(Polyhedra.points(Polyhedra.vrep(poly))) 
   
@@ -107,7 +184,7 @@ function get_hrep_normalized(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Fl
   b = Vector{Float64}(undef, numHalfspaces)
   
   for (i, h) in enumerate(hs)
-    aInterval = Interval.(h.a) # cálculo de la norma con intervalos
+    aInterval = Interval.(h.a)
     normsq = sum(aInterval .^ 2)
     normInv = 1.0 / sqrt(normsq) 
     aNormInterval = aInterval .* normInv
@@ -117,12 +194,12 @@ function get_hrep_normalized(poly::Polyhedron)::Tuple{Matrix{Float64}, Vector{Fl
     end
     
     if isempty(vertices)
-      bInterval = Interval(h.β) * normInv # caso borde: si no hay vértices, acotamos con el intervalo
-      b[i] = inf(bInterval) # queremos achicar?
+      bInterval = Interval(h.β) * normInv 
+      b[i] = sup(bInterval)
     else
       ratA = Rational{BigInt}.(A[i, :])
       maxExactb = maximum(sum(ratA[j] * v[j] for j in 1:ambDim) for v in vertices)
-      b[i] = Float64(maxExactb, RoundDown) # queremos achicar?
+      b[i] = Float64(maxExactb, RoundUp) 
     end
   end
   

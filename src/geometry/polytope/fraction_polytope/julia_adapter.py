@@ -28,20 +28,25 @@ def create_polytope(vertices: np.ndarray = None, A: np.ndarray = None, b: np.nda
 
 def get_poly_vertices(jlPoly) -> np.ndarray:
   # retorna una arreglo con los vértices del politopo
-  return np.array(jl.get_vertices(jlPoly))
+  return np.array(jl.get_vertices_outer(jlPoly))
 
 def get_poly_centroid(jlPoly) -> np.ndarray:
   # consulta el centroide del politopo
   return np.array(jl.get_centroid(jlPoly), dtype=np.float64)
 
-def get_poly_hrep(jlPoly) -> tuple[np.ndarray, np.ndarray]:
+def get_poly_hrep_inner(jlPoly) -> tuple[np.ndarray, np.ndarray]:
   # retorna las hrep del politopo Ax <= b
-  A, b = jl.get_hrep(jlPoly)
+  A, b = jl.get_hrep_inner(jlPoly)
+  return np.array(A), np.array(b).flatten()
+
+def get_poly_hrep_outer(jlPoly) -> tuple[np.ndarray, np.ndarray]:
+  # retorna las hrep del politopo Ax <= b
+  A, b = jl.get_hrep_outer(jlPoly)
   return np.array(A), np.array(b).flatten()
 
 def get_poly_hrep_normalized(jlPoly) -> tuple[np.ndarray, np.ndarray]:
   # retorna las hrep del politopo Ax <= b
-  A, b = jl.get_hrep_normalized(jlPoly)
+  A, b = jl.get_hrep_normalized_outer(jlPoly)
   return np.array(A), np.array(b).flatten()
 
 def get_poly_facets(jlPoly) -> list[Any]:
