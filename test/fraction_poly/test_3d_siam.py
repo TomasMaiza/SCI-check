@@ -28,20 +28,23 @@ def politopo():
   return polytope
 
 '''
-def sistema():
-  R_E = 100
-  R = 25
-  E = 24
-  C1 = 50
-  C2 = 25
-  L = 10
-  modos = {}
-  modos[1] = (np.array([[-1/(R_E * C1), 0, 0], [0, -1/(R * C2), 1/C2], [0, -1/L, 0]]), 
-              np.array([E/(R_E * C1), 0, 0]).reshape(-1, 1))
-  modos[2] = (np.array([[-1/(R_E * C1), 0, -1/C1], [0, -1/(R * C2), 1/C2], [1/L, -1/L, 0]]), 
-              np.array([E/(R_E * C1), 0, 0]).reshape(-1, 1))
-  sas = SwitchedAffineSystem(modos)
-  return sas
+def politopo():
+    # Matriz A: Las normales de las 6 caras del prisma rectangular
+    A = np.array([
+        [ 1.0,  0.0,  0.0],  # x1 <= 0.05
+        [-1.0,  0.0,  0.0],  # -x1 <= 0.05
+        [ 0.0,  1.0,  0.0],  # x2 <= 0.5
+        [ 0.0, -1.0,  0.0],  # -x2 <= 0.5
+        [ 0.0,  0.0,  1.0],  # x3 <= 0.02
+        [ 0.0,  0.0, -1.0]   # -x3 <= 0.02
+    ], dtype=float)
+    
+    # Vector b: Los offsets correspondientes a cada cara
+    b = np.array([0.05, 0.05, 0.5, 0.5, 0.02, 0.02], dtype=float)
+    
+    # Instanciamos el politopo usando su H-rep en lugar de vértices
+    polytope = FractionPolytope(intDim=3, ambDim=3, A=A, b=b)
+    return polytope
 
 '''
 def sistema():

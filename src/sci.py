@@ -1,10 +1,13 @@
 from coverage_checker import CoverageCheckStrategy, CoverageChecker, AbstractPredicates
 from geometry import Polytope
 from common import ON, OUT, IN
-import numpy as np
-from aabbtree import AABB, AABBTree
 from affine_system import SwitchedAffineSystem
 from polytope_subregions import FloatSubregions, IntervalSubregions
+
+"""
+Clase principal para ejecutar el algoritmo. Permite inicializarla con el politopo y el sistema afín conmutado,
+ genera las subregiones y verifica la cobertura. 
+"""
 
 class SCIChecker():
   def __init__(self, 
@@ -13,7 +16,10 @@ class SCIChecker():
                coverageChecker: CoverageCheckStrategy,
                polytope: Polytope, 
                sas: SwitchedAffineSystem):
-    self._predicates = predicates
+    """
+    La clase se inicializa con el politopo, el sistema afín conmutado y la dimensión
+    """
+    self._predicates = predicates # INICIALIZAR EN BASE A LA DIMENSIÓN
     self._polytope = polytope
     self._sas = sas
     self._subregionsAlgorithm = IntervalSubregions(dimension) # le paso acá el método de aprox?
