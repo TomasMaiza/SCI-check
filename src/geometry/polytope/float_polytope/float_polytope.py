@@ -5,7 +5,7 @@ from geometry import Halfspace, Hyperplane
 from ..polytope import Polytope
 import polytope as pc
 from .float_polytope_2d import FloatPolytope2D
-from common import Point, Edge
+from common import Point, Edge, PolytopeType, BASE
 
 class FloatPolytope(Polytope):
   # Implementación de politopos
@@ -23,6 +23,7 @@ class FloatPolytope(Polytope):
   def __init__(self, 
                intDim: int,
                ambDim: int,
+               type: PolytopeType = BASE,
                vertices: Optional['list[Point]'] = None,
                verticesnp: Optional['np.ndarray'] = None,
                A: Optional['np.ndarray'] = None, 

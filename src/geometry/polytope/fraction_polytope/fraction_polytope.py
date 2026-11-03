@@ -23,7 +23,7 @@ class FractionPolytope(Polytope):
   def __init__(self, 
                intDim: int,
                ambDim: int,
-               type: PolytopeType,
+               type: PolytopeType = BASE,
                vertices: Optional['list[Point]'] = None,
                verticesnp: Optional['np.ndarray'] = None,
                A: Optional['np.ndarray'] = None, 

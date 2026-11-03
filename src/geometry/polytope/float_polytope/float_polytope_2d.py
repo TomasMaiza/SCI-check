@@ -6,7 +6,7 @@ from ..polytope import Polytope
 import polytope as pc
 from scipy.spatial import ConvexHull
 import itertools
-from common import Point, Edge
+from common import Point, Edge, PolytopeType, BASE
 
 class FloatPolytope2D(Polytope):
   # Implementación de politopos 2D (hoja del Composite)
@@ -23,6 +23,7 @@ class FloatPolytope2D(Polytope):
   def __init__(self, 
                intDim: int,
                ambDim: int,
+               type: PolytopeType = BASE,
                vertices: Optional['list[Point]'] = None,
                verticesnp: Optional['np.ndarray'] = None,
                A: Optional['np.ndarray'] = None, 
