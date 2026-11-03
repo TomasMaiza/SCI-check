@@ -40,21 +40,28 @@ function get_subregion(approx::ApproximationStrategy,
   matrixH = reduce(vcat, subregionH)
   matrixc = reduce(vcat, subregionc)
 
-  matrixA = matrixH[:, 1:dim-1]
+  matrixA     = matrixH[:, 1:dim-1]
   matrixb_col = matrixH[:, dim]
-  matrixb = matrixc .- matrixb_col
+  matrixb     = matrixc .- matrixb_col
 
-  ## Compensación del error de matrixA, REVISAR
-  # 1. Calculamos el radio de incertidumbre de matrixA: (sup - inf) / 2
-  A_rad = (sup.(matrixA) .- inf.(matrixA)) ./ 2.0
+  ## Conversión de intervalos a Float64 con garantía
+  # 1. Representante en Float64 de cada coeficiente: Ã
+  Amid = mid.(matrixA)
 
-  # 2. Buscamos la coordenada máxima absoluta entre los vértices del politopo (approx.S)
+  # 2. Matriz de radios R, respecto del double Ã (no del punto medio exacto).
+  # mag da una cota SUPERIOR de |a_ij - Ã_ij|. Todas las entradas son >= 0.
+  A_rad = mag.(matrixA .- Amid)
+
+  # 3. Cota superior de |x_j| sobre P: ξ_j = max_v mag(v_j)  (máximo en un vértice)
   n_dim = size(matrixA, 2)
-  x_max = [maximum(sup(abs(v[j])) for v in approx.S) for j in 1:n_dim]
+  x_max = [maximum(mag(v[j]) for v in approx.S) for j in 1:n_dim]
 
-  # 3. Restamos ese peor caso angular a matrixb para achicar la pared de forma segura
-  matrixb_safe = matrixb .- (A_rad * x_max)
+  # 4. Peor caso R·ξ, calculado en INTERVALOS (redondeo hacia afuera)
+  slack = interval.(A_rad) * interval.(x_max)
+
+  # 5. b̃ = inf(β - R·ξ), redondeado hacia abajo
+  matrixb_safe = inf.(matrixb .- slack)
   ##
 
-  return IntervalMatrix(matrixA), matrixb_safe
+  return IntervalMatrix(interval.(Amid)), interval.(matrixb_safe)
 end
