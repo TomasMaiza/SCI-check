@@ -9,6 +9,8 @@ compile:
 	@mkdir -p $(BINDINGS_BUILD_DIR)
 	@cd $(BINDINGS_BUILD_DIR) && cmake .. && $(MAKE)
 
+# Tests con float polytope
+
 run: compile
 	@PYTHONPATH=./src python3 test/test_alg.py
 
@@ -17,6 +19,19 @@ run2d: compile
 
 run3d: compile
 	@PYTHONPATH=./src python3 test/test_3d_siam.py
+
+# Tests con fraction polytope
+
+frun: compile
+	@PYTHONPATH=./src python3 test/fraction_poly/test_alg.py
+
+frun2d: compile
+	@PYTHONPATH=./src python3 test/fraction_poly/test_2d_siam.py
+
+frun3d: compile
+	@PYTHONPATH=./src python3 test/fraction_poly/test_3d_siam.py
+
+# Otros tests
 
 runc4: compile
 	@PYTHONPATH=./src python3 test/test_c4.py

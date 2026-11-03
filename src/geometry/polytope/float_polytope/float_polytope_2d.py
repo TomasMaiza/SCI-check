@@ -2,17 +2,15 @@ from abc import ABC, abstractmethod
 import numpy as np
 from typing import Optional, TYPE_CHECKING
 from geometry import Halfspace, Hyperplane
-from .polytope import Polytope
+from ..polytope import Polytope
 import polytope as pc
-from .polytope_conc_2d import ConcretePolytope2D
+from scipy.spatial import ConvexHull
+import itertools
+from common import Point, Edge
 
-if TYPE_CHECKING:
-  from src.common.types import Point, Edge
+class FloatPolytope2D(Polytope):
+  # Implementación de politopos 2D (hoja del Composite)
 
-class ConcretePolytope(Polytope):
-  # Implementación de politopos
-
-  _intDim: int # dimensión intrínseca del politopo
   _ambDim: int # dimensión ambiental
   _boundaries: list['Polytope']
   _vertices: np.ndarray
@@ -33,7 +31,7 @@ class ConcretePolytope(Polytope):
     if (A is None or b is None) and vertices is None and verticesnp is None:
       raise ValueError("Inicialización inválida: Proveer vértices o (A, b)")
 
-    self._intDim = intDim
+    self._intDim = 2
     self._ambDim = ambDim
     self._halfspaces = None
     self._centroid = None
@@ -60,6 +58,12 @@ class ConcretePolytope(Polytope):
 
   def _set_h_rep_from_vertices(self):
     # calcula A y b si se inicializó con vértices
+    if self._ambDim > self._intDim:
+        self._A = np.array([])
+        self._b = np.array([])
+        return
+        
+    # Calcula A y b solo si se inicializó en un espacio 2D puro
     poly = pc.qhull(self._vertices)
     self._A, self._b = poly.A, poly.b
 
@@ -81,59 +85,26 @@ class ConcretePolytope(Polytope):
 
   def get_edges(self) -> list['Edge']:
     # retorna las aristas del politopo
-    pass
+    if self._vertices is None:
+      return [] 
+        
+    hull = ConvexHull(self._vertices, qhull_options='QJ')
+    unique_edges = set()
+    
+    for simplex in hull.simplices:
+      # itertools.combinations saca todos los pares posibles del simplex
+      # En 2D saca 1 par. En 3D saca 3 pares (los 3 lados del triángulo).
+      for i, j in itertools.combinations(simplex, 2):
+        # Ordenamos los índices para que (v1, v2) y (v2, v1) colapsen en el set
+        idx_min, idx_max = min(i, j), max(i, j)
+        p1 = tuple(self._vertices[idx_min])
+        p2 = tuple(self._vertices[idx_max])
+        unique_edges.add((p1, p2))   
+            
+    return list(unique_edges)
 
   def get_boundaries(self):
-    if hasattr(self, '_boundaries') and self._boundaries:
-      return self._boundaries
-
-    self._boundaries = []
-      
-    # Si llegamos a la dimensión mínima útil (ej: vértice), cortamos la recursión
-    # if self._intDim <= 0:
-    #  return self._boundaries
-
-    # Tolerancia estándar para compensar el punto flotante de la librería polytope
-    TOL = 1e-8 
-
-    # Iteramos sobre cada inecuación (fila de A y b)
-    for i in range(len(self._A)):
-      normal = self._A[i]
-      offset = self._b[i]
-
-      # MAGIA NUMPY: Calculamos la distancia de TODOS los vértices al plano de una sola vez
-      # Ecuación: Ax - b. Si da ~0, el vértice está en el plano.
-      distances = np.dot(self._vertices, normal) - offset # OJO CON ERROR DE CÁLCULO
-
-      # Obtenemos los índices de los vértices que cumplen la condición
-      in_plane_indices = np.where(np.isclose(distances, 0.0, atol=TOL))[0]
-
-      # Un hiperplano de dimensión N necesita al menos N vértices para formar una cara
-      # Ej: Una cara 2D necesita mínimo 3 vértices. Si tiene menos, no es una cara válida.
-      if len(in_plane_indices) >= self._intDim:
-        face_vertices = self._vertices[in_plane_indices]
-
-        # diccionario del composite para instanciar según dimensión (si es hoja o no)
-        if self._intDim == 3:
-          boundary = ConcretePolytope2D(
-            intDim = 2,
-            ambDim = self._ambDim,
-            verticesnp = face_vertices
-          )
-
-        # Instanciamos la cara reduciendo la dimensión intrínseca
-        else:
-          boundary = ConcretePolytope(
-            intDim=self._intDim - 1,
-            ambDim=self._ambDim,
-            verticesnp=face_vertices
-          )
-          
-      # (Opcional a futuro): face._supp_hyperplane = Hyperplane(normal, offset)
-          
-      self._boundaries.append(boundary)
-
-    return self._boundaries
+    return
 
   def get_halfspaces(self) -> list[Halfspace]:
     if self._halfspaces is None:
@@ -144,19 +115,36 @@ class ConcretePolytope(Polytope):
         normal = self._A[i]
         offset = self._b[i]
         
-        # 1. Buscamos qué vértices pertenecen a este hiperplano N-dimensional
+        # 1. Buscamos qué vértices pertenecen a esta inecuación
         distances = np.dot(self._vertices, normal) - offset
         in_plane_indices = np.where(np.isclose(distances, 0.0, atol=TOL))[0]
         
-        # 2. Extracción genérica para N dimensiones (tupla de N floats)
-        face_points = [
-            tuple(float(coord) for coord in self._vertices[idx])
+        # 2. Extraemos los vértices en tuplas puras
+        extracted_points = [
+            (float(self._vertices[idx][0]), float(self._vertices[idx][1])) 
             for idx in in_plane_indices
         ]
         
-        # 3. Instanciamos el semiespacio inyectando matrices Y puntos
+        # 3. Orientación geométrica y limpieza de colineales
+        if len(extracted_points) >= 2:
+            r = extracted_points[0]
+            s = extracted_points[-1] # Garantiza agarrar los dos extremos
+            
+            dx = s[0] - r[0]
+            dy = s[1] - r[1]
+            nx, ny = normal[0], normal[1]
+            
+            # Producto cruzado 2D: verifica si el interior quedó a la derecha
+            if nx * dy - ny * dx < 0:
+                face_points = [s, r] # Invertimos para corregir la línea dirigida
+            else:
+                face_points = [r, s]
+        else:
+            face_points = extracted_points
+        
+        # 4. Instanciamos inyectando TODOS los datos
         hs = Halfspace(points=face_points, normalVector=normal, b=offset)
-        self._halfspaces.append(hs)
+        self._halfspaces.append(hs) 
         
     return self._halfspaces
 
@@ -171,6 +159,9 @@ class ConcretePolytope(Polytope):
 
   def reduce(self):
     # elimina las inecuaciones redundantes
+    if self._A is None or len(self._A) == 0:
+      return
+        
     poly = pc.Polytope(self._A, self._b)
     poly = pc.reduce(poly)
     self._A, self._b = poly.A, poly.b

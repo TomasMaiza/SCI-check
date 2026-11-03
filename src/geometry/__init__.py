@@ -4,5 +4,7 @@ from .polytope import *
 __all__ = ["Halfspace", 
            "Hyperplane",
            "Polytope",
-           "ConcretePolytope",
-           "ConcretePolytope2D"]
+           "FloatPolytope",
+           "FloatPolytope2D",
+           "FractionPolytope",
+           "FractionPolytope2D"]
