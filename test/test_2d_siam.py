@@ -11,7 +11,7 @@ import polytope as pc
 from common import setup_logger, Point
 
 def set_sci(polytope: FloatPolytope2D, sas: SwitchedAffineSystem):
-  checker = SCIChecker(2, PredicatesFactory[2](), CoverageCheckerFactory[2], polytope, sas)
+  checker = SCIChecker(2, polytope, sas)
   return checker
 
 def politopo():

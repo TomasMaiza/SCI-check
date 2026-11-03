@@ -12,7 +12,7 @@ from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 import polytope as pc
 
 def set_sci(polytope: FloatPolytope, sas: SwitchedAffineSystem):
-  checker = SCIChecker(3, PredicatesFactory[3](), CoverageCheckerFactory[3], polytope, sas)
+  checker = SCIChecker(3, polytope, sas)
   return checker
 
 def politopo():

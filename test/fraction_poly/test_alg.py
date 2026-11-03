@@ -96,10 +96,8 @@ def run_matlab_validation():
     # =================================================================
     print("\nEjecutando Experimento K=12 (h ≈ 0.017)...")
     checker_k12 = SCIChecker(dimension=2,
-                                        predicates=predicates_2d, 
-                                        coverageChecker=CoverageChecker,
-                                        polytope=base_polytope, 
-                                        sas=sas)
+                             polytope=base_polytope, 
+                             sas=sas)
     
     result_k12, sub_k12 = checker_k12.sci_check(dwellTime=dwell_time, K=12)
     plot_filled_scenario("K = 12 (h = 0.017)", base_polytope, checker_k12, result_k12, sub_k12)

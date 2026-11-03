@@ -108,8 +108,6 @@ def run_matlab_validation():
     # =================================================================
     print("Ejecutando Experimento K=3 (h ≈ 0.067)...")
     checker_k3 = SCIChecker(dimension=2, 
-                                    predicates=predicates_2d, 
-                                    coverageChecker=CoverageChecker,
                                     polytope=base_polytope, 
                                     sas=sas)
     
@@ -121,8 +119,6 @@ def run_matlab_validation():
     # =================================================================
     print("\nEjecutando Experimento K=12 (h ≈ 0.017)...")
     checker_k12 = SCIChecker(dimension=2,
-                                        predicates=predicates_2d, 
-                                        coverageChecker=CoverageChecker,
                                         polytope=base_polytope, 
                                         sas=sas)
     
@@ -134,8 +130,6 @@ def run_matlab_validation():
     # =================================================================
     print("\nEjecutando Experimento K=11 (h ≈ )...")
     checker_k350 = SCIChecker(dimension=2,
-                                        predicates=predicates_2d, 
-                                        coverageChecker=CoverageChecker,
                                         polytope=base_polytope, 
                                         sas=sas)
         
