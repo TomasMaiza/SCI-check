@@ -4,6 +4,7 @@ from affine_system import *
 from geometry import Polytope
 from .float_imp import Euler, Taylor, partition_matrices, partition_matrices_bound
 from affine_system import SwitchedAffineSystem, AffineMode
+from common import SUBREGION
 
 class FloatSubregions(SubregionsStrategy):
   def __init__(self, dimension: int, approxMethod: str="Euler"):
@@ -39,7 +40,7 @@ class FloatSubregions(SubregionsStrategy):
     # obtengo A y b separando la última columna de matrixH y me queda que Ax <= c - b
     matrixA, matrixb = np.hsplit(matrixH, [dim - 1]) # obtiene A y b separando la últ col de H
     matrixb = matrixc - matrixb
-    subregionPolytope = type(polytope)(intDim = self._dimension, ambDim = self._dimension, A = matrixA, b = matrixb)
+    subregionPolytope = type(polytope)(intDim = self._dimension, ambDim = self._dimension, type = SUBREGION, A = matrixA, b = matrixb)
     #subregionPolytope.reduce()
     return subregionPolytope
 

@@ -4,6 +4,7 @@ from affine_system import *
 from geometry import Polytope
 from .interval_imp import get_subregion_from_julia
 from affine_system import SwitchedAffineSystem, AffineMode
+from common import SUBREGION
 
 class IntervalSubregions(SubregionsStrategy):
   def __init__(self, dimension: int, approxMethod: str="Euler"):
@@ -19,7 +20,7 @@ class IntervalSubregions(SubregionsStrategy):
     A, b = subsystem.get_subsystem()
     
     matrixA, matrixb = get_subregion_from_julia(self._approx, H, c, S, A, b, self._h, self._K)
-    subregionPolytope = type(polytope)(intDim = self._dimension, ambDim = self._dimension, A = matrixA, b = matrixb)
+    subregionPolytope = type(polytope)(intDim = self._dimension, ambDim = self._dimension, type = SUBREGION, A = matrixA, b = matrixb)
     return subregionPolytope
 
   def get_subregions(self, 
