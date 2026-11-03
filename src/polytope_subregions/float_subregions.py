@@ -6,8 +6,9 @@ from .float_imp import Euler, Taylor, partition_matrices, partition_matrices_bou
 from affine_system import SwitchedAffineSystem, AffineMode
 
 class FloatSubregions(SubregionsStrategy):
-  def __init__(self, dimension: int):
-    self._approxMethod = Taylor
+  def __init__(self, dimension: int, approxMethod: str="Euler"):
+    approxDict = {"Euler": Euler, "Taylor": Taylor}
+    self._approxMethod = approxDict["approxMethod"]
     self._dimension = dimension
   
   def get_subregion(self, 

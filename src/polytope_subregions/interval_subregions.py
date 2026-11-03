@@ -6,8 +6,8 @@ from .interval_imp import get_subregion_from_julia
 from affine_system import SwitchedAffineSystem, AffineMode
 
 class IntervalSubregions(SubregionsStrategy):
-  def __init__(self, dimension: int):
-    self._approx = "Taylor"
+  def __init__(self, dimension: int, approxMethod: str="Euler"):
+    self._approx = approxMethod
     self._dimension = dimension
   
   def get_subregion(self, 

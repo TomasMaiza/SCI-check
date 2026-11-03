@@ -20,7 +20,7 @@ class SCIChecker():
     self._predicates = PredicatesFactory[dimension]()
     self._polytope = polytope
     self._sas = sas
-    self._subregionsAlgorithm = IntervalSubregions(dimension) # le paso acá el método de aprox?
+    self._subregionsAlgorithm = IntervalSubregions(dimension, "Taylor")
     covChecker = CoverageCheckerFactory[dimension]
     self._coverageChecker = covChecker(self._predicates)
 
